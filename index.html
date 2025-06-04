@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>타워 디펜스 게임</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:,">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039"
+     crossorigin="anonymous"></script>
+</head>
+<body>
+    <div id="loadingScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 9999;">
+        <div style="color: white; text-align: center;">
+            <h2>게임 로딩 중...</h2>
+            <p>잠시만 기다려주세요.</p>
+        </div>
+    </div>
+    <div class="game-container">
+        <!-- 게임 정보 바 -->
+        <div class="info-bar">
+            <div class="info-item">
+                <span class="info-icon">💰</span>
+                <span id="infoGold">골드: 100</span>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">❤️</span>
+                <span id="infoLives">생명: 20</span>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">🌊</span>
+                <span id="infoWave">웨이브: 1</span>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">⭐</span>
+                <span id="infoScore">점수: 0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">🎯</span>
+                <span id="infoTowerCount">타워: <span id="towerLimitCount">0</span>/<span id="towerLimitMax">10</span></span>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">💀</span>
+                <span id="enemiesKilled">처치한 적: 0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">👑</span>
+                <span id="bossesKilled">처치한 보스: 0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">💰</span>
+                <span id="totalGold">총 획득 골드: 0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-icon">🌊</span>
+                <span id="highestWave">최고 웨이브: 0</span>
+            </div>
+        </div>
+
+        <!-- 게임 영역 -->
+        <div class="game-area">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+            
+            <!-- 미니맵 -->
+            <div class="minimap-container">
+                <canvas id="minimapCanvas" width="150" height="150"></canvas>
+                <div class="game-settings">
+                    <div class="settings-row">
+                        <div class="setting-item">
+                            <label for="difficultySelect">난이도</label>
+                            <select id="difficultySelect">
+                                <option value="EASY">쉬움</option>
+                                <option value="NORMAL" selected>보통</option>
+                                <option value="HARD">어려움</option>
+                            </select>
+                        </div>
+                        <div class="setting-item">
+                            <label for="mapSelect">맵</label>
+                            <select id="mapSelect">
+                                <option value="STRAIGHT" selected>직선</option>
+                                <option value="ZIGZAG">지그재그</option>
+                                <option value="SPIRAL">나선형</option>
+                                <option value="MAZE">미로</option>
+                                <option value="CROSS">십자형</option>
+                                <option value="SNAKE">뱀형</option>
+                                <option value="DIAMOND">다이아몬드</option>
+                                <option value="LABYRINTH">맵3</option>
+                                <option value="DOUBLE_SPIRAL">맵4</option>
+                                <option value="PYRAMID">맵5</option>
+                                <option value="WAVE">맵6</option>
+                                <option value="STAIRS">맵7</option>
+                                <option value="CROSSROADS">맵8</option>
+                                <option value="INFINITY">맵9</option>
+                                <option value="BUTTERFLY">맵10</option>
+                                <option value="HOURGLASS">맵11</option>
+                                <option value="STAR">별형</option>
+                                <option value="VORTEX">소용돌이</option>
+                                <option value="MAZE2">맵14</option>
+                                <option value="SNAKE2">맵15</option>
+                                <option value="TRIANGLE">맵12</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="game-controls">
+                        <button id="waveStartButton" class="wave-start-button" style="display: none;">다음 웨이브</button>
+                        <button id="startBtn" class="control-button">게임 시작</button>
+                        <button id="pauseBtn" class="control-button">일시정지</button>
+                    </div>
+                    <div class="sound-controls">
+                        <button id="soundToggleBtn" class="sound-button">
+                            <span class="sound-icon">🔊</span>
+                            <span class="sound-label">효과음</span>
+                            <span class="sound-status">켜짐</span>
+                        </button>
+                        <button id="musicToggleBtn" class="sound-button">
+                            <span class="sound-icon">🎵</span>
+                            <span class="sound-label">배경음악</span>
+                            <span class="sound-status">켜짐</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 웨이브 진행 바 -->
+            <div id="waveProgress" class="wave-progress">
+                <div class="fill"></div>
+            </div>
+
+            <!-- 카운트다운 -->
+            <div id="countdown" class="countdown"></div>
+        </div>
+
+        <!-- 컨트롤 버튼 -->
+        <div class="control-buttons">
+            <button id="helpBtn" class="control-button">도움말</button>
+            <button id="saveBtn" class="control-button">저장</button>
+            <button id="loadBtn" class="control-button">불러오기</button>
+        </div>
+
+        <!-- 게임 설정 -->
+        <div class="game-settings">
+        </div>
+
+        <!-- 저장/불러오기 알림 -->
+        <div id="saveLoadNotification" class="save-load-notification"></div>
+
+        <!-- 특수 이벤트 목록 -->
+        <div class="events-list">
+            <h3>발생한 특수 이벤트</h3>
+            <ul id="eventsList"></ul>
+        </div>
+    </div>
+
+    <!-- 모달 창들 -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <h2>게임 도움말</h2>
+            <p>스페이스바: 다음 웨이브 시작</p>
+            <p>P: 일시정지</p>
+            <p>H: 도움말</p>
+            <button id="closeHelp" class="control-button">닫기</button>
+        </div>
+    </div>
+
+    <div id="gameOver" class="modal">
+        <div class="modal-content">
+            <h2>게임 오버</h2>
+            <p>최종 점수: <span id="finalScore">0</span></p>
+            <p>최종 웨이브: <span id="finalWave">0</span></p>
+            <button onclick="restartGame()" class="control-button">다시 시작</button>
+        </div>
+    </div>
+
+    <div id="tutorial" class="modal">
+        <div class="modal-content">
+            <h2>게임 튜토리얼</h2>
+            <p>1. 타워를 설치하여 적을 막으세요.</p>
+            <p>2. 타워를 업그레이드하여 더 강력하게 만드세요.</p>
+            <p>3. 웨이브를 클리어하여 골드를 획득하세요.</p>
+            <button onclick="document.getElementById('tutorial').style.display='none'" class="control-button">시작하기</button>
+        </div>
+    </div>
+
+    <!-- 푸터 추가 -->
+    <footer class="game-footer">
+        <div class="footer-links">
+            <a href="privacy.html">개인정보 처리방침</a>
+            <a href="terms.html">이용약관</a>
+            <a href="contact.html">문의하기</a>
+        </div>
+        <div class="copyright">
+            © 2025 ChipTowerGame. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="game.js"></script>
+</body>
+</html> 
