@@ -1353,6 +1353,42 @@ class Tower {
             this.y * TILE_SIZE + TILE_SIZE/2 + 4
         );
         
+        // 사거리 원 내부 채우기 (더 진하게)
+        ctx.save();
+        ctx.globalAlpha = 0.18;
+        ctx.beginPath();
+        ctx.arc(
+            this.x * TILE_SIZE + TILE_SIZE/2,
+            this.y * TILE_SIZE + TILE_SIZE/2,
+            this.range * TILE_SIZE,
+            0,
+            Math.PI * 2
+        );
+        ctx.fillStyle = this.color === 'blue' ? 'rgba(0, 0, 255, 0.18)' :
+                        this.color === 'red' ? 'rgba(255, 0, 0, 0.18)' :
+                        this.color === 'green' ? 'rgba(0, 255, 0, 0.18)' :
+                        this.color === 'yellow' ? 'rgba(255, 255, 0, 0.18)' :
+                        this.color === 'purple' ? 'rgba(128, 0, 128, 0.18)' :
+                        'rgba(255, 255, 255, 0.18)';
+        ctx.fill();
+        ctx.restore();
+
+        // 사거리 원 테두리 강조
+        ctx.save();
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = 3;
+        ctx.globalAlpha = 0.7;
+        ctx.beginPath();
+        ctx.arc(
+            this.x * TILE_SIZE + TILE_SIZE/2,
+            this.y * TILE_SIZE + TILE_SIZE/2,
+            this.range * TILE_SIZE,
+            0,
+            Math.PI * 2
+        );
+        ctx.stroke();
+        ctx.restore();
+        
         // 타워 범위 표시 (항상 표시)
         const gradient = ctx.createRadialGradient(
             this.x * TILE_SIZE + TILE_SIZE/2,
@@ -5126,3 +5162,7 @@ function initializeGame() {
     updateInfoBar();
 }
 // ... existing code ...
+
+document.getElementById('waveStartButton').addEventListener('click', () => {
+    showCountdown();
+});
