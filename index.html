@@ -163,6 +163,7 @@
         <!-- 컨트롤 버튼 -->
         <div class="control-buttons">
             <button id="descriptionBtn" class="control-button">게임 설명</button>
+            <button id="howtoBtn" class="control-button">이용 방법</button>
             <button id="helpBtn" class="control-button">도움말</button>
             <button id="saveBtn" class="control-button">저장</button>
             <button id="loadBtn" class="control-button">불러오기</button>
@@ -205,6 +206,30 @@
       </div>
     </div>
 
+    <!-- 게임 이용 방법 모달 -->
+    <div id="howtoModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <h2>이용 방법</h2>
+        <p><b>타워 디펜스 게임</b>은 전략적으로 타워를 설치하고 업그레이드하여 몰려오는 적을 막는 게임입니다.<br>
+        아래 안내를 참고하여 최고의 기록에 도전해보세요!</p>
+        <ul>
+          <li><b>게임 목표</b>: 제한된 자원(골드)으로 최적의 타워 조합과 배치로 최대한 많은 웨이브를 방어하세요.</li>
+          <li><b>타워 설치</b>: 게임 영역의 빈 칸을 마우스로 클릭하면 타워 설치 메뉴가 나타납니다. 원하는 타워를 선택해 설치하세요.</li>
+          <li><b>타워 업그레이드</b>: 이미 설치된 타워를 클릭하면 업그레이드 메뉴가 열립니다. 골드를 사용해 타워를 강화할 수 있습니다.</li>
+          <li><b>웨이브 시작</b>: '게임 시작' 또는 '다음 웨이브' 버튼을 누르거나, 스페이스바를 눌러 적의 공격을 시작할 수 있습니다.</li>
+          <li><b>일시정지/재개</b>: '일시정지' 버튼 또는 P 키로 게임을 일시정지/재개할 수 있습니다.</li>
+          <li><b>도움말/설명</b>: '도움말' 버튼(H 키)과 '게임 설명' 버튼을 통해 추가 정보를 확인할 수 있습니다.</li>
+          <li><b>저장/불러오기</b>: '저장' 버튼으로 현재 진행 상황을 저장하고, '불러오기' 버튼으로 이어서 플레이할 수 있습니다.</li>
+          <li><b>특수 이벤트</b>: 게임 중 무작위로 골드 러시, 타워 강화 등 다양한 이벤트가 발생할 수 있습니다. 화면 하단에서 발생한 이벤트를 확인하세요.</li>
+          <li><b>업적/통계</b>: 플레이 중 다양한 업적을 달성할 수 있으며, 게임 정보 바에서 실시간 통계를 확인할 수 있습니다.</li>
+        </ul>
+        <div style="margin-top:18px; color:#a5b4fc; font-size:0.98em;">
+          다양한 맵과 난이도, 특수 이벤트, 업적 시스템을 활용해 최고의 기록에 도전해보세요!
+        </div>
+        <button id="closeHowto" class="control-button" style="margin-top:20px;">닫기</button>
+      </div>
+    </div>
+
     <!-- 모달 창들 -->
     <div id="helpModal" class="modal">
         <div class="modal-content">
@@ -235,20 +260,33 @@
         </div>
     </div>
 
-    <!-- 푸터 추가 -->
+    <!-- 푸터 -->
     <footer class="game-footer">
         <div class="footer-links">
             <a href="privacy.html">개인정보 처리방침</a>
             <a href="terms.html">이용약관</a>
-            <a href="contact.html">문의하기</a>
+            <a href="contact.html" style="font-weight:bold;color:#a5b4fc;">문의하기</a>
+            <a href="#" id="aboutBtn" style="font-weight:bold;color:#a5b4fc;">개발자 소개</a>
         </div>
         <div class="copyright">
-            © 2025 ChipTowerGame. All rights reserved.
+            © 2025 ChipGames. All rights reserved.
         </div>
     </footer>
 
+    <!-- 개발자 소개 모달 -->
+    <div id="aboutModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <h2>개발자 소개</h2>
+        <p>이 게임은 전략 게임과 웹 기술을 사랑하는 1인 개발자에 의해 제작되었습니다.<br>
+        <b>ChipGames</b>은 누구나 쉽고 재미있게 즐길 수 있는 디펜스 게임을 목표로 하며, 지속적으로 업데이트될 예정입니다.<br>
+        문의/제안/버그 신고는 <a href="contact.html" style="color:#a5b4fc;">문의하기</a>를 이용해 주세요!</p>
+        <button id="closeAbout" class="control-button" style="margin-top:20px;">닫기</button>
+      </div>
+    </div>
+
     <script src="game.js"></script>
     <script>
+    // 게임 설명 모달
     document.getElementById('descriptionBtn').onclick = function() {
         document.getElementById('descriptionModal').classList.add('show');
         document.getElementById('descriptionModal').style.display = 'flex';
@@ -258,6 +296,36 @@
         document.getElementById('descriptionModal').style.display = 'none';
     };
     document.getElementById('descriptionModal').onclick = function(e) {
+        if (e.target === this) {
+            this.classList.remove('show');
+            this.style.display = 'none';
+        }
+    };
+    // 이용 방법 모달
+    document.getElementById('howtoBtn').onclick = function() {
+        document.getElementById('howtoModal').classList.add('show');
+        document.getElementById('howtoModal').style.display = 'flex';
+    };
+    document.getElementById('closeHowto').onclick = function() {
+        document.getElementById('howtoModal').classList.remove('show');
+        document.getElementById('howtoModal').style.display = 'none';
+    };
+    document.getElementById('howtoModal').onclick = function(e) {
+        if (e.target === this) {
+            this.classList.remove('show');
+            this.style.display = 'none';
+        }
+    };
+    // 개발자 소개 모달
+    document.getElementById('aboutBtn').onclick = function() {
+        document.getElementById('aboutModal').classList.add('show');
+        document.getElementById('aboutModal').style.display = 'flex';
+    };
+    document.getElementById('closeAbout').onclick = function() {
+        document.getElementById('aboutModal').classList.remove('show');
+        document.getElementById('aboutModal').style.display = 'none';
+    };
+    document.getElementById('aboutModal').onclick = function(e) {
         if (e.target === this) {
             this.classList.remove('show');
             this.style.display = 'none';

@@ -2828,11 +2828,76 @@ body {
     margin-bottom: 16px;
 }
 #descriptionModal ul {
-    margin: 16px 0 0 0;
-    padding: 0 0 0 18px;
+    margin-top: 18px;
+    margin-bottom: 0;
+    padding-left: 20px;
 }
 #descriptionModal li {
-    margin: 6px 0;
-    font-size: 1.08em;
+    margin-bottom: 13px;
+    word-break: keep-all;
+}
+#descriptionModal b {
+    color: #a5b4fc;
+}
+
+/* 게임 이용 방법/개발자 소개 모달 스타일 */
+#howtoModal.modal, #aboutModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+}
+#howtoModal.show, #aboutModal.show { display: flex !important; }
+#howtoModal .modal-content, #aboutModal .modal-content {
+    background: #22223b;
+    color: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    max-width: 400px;
+    width: 90vw;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    text-align: left;
+}
+#howtoModal h2, #aboutModal h2 {
+    color: #a5b4fc;
+    margin-bottom: 16px;
+}
+#howtoModal ul {
+    margin-top: 18px;
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+#howtoModal li {
+    margin-bottom: 13px;
+    word-break: keep-all;
+}
+#howtoModal b {
+    color: #a5b4fc;
+}
+
+#howtoModal .modal-content {
+    font-size: 0.97em;
+    line-height: 1.7;
+    padding: 36px 32px;
+    max-width: 800px;
+    width: 90vw;
+}
+@media (max-width: 700px) {
+    #howtoModal .modal-content {
+        font-size: 0.93em;
+        padding: 16px 4px;
+        max-width: 98vw;
+    }
+}
+
+#descriptionModal .modal-content {
+    font-size: 0.97em;
+    line-height: 1.7;
+    padding: 36px 32px;
+    max-width: 800px;
+    width: 90vw;
 }
   
