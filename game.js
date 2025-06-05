@@ -2948,17 +2948,25 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
 
 // 게임 시작 시 로딩 화면
 window.addEventListener('load', () => {
-    setTimeout(() => {
-        document.getElementById('loadingScreen').style.display = 'none';
-        updateTowerLimit();
-        document.getElementById('waveStartButton').style.display = 'none';
-        
-        document.getElementById('waveStartButton').addEventListener('click', () => {
-            if (!gameState.waveInProgress && !gameState.isGameOver && !isCountdownActive && gameState.isStarted) {
-                showCountdown();
+    initializeGame(); // 페이지 진입 시 게임 초기화
+    drawMinimap();
+    // 맵 선택 이벤트 리스너
+    const mapSelect = document.getElementById('mapSelect');
+    if (mapSelect) {
+        mapSelect.value = gameState.currentMap;
+        mapSelect.addEventListener('change', (e) => {
+            if (!gameState.isStarted) {
+                selectMap(e.target.value);
+                gameState.currentMap = e.target.value;
+                drawMinimap();
             }
         });
-    }, 1500);
+    }
+    // 로딩 화면 숨기기
+    const loadingScreen = document.getElementById('loadingScreen');
+    if (loadingScreen) {
+        loadingScreen.style.display = 'none';
+    }
 });
 
 // 데미지 숫자 표시 함수
@@ -5068,4 +5076,53 @@ window.addEventListener('load', () => {
     }
 });
 
+// ... existing code ...
+
+// 게임 초기화 함수
+function initializeGame() {
+    // 게임 상태 초기화
+    gameState.gold = DIFFICULTY_SETTINGS[gameState.difficulty].gold;
+    gameState.lives = DIFFICULTY_SETTINGS[gameState.difficulty].lives;
+    gameState.wave = 1;
+    gameState.isGameOver = false;
+    gameState.waveInProgress = false;
+    gameState.enemiesRemaining = 0;
+    gameState.isPaused = false;
+    gameState.isStarted = false;
+    gameState.score = 0;
+    gameState.currentMap = 'STRAIGHT';
+    
+    // 맵 초기화
+    currentMap = MAPS[gameState.currentMap];
+    
+    // 타워와 적 배열 초기화
+    towers = [];
+    enemies = [];
+    
+    // 게임 화면 그리기
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 그리드 그리기
+    ctx.strokeStyle = '#ccc';
+    for (let i = 0; i < GRID_WIDTH; i++) {
+        for (let j = 0; j < GRID_HEIGHT; j++) {
+            ctx.strokeRect(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
+    }
+    
+    // 경로 그리기
+    ctx.fillStyle = '#eee';
+    for (let point of currentMap.path) {
+        ctx.fillRect(point.x * TILE_SIZE, point.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+    
+    // 타워 설치 가능한 위치 표시
+    showPlaceablePositions();
+    
+    // 미니맵 업데이트
+    drawMinimap();
+    
+    // UI 업데이트
+    updateInfoBar();
+}
 // ... existing code ...
