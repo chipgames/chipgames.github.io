@@ -1273,7 +1273,7 @@ class Tower {
                 this.damage = this.baseDamage * (1 + this.damageLevel * 0.3);
                 break;
             case 'speed':
-                this.maxCooldown = this.baseCooldown * (1 - this.speedLevel * 0.1);
+                this.maxCooldown = Math.max(5, this.baseCooldown * (1 - this.speedLevel * 0.1));
                 break;
             case 'bullet':
                 this.bulletCount = 1 + this.bulletLevel;
