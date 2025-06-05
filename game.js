@@ -701,7 +701,7 @@ const MAPS = {
 };
 
 // 현재 선택된 맵
-let currentMap = MAPS.STRAIGHT;
+let currentMap = MAPS[gameState.currentMap];
 
 // 타워 배열
 let towers = [];
@@ -5046,3 +5046,26 @@ function applyGroupBuffs() {
         });
     });
 }
+
+// 현재 맵 초기화
+currentMap = MAPS[gameState.currentMap];
+
+// 페이지 로드 시 미니맵 초기화
+window.addEventListener('load', () => {
+    drawMinimap();
+    
+    // 맵 선택 이벤트 리스너
+    const mapSelect = document.getElementById('mapSelect');
+    if (mapSelect) {
+        mapSelect.value = gameState.currentMap;
+        mapSelect.addEventListener('change', (e) => {
+            if (!gameState.isStarted) {
+                selectMap(e.target.value);
+                gameState.currentMap = e.target.value;
+                drawMinimap();
+            }
+        });
+    }
+});
+
+// ... existing code ...
