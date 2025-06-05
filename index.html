@@ -6,8 +6,10 @@
     <title>타워 디펜스 게임</title>
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="data:,">
+    <!--
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039"
      crossorigin="anonymous"></script>
+    -->
 </head>
 <body>
     <div id="loadingScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 9999;">
@@ -16,6 +18,34 @@
             <p>잠시만 기다려주세요.</p>
         </div>
     </div>
+
+    <!-- 소개+광고를 게임 영역 위에 한 번만 노출 -->
+    <div class="intro-ad-wrap">
+        <div class="game-intro">
+            <h2>타워 디펜스 게임</h2>
+            <p>전략적인 타워 배치와 업그레이드를 통해 적을 막으세요!</p>
+            <ul class="feature-list">
+                <li>🏰 다양한 타워와 업그레이드</li>
+                <li>🗺️ 여러 맵과 난이도</li>
+                <li>👾 보스/특수 이벤트</li>
+                <li>💾 저장/불러오기 지원</li>
+            </ul>
+        </div>
+        <!--
+        <div class="ad-container">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-2533613198240039"
+                 data-ad-slot="YOUR_AD_SLOT"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+        -->
+    </div>
+
     <div class="game-container">
         <!-- 게임 정보 바 -->
         <div class="info-bar">
@@ -132,6 +162,7 @@
 
         <!-- 컨트롤 버튼 -->
         <div class="control-buttons">
+            <button id="descriptionBtn" class="control-button">게임 설명</button>
             <button id="helpBtn" class="control-button">도움말</button>
             <button id="saveBtn" class="control-button">저장</button>
             <button id="loadBtn" class="control-button">불러오기</button>
@@ -149,6 +180,29 @@
             <h3>발생한 특수 이벤트</h3>
             <ul id="eventsList"></ul>
         </div>
+    </div>
+
+    <!-- 게임 설명 모달 -->
+    <div id="descriptionModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <h2>게임 설명</h2>
+        <p><b>타워 디펜스 게임</b>은 다양한 타워와 맵, 전략적 업그레이드, 특수 이벤트가 어우러진 전략 시뮬레이션 게임입니다.<br>
+        플레이어는 각기 다른 특성을 가진 타워를 설치하고 업그레이드하여, 웨이브마다 몰려오는 적과 강력한 보스를 막아내야 합니다.<br>
+        게임 중 무작위로 발생하는 특수 이벤트와 파워업, 다양한 업적 시스템, 그리고 저장/불러오기 기능까지!<br>
+        직관적인 UI와 다양한 편의 기능으로 누구나 쉽게 즐길 수 있으며, 반복 플레이를 통해 최고의 기록에 도전해보세요!</p>
+        <ul>
+          <li><b>다양한 타워와 업그레이드</b> : 여러 종류의 타워와 업그레이드 시스템</li>
+          <li><b>여러 맵과 난이도</b> : 15종 이상의 맵, 쉬움/보통/어려움 난이도</li>
+          <li><b>웨이브 & 보스</b> : 점점 강해지는 적과 보스 몬스터</li>
+          <li><b>특수 이벤트/파워업</b> : 골드 러시, 타워 강화 등 전략적 변수</li>
+          <li><b>업적/통계</b> : 다양한 업적과 실시간 통계</li>
+          <li><b>저장/불러오기</b> : 언제든 이어서 플레이 가능</li>
+        </ul>
+        <div style="margin-top:18px; color:#a5b4fc; font-size:0.98em;">
+          목표: 제한된 자원으로 최적의 타워 조합과 배치로 최대한 많은 웨이브를 방어하세요!
+        </div>
+        <button id="closeDescription" class="control-button" style="margin-top:20px;">닫기</button>
+      </div>
     </div>
 
     <!-- 모달 창들 -->
@@ -194,5 +248,21 @@
     </footer>
 
     <script src="game.js"></script>
+    <script>
+    document.getElementById('descriptionBtn').onclick = function() {
+        document.getElementById('descriptionModal').classList.add('show');
+        document.getElementById('descriptionModal').style.display = 'flex';
+    };
+    document.getElementById('closeDescription').onclick = function() {
+        document.getElementById('descriptionModal').classList.remove('show');
+        document.getElementById('descriptionModal').style.display = 'none';
+    };
+    document.getElementById('descriptionModal').onclick = function(e) {
+        if (e.target === this) {
+            this.classList.remove('show');
+            this.style.display = 'none';
+        }
+    };
+    </script>
 </body>
 </html> 
