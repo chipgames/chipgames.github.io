@@ -2671,4 +2671,263 @@ body {
         padding: 5px;
     }
 }
+
+/* 게임 소개 섹션 스타일 */
+.game-intro {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0;
+}
+
+.game-intro .modal-content {
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 0;
+}
+
+.game-intro h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.game-description {
+    background-color: transparent;
+    padding: 0;
+    box-shadow: none;
+}
+
+.game-description h3 {
+    color: #34495e;
+    margin: 20px 0 15px;
+    font-size: 18px;
+}
+
+.game-description p {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.game-intro .settings-section {
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 20px;
+}
+
+.game-intro .settings-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    margin: 5px 0;
+    background-color: white;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.game-intro .settings-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.game-intro .info-icon {
+    font-size: 20px;
+    margin-right: 10px;
+    width: 30px;
+    text-align: center;
+}
+
+/* 광고 컨테이너 스타일 */
+.ad-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 소개+광고 래퍼 */
+.intro-ad-wrap {
+    max-width: 900px;
+    margin: 32px auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 게임 소개 카드 */
+.game-intro {
+    background: rgba(30,27,75,0.95);
+    color: #fff;
+    border-radius: 12px;
+    padding: 24px 32px;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.15);
+}
+.game-intro h2 {
+    color: #a5b4fc;
+    margin-bottom: 10px;
+    font-size: 1.7em;
+}
+.game-intro p {
+    margin-bottom: 12px;
+    color: #e0e7ef;
+}
+.feature-list {
+    margin: 0;
+    padding: 0 0 0 10px;
+    list-style: none;
+}
+.feature-list li {
+    margin: 6px 0;
+    font-size: 1.08em;
+    letter-spacing: 0.01em;
+}
+
+/* 광고 컨테이너 */
+.ad-container {
+    background: #18181b;
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.08);
+}
+
+@media (max-width: 900px) {
+    .intro-ad-wrap { max-width: 98vw; }
+    .game-intro { padding: 16px 8px; }
+}
+
+/* 게임 설명 모달 스타일 */
+#descriptionModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+}
+#descriptionModal.show { display: flex !important; }
+#descriptionModal .modal-content {
+    background: #22223b;
+    color: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    max-width: 400px;
+    width: 90vw;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    text-align: left;
+}
+#descriptionModal h2 {
+    color: #a5b4fc;
+    margin-bottom: 16px;
+}
+#descriptionModal ul {
+    margin-top: 18px;
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+#descriptionModal li {
+    margin-bottom: 13px;
+    word-break: keep-all;
+}
+#descriptionModal b {
+    color: #a5b4fc;
+}
+
+/* 게임 이용 방법/개발자 소개 모달 스타일 */
+#howtoModal.modal, #aboutModal.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0; top: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+}
+#howtoModal.show, #aboutModal.show { display: flex !important; }
+#howtoModal .modal-content, #aboutModal .modal-content {
+    background: #22223b;
+    color: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    max-width: 400px;
+    width: 90vw;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    text-align: left;
+}
+#howtoModal h2, #aboutModal h2 {
+    color: #a5b4fc;
+    margin-bottom: 16px;
+}
+#howtoModal ul {
+    margin-top: 18px;
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+#howtoModal li {
+    margin-bottom: 13px;
+    word-break: keep-all;
+}
+#howtoModal b {
+    color: #a5b4fc;
+}
+
+#howtoModal .modal-content {
+    font-size: 0.97em;
+    line-height: 1.7;
+    padding: 36px 32px;
+    max-width: 800px;
+    width: 90vw;
+}
+@media (max-width: 700px) {
+    #howtoModal .modal-content {
+        font-size: 0.93em;
+        padding: 16px 4px;
+        max-width: 98vw;
+    }
+}
+
+#descriptionModal .modal-content {
+    font-size: 0.97em;
+    line-height: 1.7;
+    padding: 36px 32px;
+    max-width: 800px;
+    width: 90vw;
+}
+
+#helpModal .modal-content {
+    font-size: 0.97em;
+    line-height: 1.7;
+    padding: 36px 32px;
+    max-width: 800px;
+    width: 90vw;
+}
+#helpModal ul {
+    margin-top: 18px;
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+#helpModal li {
+    margin-bottom: 13px;
+    word-break: keep-all;
+}
+#helpModal b {
+    color: #a5b4fc;
+}
+
+#helpModal .help-shortcuts p {
+    margin: 0 0 8px 0;
+    font-size: 1em;
+}
+
+#helpModal .help-faq p {
+    margin: 0 0 10px 0;
+    font-size: 1em;
+}
   
