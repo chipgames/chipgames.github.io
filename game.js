@@ -1822,6 +1822,8 @@ class Enemy {
                 gameState.gold += this.reward * (gameState.goldMultiplier || 1);
                 gameStats.totalGold += this.reward * (gameState.goldMultiplier || 1);
                 gameStats.enemiesKilled++;
+                // 점수 증가
+                gameState.score += this.reward;
                 if (this.type === 'BOSS') {
                     gameStats.bossesKilled++;
                     gameState.bossKilled = true;
