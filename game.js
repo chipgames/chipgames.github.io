@@ -1273,7 +1273,7 @@ class Tower {
                 this.damage = this.baseDamage * (1 + this.damageLevel * 0.3);
                 break;
             case 'speed':
-                this.maxCooldown = this.baseCooldown * (1 - this.speedLevel * 0.1);
+                this.maxCooldown = Math.max(5, this.baseCooldown * (1 - this.speedLevel * 0.1));
                 break;
             case 'bullet':
                 this.bulletCount = 1 + this.bulletLevel;
@@ -1469,24 +1469,18 @@ class Tower {
             this.cooldown--;
             return;
         }
-
-        // 범위 내 적 찾기
         const target = enemies.find(enemy => {
             const dx = (enemy.x - this.x) * TILE_SIZE;
             const dy = (enemy.y - this.y) * TILE_SIZE;
             const distance = Math.sqrt(dx * dx + dy * dy);
             return distance <= this.range * TILE_SIZE;
         });
-
         if (target) {
-            // 크리티컬 판정
             const isCritical = Math.random() < CRITICAL_CHANCE;
             const damage = isCritical ? this.damage * CRITICAL_MULTIPLIER : this.damage;
-
-            // 공격 효과음 재생
+            // 마지막 데미지 및 크리티컬 여부 기록
+            target.lastDamage = { amount: damage, isCritical };
             playSound('tower_attack');
-
-            // 타워 종류별 공격 효과
             switch(this.type) {
                 case 'BASIC':
                     target.health -= damage;
@@ -1509,35 +1503,32 @@ class Tower {
                     showDamageNumber(target.x, target.y, damage, isCritical);
                     break;
                 case 'SPLASH':
-                    // 범위 내 모든 적에게 데미지
                     enemies.forEach(enemy => {
                         const dx = (enemy.x - this.x) * TILE_SIZE;
                         const dy = (enemy.y - this.y) * TILE_SIZE;
                         const distance = Math.sqrt(dx * dx + dy * dy);
                         if (distance <= this.splashRadius * TILE_SIZE) {
-                            // 각 적마다 크리티컬 판정
                             const splashCritical = Math.random() < CRITICAL_CHANCE;
                             const splashDamage = splashCritical ? this.damage * CRITICAL_MULTIPLIER : this.damage;
                             enemy.health -= splashDamage;
                             enemy.speed *= (1 - this.slowEffect);
                             showDamageNumber(enemy.x, enemy.y, splashDamage, splashCritical);
+                            // 마지막 데미지 및 크리티컬 여부 기록
+                            enemy.lastDamage = { amount: splashDamage, isCritical: splashCritical };
                         }
                     });
                     break;
                 case 'SUPPORT':
-                    // 이전에 버프된 타워들의 데미지 복원
                     this.buffedTowers.forEach(tower => {
                         tower.damage = tower.baseDamage * (1 + tower.damageLevel * 0.3);
                     });
                     this.buffedTowers.clear();
-                    // 주변 타워 강화
                     towers.forEach(tower => {
                         if (tower !== this) {
                             const dx = (tower.x - this.x) * TILE_SIZE;
                             const dy = (tower.y - this.y) * TILE_SIZE;
                             const distance = Math.sqrt(dx * dx + dy * dy);
                             if (distance <= this.buffRange * TILE_SIZE) {
-                                // 기본 데미지에 버프 적용
                                 const baseDamage = tower.baseDamage * (1 + tower.damageLevel * 0.3);
                                 tower.damage = baseDamage * this.buffMultiplier;
                                 this.buffedTowers.add(tower);
@@ -1822,10 +1813,17 @@ class Enemy {
                 gameState.gold += this.reward * (gameState.goldMultiplier || 1);
                 gameStats.totalGold += this.reward * (gameState.goldMultiplier || 1);
                 gameStats.enemiesKilled++;
+                // 크리티컬로 처치 시 점수 2배, 보스는 3배
+                let scoreToAdd = this.reward;
+                if (this.lastDamage && this.lastDamage.isCritical) {
+                    scoreToAdd *= 2;
+                }
                 if (this.type === 'BOSS') {
+                    scoreToAdd = this.reward * 3;
                     gameStats.bossesKilled++;
                     gameState.bossKilled = true;
                 }
+                gameState.score += scoreToAdd;
                 playSound('enemy_death');
                 updateStats();
             }
@@ -2378,8 +2376,8 @@ function checkWaveEnd() {
         const reward = calculateWaveReward();
         gameState.gold += reward;
         showRewardPopup(reward);
-        
-        // 웨이브 클리어 효과음
+        // 웨이브 클리어 시 점수 추가
+        gameState.score += reward;
         playSound('powerup');
     }
 }
