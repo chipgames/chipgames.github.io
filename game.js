@@ -4,6 +4,8 @@ const ctx = canvas.getContext('2d');
 
 // 게임 상수
 const TILE_SIZE = 40;
+const CRITICAL_CHANCE = 0.2; // 20%
+const CRITICAL_MULTIPLIER = 2;
 const ENEMY_LEVEL_SETTINGS = {
     maxLevel: 10,
     healthMultiplier: 1.2, // 레벨당 체력 증가율
@@ -1477,75 +1479,73 @@ class Tower {
         });
 
         if (target) {
+            // 크리티컬 판정
+            const isCritical = Math.random() < CRITICAL_CHANCE;
+            const damage = isCritical ? this.damage * CRITICAL_MULTIPLIER : this.damage;
+
             // 공격 효과음 재생
             playSound('tower_attack');
 
             // 타워 종류별 공격 효과
             switch(this.type) {
                 case 'BASIC':
-                    target.health -= this.damage;
-                    showDamageNumber(target.x, target.y, this.damage);
-                        break;
-
+                    target.health -= damage;
+                    showDamageNumber(target.x, target.y, damage, isCritical);
+                    break;
                 case 'ICE':
-                    target.health -= this.damage;
+                    target.health -= damage;
                     target.applyStatusEffect('FROZEN', this.freezeDuration);
-                    showDamageNumber(target.x, target.y, this.damage);
-                        break;
-
+                    showDamageNumber(target.x, target.y, damage, isCritical);
+                    break;
                 case 'POISON':
-                    target.health -= this.damage;
+                    target.health -= damage;
                     target.poisonDamage = this.poisonDamage;
                     target.poisonDuration = this.poisonDuration;
-                    showDamageNumber(target.x, target.y, this.damage);
-                        break;
-
+                    showDamageNumber(target.x, target.y, damage, isCritical);
+                    break;
                 case 'LASER':
-                    target.health -= this.damage;
+                    target.health -= damage;
                     target.continuousDamage = this.continuousDamage;
-                    showDamageNumber(target.x, target.y, this.damage);
-                break;
-
+                    showDamageNumber(target.x, target.y, damage, isCritical);
+                    break;
                 case 'SPLASH':
                     // 범위 내 모든 적에게 데미지
                     enemies.forEach(enemy => {
                         const dx = (enemy.x - this.x) * TILE_SIZE;
                         const dy = (enemy.y - this.y) * TILE_SIZE;
                         const distance = Math.sqrt(dx * dx + dy * dy);
-                        
                         if (distance <= this.splashRadius * TILE_SIZE) {
-                            enemy.health -= this.damage;
+                            // 각 적마다 크리티컬 판정
+                            const splashCritical = Math.random() < CRITICAL_CHANCE;
+                            const splashDamage = splashCritical ? this.damage * CRITICAL_MULTIPLIER : this.damage;
+                            enemy.health -= splashDamage;
                             enemy.speed *= (1 - this.slowEffect);
-                            showDamageNumber(enemy.x, enemy.y, this.damage);
+                            showDamageNumber(enemy.x, enemy.y, splashDamage, splashCritical);
                         }
                     });
                     break;
-
                 case 'SUPPORT':
                     // 이전에 버프된 타워들의 데미지 복원
                     this.buffedTowers.forEach(tower => {
                         tower.damage = tower.baseDamage * (1 + tower.damageLevel * 0.3);
                     });
                     this.buffedTowers.clear();
-
                     // 주변 타워 강화
                     towers.forEach(tower => {
                         if (tower !== this) {
                             const dx = (tower.x - this.x) * TILE_SIZE;
                             const dy = (tower.y - this.y) * TILE_SIZE;
                             const distance = Math.sqrt(dx * dx + dy * dy);
-                            
                             if (distance <= this.buffRange * TILE_SIZE) {
                                 // 기본 데미지에 버프 적용
                                 const baseDamage = tower.baseDamage * (1 + tower.damageLevel * 0.3);
                                 tower.damage = baseDamage * this.buffMultiplier;
                                 this.buffedTowers.add(tower);
-        }
-    }
+                            }
+                        }
                     });
                     break;
             }
-
             this.cooldown = this.maxCooldown;
         }
     }
