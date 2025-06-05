@@ -5126,3 +5126,13 @@ function initializeGame() {
     updateInfoBar();
 }
 // ... existing code ...
+
+document.getElementById('waveStartButton').addEventListener('click', () => {
+    console.log('다음 웨이브 버튼 클릭');
+    console.log('isStarted:', gameState.isStarted);
+    console.log('waveInProgress:', gameState.waveInProgress);
+    console.log('isGameOver:', gameState.isGameOver);
+    console.log('isCountdownActive:', typeof isCountdownActive !== 'undefined' ? isCountdownActive : 'undefined');
+    console.log('enemies:', enemies.length);
+    showCountdown(); // 조건 없이 실행
+});
