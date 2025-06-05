@@ -2225,6 +2225,12 @@ function startWave() {
     let groupsToSpawn = Math.ceil(totalEnemies / groupSize);
     gameState.enemiesRemaining = totalEnemies;
     enemyGroups = [];
+    
+    // 20% 확률로 특수 이벤트 발생
+    if (Math.random() < 0.2) {
+        triggerSpecialEvent();
+    }
+    
     for (let i = 0; i < groupsToSpawn; i++) {
         const group = new EnemyGroup(groupIdCounter++, groupSize);
         for (let j = 0; j < groupSize && gameState.enemiesRemaining > 0; j++) {
@@ -2235,13 +2241,15 @@ function startWave() {
         }
         enemyGroups.push(group);
     }
+    
     // 보스 웨이브는 기존대로
     if (gameState.wave % gameState.bossWave === 0) {
         gameState.enemiesRemaining = 1;
         enemies.push(new Enemy(gameState.wave, true));
     }
+    
     showWaveStartEffect();
-    playSound('powerup');
+    playSound('wave_start');
 }
 
 // 웨이브 시작 이펙트
@@ -5164,3 +5172,54 @@ function initializeGame() {
 document.getElementById('waveStartButton').addEventListener('click', () => {
     showCountdown();
 });
+
+// 특수 이벤트 트리거 함수 추가
+function triggerSpecialEvent() {
+    const eventKeys = Object.keys(SPECIAL_EVENTS);
+    const randomEvent = eventKeys[Math.floor(Math.random() * eventKeys.length)];
+    
+    // 이미 발생한 이벤트인지 확인
+    if (!gameStats.eventsTriggered.includes(randomEvent)) {
+        const event = SPECIAL_EVENTS[randomEvent];
+        event.effect();
+        gameStats.eventsTriggered.push(randomEvent);
+        updateStats();
+    }
+}
+
+// 웨이브 시작 시 특수 이벤트 발생 확률 추가
+function startWave() {
+    if (gameState.waveInProgress) return;
+    
+    gameState.waveInProgress = true;
+    let groupSize = 3 + Math.floor(Math.random() * 3); // 3~5마리 그룹
+    let totalEnemies = 10 + (gameState.wave * 2);
+    let groupsToSpawn = Math.ceil(totalEnemies / groupSize);
+    gameState.enemiesRemaining = totalEnemies;
+    enemyGroups = [];
+    
+    // 20% 확률로 특수 이벤트 발생
+    if (Math.random() < 0.2) {
+        triggerSpecialEvent();
+    }
+    
+    for (let i = 0; i < groupsToSpawn; i++) {
+        const group = new EnemyGroup(groupIdCounter++, groupSize);
+        for (let j = 0; j < groupSize && gameState.enemiesRemaining > 0; j++) {
+            const enemy = new Enemy(gameState.wave);
+            group.add(enemy);
+            enemies.push(enemy);
+            gameState.enemiesRemaining--;
+        }
+        enemyGroups.push(group);
+    }
+    
+    // 보스 웨이브는 기존대로
+    if (gameState.wave % gameState.bossWave === 0) {
+        gameState.enemiesRemaining = 1;
+        enemies.push(new Enemy(gameState.wave, true));
+    }
+    
+    showWaveStartEffect();
+    playSound('wave_start');
+}
