@@ -2918,6 +2918,7 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
                 gameState.towerCount++;
                 updateTowerLimit();
                 playSound('tower_place');
+                hideTowerRangePreview(); // 타워 설치 후 미리보기 즉시 제거
                 if (towerMenu.parentNode) {
                     towerMenu.parentNode.removeChild(towerMenu);
                 }
