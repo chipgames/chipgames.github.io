@@ -48,7 +48,9 @@ const DIFFICULTY_SETTINGS = {
         enemySpeed: 0.8,
         goldReward: 1.2,
         maxTowers: 12,
-        enemySpawnRate: 0.03
+        enemySpawnRate: 0.03,
+        initialGold: 200,
+        initialLives: 25
     },
     NORMAL: {
         gold: 150,
@@ -57,7 +59,9 @@ const DIFFICULTY_SETTINGS = {
         enemySpeed: 1,
         goldReward: 1,
         maxTowers: 10,
-        enemySpawnRate: 0.05
+        enemySpawnRate: 0.05,
+        initialGold: 150,
+        initialLives: 20
     },
     HARD: {
         gold: 100,
@@ -66,7 +70,9 @@ const DIFFICULTY_SETTINGS = {
         enemySpeed: 1.2,
         goldReward: 0.8,
         maxTowers: 8,
-        enemySpawnRate: 0.07
+        enemySpawnRate: 0.07,
+        initialGold: 100,
+        initialLives: 15
     }
 };
 
@@ -5210,59 +5216,90 @@ window.addEventListener('load', () => {
 
 // 게임 초기화 함수
 function initializeGame() {
-    // 캔버스 초기화
-    canvas.width = 800;
-    canvas.height = 600;
-    
     // 게임 상태 초기화
-    Object.assign(gameState, {
-        gold: DIFFICULTY_SETTINGS[gameState.difficulty].gold,
-        lives: DIFFICULTY_SETTINGS[gameState.difficulty].lives,
-        wave: 1,
-        isGameOver: false,
-        waveInProgress: false,
-        enemiesRemaining: 0,
-        isPaused: false,
-        isStarted: false,
-        score: 0,
-        bossKilled: false,
-        goldMultiplier: 1,
-        maxTowers: DIFFICULTY_SETTINGS[gameState.difficulty].maxTowers,
-        towerCount: 0,
-        experience: 0,
-        level: 1,
-        experienceToNextLevel: 100
-    });
+    gameState.gold = DIFFICULTY_SETTINGS[gameState.difficulty].initialGold;
+    gameState.lives = DIFFICULTY_SETTINGS[gameState.difficulty].initialLives;
+    gameState.wave = 0;
+    gameState.score = 0;
+    gameState.towers = [];
+    gameState.enemies = [];
+    gameState.projectiles = [];
+    gameState.effects = [];
+    gameState.isPaused = false;
+    gameState.isGameOver = false;
+    gameState.isWaveInProgress = false;
+    gameState.towerLimit = DIFFICULTY_SETTINGS[gameState.difficulty].maxTowers;
+    gameState.towersPlaced = 0;
+    gameState.selectedTower = null;
+    gameState.hoveredTile = null;
+    gameState.lastFrameTime = performance.now();
+    gameState.waveStartTime = 0;
+    gameState.waveDuration = 0;
+    gameState.waveProgress = 0;
+    gameState.enemiesSpawned = 0;
+    gameState.enemiesDefeated = 0;
+    gameState.totalEnemies = 0;
+    gameState.waveReward = 0;
 
-    // 로딩 화면 처리
-    const loadingScreen = document.getElementById('loadingScreen');
-    if (loadingScreen) {
-        const progressBar = loadingScreen.querySelector('.progress-bar');
-        if (progressBar) {
-            // 로딩 진행률 표시
-            let progress = 0;
-            const loadingInterval = setInterval(() => {
-                progress += 5;
-                progressBar.style.width = `${progress}%`;
-                
-                if (progress >= 100) {
-                    clearInterval(loadingInterval);
-                    loadingScreen.style.display = 'none';
-                    
-                    // 게임 소개 표시
-                    const introWrap = document.querySelector('.intro-wrap');
-                    if (introWrap) {
-                        introWrap.style.display = 'block';
-                    }
-                    
-                    // 게임 시작
-                    gameLoop();
-                }
-            }, 100);
-        }
+    // 맵 선택 드롭다운 초기화
+    const mapSelect = document.getElementById('mapSelect');
+    if (mapSelect) {
+        mapSelect.value = gameState.currentMap;
     }
 
-    initializeEffects();
+    // 기본 맵 미리보기 표시
+    const defaultMap = MAPS[gameState.currentMap];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 배경 그리기
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 그리드 그리기
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= canvas.width; x += TILE_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+    }
+    for (let y = 0; y <= canvas.height; y += TILE_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+    }
+    
+    // 경로 그리기
+    ctx.strokeStyle = '#4CAF50';
+    ctx.lineWidth = TILE_SIZE;
+    ctx.beginPath();
+    ctx.moveTo(defaultMap.path[0].x * TILE_SIZE + TILE_SIZE/2, defaultMap.path[0].y * TILE_SIZE + TILE_SIZE/2);
+    for (let i = 1; i < defaultMap.path.length; i++) {
+        ctx.lineTo(defaultMap.path[i].x * TILE_SIZE + TILE_SIZE/2, defaultMap.path[i].y * TILE_SIZE + TILE_SIZE/2);
+    }
+    ctx.stroke();
+    
+    // 시작점과 끝점 표시
+    ctx.fillStyle = '#4CAF50';
+    ctx.beginPath();
+    ctx.arc(defaultMap.path[0].x * TILE_SIZE + TILE_SIZE/2, defaultMap.path[0].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#e74c3c';
+    ctx.beginPath();
+    ctx.arc(defaultMap.path[defaultMap.path.length-1].x * TILE_SIZE + TILE_SIZE/2, defaultMap.path[defaultMap.path.length-1].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 맵 이름 표시
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 24px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(defaultMap.name, canvas.width/2, 10);
+
+    // 미니맵 초기화
+    drawMinimap();
 }
 // ... existing code ...
 
