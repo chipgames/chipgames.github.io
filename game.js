@@ -5122,50 +5122,52 @@ window.addEventListener('load', () => {
 
 // 게임 초기화 함수
 function initializeGame() {
+    // 캔버스 초기화
+    canvas.width = 800;
+    canvas.height = 600;
+    
     // 게임 상태 초기화
-    gameState.gold = DIFFICULTY_SETTINGS[gameState.difficulty].gold;
-    gameState.lives = DIFFICULTY_SETTINGS[gameState.difficulty].lives;
-    gameState.wave = 1;
-    gameState.isGameOver = false;
-    gameState.waveInProgress = false;
-    gameState.enemiesRemaining = 0;
-    gameState.isPaused = false;
-    gameState.isStarted = false;
-    gameState.score = 0;
-    gameState.currentMap = 'STRAIGHT';
+    Object.assign(gameState, {
+        gold: DIFFICULTY_SETTINGS[gameState.difficulty].gold,
+        lives: DIFFICULTY_SETTINGS[gameState.difficulty].lives,
+        wave: 1,
+        isGameOver: false,
+        waveInProgress: false,
+        enemiesRemaining: 0,
+        isPaused: false,
+        isStarted: false,
+        score: 0,
+        bossKilled: false,
+        goldMultiplier: 1,
+        maxTowers: DIFFICULTY_SETTINGS[gameState.difficulty].maxTowers,
+        towerCount: 0,
+        experience: 0,
+        level: 1,
+        experienceToNextLevel: 100
+    });
+
+    // 로딩 화면 처리
+    const loadingScreen = document.getElementById('loadingScreen');
+    const progressBar = loadingScreen.querySelector('.progress-bar');
     
-    // 맵 초기화
-    currentMap = MAPS[gameState.currentMap];
-    
-    // 타워와 적 배열 초기화
-    towers = [];
-    enemies = [];
-    
-    // 게임 화면 그리기
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // 그리드 그리기
-    ctx.strokeStyle = '#ccc';
-    for (let i = 0; i < GRID_WIDTH; i++) {
-        for (let j = 0; j < GRID_HEIGHT; j++) {
-            ctx.strokeRect(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    // 로딩 진행률 표시
+    let progress = 0;
+    const loadingInterval = setInterval(() => {
+        progress += 5;
+        progressBar.style.width = `${progress}%`;
+        
+        if (progress >= 100) {
+            clearInterval(loadingInterval);
+            loadingScreen.style.display = 'none';
+            
+            // 게임 소개 표시
+            const introWrap = document.querySelector('.intro-wrap');
+            introWrap.style.display = 'block';
+            
+            // 게임 시작
+            gameLoop();
         }
-    }
-    
-    // 경로 그리기
-    ctx.fillStyle = '#eee';
-    for (let point of currentMap.path) {
-        ctx.fillRect(point.x * TILE_SIZE, point.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-    }
-    
-    // 타워 설치 가능한 위치 표시
-    showPlaceablePositions();
-    
-    // 미니맵 업데이트
-    drawMinimap();
-    
-    // UI 업데이트
-    updateInfoBar();
+    }, 100);
 }
 // ... existing code ...
 
