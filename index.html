@@ -9,6 +9,22 @@
     <link rel="icon" href="data:,">
     <style>
         html { scroll-behavior: smooth; }
+        .game-area {
+            position: relative;
+        }
+        #countdown {
+            display: none;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            color: #4CAF50;
+            font-weight: bold;
+            text-shadow: 0 2px 8px #000a;
+            z-index: 1000;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -93,7 +109,7 @@
             </div>
 
             <!-- 카운트다운 표시 영역 -->
-            <div id="countdown" style="display:none; font-size:3em; color:#4CAF50; text-align:center; margin:20px 0; font-weight:bold; text-shadow:0 2px 8px #000a;"></div>
+            <div id="countdown"></div>
 
             <!-- 게임 컨트롤 -->
             <div class="game-controls">
