@@ -3441,16 +3441,66 @@ function selectMap(mapKey) {
     }
     currentMap = MAPS[mapKey];
     path = [...currentMap.path];
+    
+    // 게임 캔버스에 선택된 맵 표시
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // 배경 그리기
+    ctx.fillStyle = '#2c3e50';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 그리드 그리기
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x <= canvas.width; x += TILE_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+    }
+    for (let y = 0; y <= canvas.height; y += TILE_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+    }
+    
+    // 경로 그리기
+    ctx.strokeStyle = '#4CAF50';
+    ctx.lineWidth = TILE_SIZE;
+    ctx.beginPath();
+    ctx.moveTo(currentMap.path[0].x * TILE_SIZE + TILE_SIZE/2, currentMap.path[0].y * TILE_SIZE + TILE_SIZE/2);
+    for (let i = 1; i < currentMap.path.length; i++) {
+        ctx.lineTo(currentMap.path[i].x * TILE_SIZE + TILE_SIZE/2, currentMap.path[i].y * TILE_SIZE + TILE_SIZE/2);
+    }
+    ctx.stroke();
+    
+    // 시작점과 끝점 표시
+    ctx.fillStyle = '#4CAF50';
+    ctx.beginPath();
+    ctx.arc(currentMap.path[0].x * TILE_SIZE + TILE_SIZE/2, currentMap.path[0].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#e74c3c';
+    ctx.beginPath();
+    ctx.arc(currentMap.path[currentMap.path.length-1].x * TILE_SIZE + TILE_SIZE/2, currentMap.path[currentMap.path.length-1].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
+    ctx.fill();
+    
+    // 맵 이름 표시
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 24px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(currentMap.name, canvas.width/2, 10);
+    
     // 게임 재시작
     restartGame();
 }
 
-// 맵 선택 UI 추가
+// 맵 선택 UI 이벤트 리스너
 document.getElementById('mapSelect').addEventListener('change', (e) => {
     if (!gameState.isStarted) {
         selectMap(e.target.value);
         gameState.currentMap = e.target.value;
-        // 미니맵 업데이트
         drawMinimap();
     }
 });
