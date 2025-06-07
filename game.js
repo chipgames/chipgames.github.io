@@ -1478,7 +1478,7 @@ class Tower {
         // 사거리 원 테두리 강조
         ctx.save();
         ctx.strokeStyle = this.color;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 1.5;
         ctx.globalAlpha = 0.7;
         ctx.beginPath();
         ctx.arc(
@@ -1526,7 +1526,7 @@ class Tower {
         
         // 범위 테두리
         ctx.strokeStyle = this.color;
-        ctx.lineWidth = 1;
+        ctx.lineWidth = 0.7;
         ctx.globalAlpha = 0.3;
         ctx.beginPath();
         ctx.arc(
