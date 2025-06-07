@@ -44,45 +44,6 @@
                 </div>
             </div>
 
-            <!-- 게임 캔버스 -->
-            <canvas id="gameCanvas" width="800" height="600"></canvas>
-            <!-- 카운트다운 표시 영역 -->
-            <div id="countdown" style="display:none; font-size:3em; color:#4CAF50; text-align:center; margin:20px 0; font-weight:bold; text-shadow:0 2px 8px #000a;"></div>
-            
-            <!-- 게임 컨트롤 -->
-            <div class="game-controls">
-                <button id="startBtn" class="control-button">게임 시작</button>
-                <button id="pauseBtn" class="control-button">일시정지</button>
-                <button id="waveStartButton" class="wave-start-button">다음 웨이브</button>
-                <button id="saveBtn" class="control-button">저장</button>
-                <button id="loadBtn" class="control-button">불러오기</button>
-                <button id="soundToggleBtn">🔊 효과음</button>
-                <button id="musicToggleBtn">🎵 배경음악</button>
-                <select id="difficultySelect" class="control-button">
-                    <option value="EASY" selected>쉬움</option>
-                    <option value="NORMAL">보통</option>
-                    <option value="HARD">어려움</option>
-                </select>
-                <select id="mapSelect" class="control-button">
-                    <option value="STRAIGHT">직선 경로</option>
-                    <option value="ZIGZAG">지그재그</option>
-                    <option value="SPIRAL">나선형</option>
-                    <option value="MAZE">미로</option>
-                    <option value="CROSS">십자형</option>
-                    <option value="SNAKE">뱀형</option>
-                    <option value="DIAMOND">다이아몬드</option>
-                    <option value="STAR">별형</option>
-                    <option value="VORTEX">소용돌이</option>
-                    <option value="TRIANGLE">삼각형</option>
-                    <option value="WAVE">파도형</option>
-                    <option value="STAIRS">계단형</option>
-                    <option value="CROSSROADS">교차로</option>
-                    <option value="INFINITY">무한형</option>
-                    <option value="BUTTERFLY">나비형</option>
-                    <option value="HOURGLASS">모래시계</option>
-                </select>
-            </div>
-
             <!-- 게임 정보 -->
             <div class="info-bar">
                 <div class="info-item">
@@ -122,10 +83,53 @@
                     <span id="highestWave">최고 웨이브: 0</span>
                 </div>
             </div>
+
+            <!-- 게임 캔버스 -->
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+
             <!-- 웨이브 진행률 바 -->
             <div id="waveProgress" class="wave-progress" style="display:none;">
                 <div class="fill"></div>
             </div>
+
+            <!-- 카운트다운 표시 영역 -->
+            <div id="countdown" style="display:none; font-size:3em; color:#4CAF50; text-align:center; margin:20px 0; font-weight:bold; text-shadow:0 2px 8px #000a;"></div>
+
+            <!-- 게임 컨트롤 -->
+            <div class="game-controls">
+                <select id="difficultySelect" class="control-button">
+                    <option value="EASY" selected>쉬움</option>
+                    <option value="NORMAL">보통</option>
+                    <option value="HARD">어려움</option>
+                </select>
+                <select id="mapSelect" class="control-button">
+                    <option value="STRAIGHT">직선 경로</option>
+                    <option value="ZIGZAG">지그재그</option>
+                    <option value="SPIRAL">나선형</option>
+                    <option value="MAZE">미로</option>
+                    <option value="CROSS">십자형</option>
+                    <option value="SNAKE">뱀형</option>
+                    <option value="DIAMOND">다이아몬드</option>
+                    <option value="STAR">별형</option>
+                    <option value="VORTEX">소용돌이</option>
+                    <option value="TRIANGLE">삼각형</option>
+                    <option value="WAVE">파도형</option>
+                    <option value="STAIRS">계단형</option>
+                    <option value="CROSSROADS">교차로</option>
+                    <option value="INFINITY">무한형</option>
+                    <option value="BUTTERFLY">나비형</option>
+                    <option value="HOURGLASS">모래시계</option>
+                </select>
+                <button id="waveStartButton" class="wave-start-button">다음 웨이브</button>
+                <button id="startBtn" class="control-button">게임 시작</button>
+                <button id="pauseBtn" class="control-button">일시정지</button>
+                <button id="saveBtn" class="control-button">저장</button>
+                <button id="loadBtn" class="control-button">불러오기</button>
+                <button id="soundToggleBtn">🔊 효과음</button>
+                <button id="musicToggleBtn">🎵 배경음악</button>
+
+            </div>
+
         </main>
     </div>
 

@@ -5577,3 +5577,44 @@ function showEventNotification(message) {
     if (lowSpecMode) return;
     // ... 기존 코드 ...
 }
+
+function updateControlVisibility() {
+    const isStarted = gameState.isStarted;
+    // 게임 시작 버튼은 항상 노출, 텍스트만 변경
+    const startBtn = document.getElementById('startBtn');
+    if (startBtn) {
+        startBtn.style.display = 'inline-block';
+        startBtn.textContent = isStarted ? '재시작' : '게임 시작';
+    }
+    // 난이도/맵 드롭다운
+    document.getElementById('difficultySelect').style.display = isStarted ? 'none' : 'inline-block';
+    document.getElementById('mapSelect').style.display = isStarted ? 'none' : 'inline-block';
+    // 시작 후 노출
+    document.getElementById('waveStartButton').style.display = isStarted ? 'inline-block' : 'none';
+    document.getElementById('pauseBtn').style.display = isStarted ? 'inline-block' : 'none';
+    document.getElementById('saveBtn').style.display = isStarted ? 'inline-block' : 'none';
+    document.getElementById('loadBtn').style.display = isStarted ? 'inline-block' : 'none';
+    document.getElementById('soundToggleBtn').style.display = isStarted ? 'inline-block' : 'none';
+    document.getElementById('musicToggleBtn').style.display = isStarted ? 'inline-block' : 'none';
+}
+
+// 게임 시작 버튼 클릭 이벤트에 추가
+const startBtn = document.getElementById('startBtn');
+if (startBtn) {
+    startBtn.addEventListener('click', () => {
+        if (!gameState.isStarted) {
+            gameState.isStarted = true;
+            updateControlVisibility();
+            // 기존 게임 시작 로직은 그대로 유지
+        } else {
+            // 재시작 로직
+            // (원래의 restartGame 함수 등 호출)
+            restartGame();
+            gameState.isStarted = true; // 재시작 후에도 isStarted는 true 유지
+            updateControlVisibility();
+        }
+    });
+}
+
+// 페이지 로드 시 초기 상태 설정
+window.addEventListener('DOMContentLoaded', updateControlVisibility);
