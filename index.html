@@ -18,6 +18,7 @@
             <div class="logo">
                 <h1>타워 디펜스</h1>
             </div>
+            <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
             <ul class="nav-links">
                 <li><a href="#game">게임하기</a></li>
                 <li><a href="#guides">가이드</a></li>
@@ -498,6 +499,15 @@
                 e.target.classList.remove('show');
             }
         });
+
+        // 햄버거 메뉴 토글
+        const navToggle = document.querySelector('.nav-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('open');
+            });
+        }
     });
     </script>
 </body>
