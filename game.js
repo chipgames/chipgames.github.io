@@ -1064,15 +1064,12 @@ function loadSoundSettings() {
         const settings = JSON.parse(savedSettings);
         soundEnabled = settings.soundEnabled;
         musicEnabled = settings.musicEnabled;
-        
-        // UI 업데이트
         const soundBtn = document.getElementById('soundToggleBtn');
         const musicBtn = document.getElementById('musicToggleBtn');
-        
         soundBtn.classList.toggle('muted', !soundEnabled);
         musicBtn.classList.toggle('muted', !musicEnabled);
-        
-        // 배경음악 상태 적용
+        soundBtn.setAttribute('data-status', soundEnabled ? '켜짐' : '꺼짐');
+        musicBtn.setAttribute('data-status', musicEnabled ? '켜짐' : '꺼짐');
         if (musicEnabled && gameState.isStarted) {
             sounds.bgm.loop = true;
             sounds.bgm.play().catch(error => console.log('BGM 재생 실패:', error));
@@ -1095,6 +1092,7 @@ function toggleSound() {
     soundEnabled = !soundEnabled;
     const soundBtn = document.getElementById('soundToggleBtn');
     soundBtn.classList.toggle('muted', !soundEnabled);
+    soundBtn.setAttribute('data-status', soundEnabled ? '켜짐' : '꺼짐');
     saveSoundSettings(); // 설정 저장
 }
 
@@ -2167,34 +2165,55 @@ function showPlaceablePositions() {
 function showTowerEffect(x, y) {
     const effect = document.createElement('div');
     effect.className = 'tower-effect';
-    effect.style.left = `${x * TILE_SIZE}px`;
-    effect.style.top = `${y * TILE_SIZE}px`;
+    
+    // 타워 중심을 기준으로 계산
+    const centerX = x * TILE_SIZE + TILE_SIZE/2;
+    const centerY = y * TILE_SIZE + TILE_SIZE/2;
+    
+    effect.style.left = `${centerX - TILE_SIZE/2}px`;
+    effect.style.top = `${centerY - TILE_SIZE/2}px`;
     effect.style.width = `${TILE_SIZE}px`;
     effect.style.height = `${TILE_SIZE}px`;
-    effect.style.backgroundColor = 'rgba(76, 175, 80, 0.5)';
-    effect.style.borderRadius = '50%';
+    
     document.querySelector('.game-area').appendChild(effect);
     
-    setTimeout(() => {
+    // 애니메이션 종료 후 제거
+    effect.addEventListener('animationend', () => {
         effect.remove();
-    }, 500);
+    });
 }
 
 // 타워 업그레이드 이펙트
 function showUpgradeEffect(x, y) {
+    // 업그레이드 이펙트 생성
     const effect = document.createElement('div');
-    effect.className = 'tower-effect';
-    effect.style.left = `${x * TILE_SIZE}px`;
-    effect.style.top = `${y * TILE_SIZE}px`;
-    effect.style.width = `${TILE_SIZE}px`;
-    effect.style.height = `${TILE_SIZE}px`;
-    effect.style.backgroundColor = 'rgba(255, 215, 0, 0.5)';
-    effect.style.borderRadius = '50%';
+    effect.className = 'upgrade-effect';
+    
+    // 타워 중심을 기준으로 계산
+    const centerX = x * TILE_SIZE + TILE_SIZE/2;
+    const centerY = y * TILE_SIZE + TILE_SIZE/2;
+    
+    effect.style.left = `${centerX}px`;
+    effect.style.top = `${centerY}px`;
+    
+    // 이펙트 내용
+    effect.innerHTML = `
+        <div class="upgrade-ring"></div>
+        <div class="upgrade-particles">
+            ${Array(8).fill().map(() => '<div class="particle"></div>').join('')}
+        </div>
+        <div class="upgrade-text">업그레이드!</div>
+    `;
+    
     document.querySelector('.game-area').appendChild(effect);
     
-    setTimeout(() => {
+    // 사운드 재생
+    playSound('upgrade');
+    
+    // 애니메이션 종료 후 제거
+    effect.addEventListener('animationend', () => {
         effect.remove();
-    }, 500);
+    });
 }
 
 // 게임 시작 버튼 이벤트 수정
@@ -2354,17 +2373,21 @@ function showTowerRangePreview(x, y, range, type) {
     
     rangePreview = document.createElement('div');
     rangePreview.className = 'tower-range-preview';
-    rangePreview.style.left = `${x * TILE_SIZE + TILE_SIZE/2}px`;
-    rangePreview.style.top = `${y * TILE_SIZE + TILE_SIZE/2}px`;
-    rangePreview.style.width = `${range * TILE_SIZE * 2}px`;
-    rangePreview.style.height = `${range * TILE_SIZE * 2}px`;
-    rangePreview.style.marginLeft = `-${range * TILE_SIZE}px`;
-    rangePreview.style.marginTop = `-${range * TILE_SIZE}px`;
+    
+    // 타워 중심을 기준으로 계산
+    const centerX = x * TILE_SIZE + TILE_SIZE/2;
+    const centerY = y * TILE_SIZE + TILE_SIZE/2;
+    const diameter = range * TILE_SIZE * 2;
+    
+    rangePreview.style.left = `${centerX - diameter/2}px`;
+    rangePreview.style.top = `${centerY - diameter/2}px`;
+    rangePreview.style.width = `${diameter}px`;
+    rangePreview.style.height = `${diameter}px`;
     
     // 타워 종류에 따른 색상 설정
     const tower = TOWER_TYPES[type];
     rangePreview.style.backgroundColor = `${tower.color}20`;
-    rangePreview.style.border = `2px solid ${tower.color}`;
+    rangePreview.style.borderColor = tower.color;
     
     document.querySelector('.game-area').appendChild(rangePreview);
 }
@@ -2844,140 +2867,161 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
 
 // 타워 업그레이드 메뉴 표시 함수 수정
 function showTowerUpgradeMenu(tower, clientX, clientY) {
-    const existingMenu = document.querySelector('.tower-menu');
-    if (existingMenu && existingMenu.parentNode) {
-        existingMenu.parentNode.removeChild(existingMenu);
-    }
-
-    const towerMenu = document.createElement('div');
-    towerMenu.className = 'tower-menu';
+    const menu = document.createElement('div');
+    menu.className = 'tower-upgrade-menu';
     
-    // 메뉴 위치 조정
-    const menuWidth = 300;
+    // 메뉴 위치 계산 (화면 밖으로 나가지 않도록)
+    const menuWidth = 280;
     const menuHeight = 400;
-    let menuX = clientX;
-    let menuY = clientY;
+    const padding = 20;
     
-    // 화면 경계 체크
-    if (menuX + menuWidth > window.innerWidth) {
-        menuX = window.innerWidth - menuWidth;
-    }
-    if (menuY + menuHeight > window.innerHeight) {
-        menuY = window.innerHeight - menuHeight;
+    let left = clientX;
+    let top = clientY;
+    
+    // 오른쪽으로 넘치면 왼쪽에 표시
+    if (left + menuWidth > window.innerWidth) {
+        left = window.innerWidth - menuWidth - padding;
     }
     
-    towerMenu.style.left = `${menuX}px`;
-    towerMenu.style.top = `${menuY}px`;
-
-    // 타워 헤더
+    // 아래로 넘치면 위에 표시
+    if (top + menuHeight > window.innerHeight) {
+        top = window.innerHeight - menuHeight - padding;
+    }
+    
+    menu.style.left = `${left}px`;
+    menu.style.top = `${top}px`;
+    
+    // 타워 정보 헤더
     const header = document.createElement('div');
-    header.className = 'tower-header';
+    header.className = 'upgrade-header';
     header.innerHTML = `
-        <div class="tower-title">
-            <h3>${TOWER_TYPES[tower.type].name}</h3>
-            <span class="tower-level">Lv.${tower.level}</span>
-        </div>
+        <h3>${TOWER_TYPES[tower.type].name} Lv.${tower.level}</h3>
         <div class="tower-stats">
-            <div class="stat-item">
-                <span class="stat-icon">🎯</span>
-                <span class="stat-value">${tower.range.toFixed(2)}</span>
-                <span class="stat-level">(${tower.rangeLevel}/${tower.level})</span>
-            </div>
-            <div class="stat-item">
+            <div class="stat">
                 <span class="stat-icon">⚔️</span>
-                <span class="stat-value">${tower.damage.toFixed(2)}</span>
-                <span class="stat-level">(${tower.damageLevel}/${tower.level})</span>
+                <span class="stat-value">${tower.damage}</span>
             </div>
-            <div class="stat-item">
-                <span class="stat-icon">⚡</span>
-                <span class="stat-value">${(60/tower.maxCooldown).toFixed(2)}/초</span>
-                <span class="stat-level">(${tower.speedLevel}/${tower.level})</span>
-            </div>
-            <div class="stat-item">
+            <div class="stat">
                 <span class="stat-icon">🎯</span>
-                <span class="stat-value">${tower.bulletCount}발</span>
-                <span class="stat-level">(${tower.bulletLevel}/${tower.level})</span>
+                <span class="stat-value">${tower.range}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-icon">⚡</span>
+                <span class="stat-value">${tower.attackSpeed.toFixed(1)}</span>
             </div>
         </div>
     `;
-    towerMenu.appendChild(header);
-
-    // 업그레이드 섹션
-    const upgradeSection = document.createElement('div');
-    upgradeSection.className = 'upgrade-section';
+    menu.appendChild(header);
     
-    const upgradeTypes = [
-        { type: 'range', name: '사거리', icon: '🎯', description: '공격 범위 증가' },
-        { type: 'damage', name: '데미지', icon: '⚔️', description: '공격력 증가' },
-        { type: 'speed', name: '공격속도', icon: '⚡', description: '공격 속도 증가' },
-        { type: 'bullet', name: '발사체', icon: '🎯', description: '동시 발사 수 증가' }
-    ];
-
-    upgradeTypes.forEach(({ type, name, icon, description }) => {
-        const upgradeItem = document.createElement('div');
-        upgradeItem.className = 'upgrade-item';
-        
+    // 업그레이드 옵션들
+    const upgradeTypes = ['damage', 'range', 'speed'];
+    const upgradeIcons = ['⚔️', '🎯', '⚡'];
+    const upgradeNames = ['공격력', '사거리', '공격속도'];
+    
+    upgradeTypes.forEach((type, index) => {
         const cost = tower.getUpgradeCost(type);
         const canUpgrade = tower.canUpgrade(type);
         
-        upgradeItem.innerHTML = `
+        const option = document.createElement('div');
+        option.className = `upgrade-option ${canUpgrade ? '' : 'disabled'}`;
+        
+        const currentValue = type === 'speed' ? 
+            tower.attackSpeed.toFixed(1) : 
+            tower[type];
+        
+        const nextValue = type === 'speed' ? 
+            (tower.attackSpeed * 1.2).toFixed(1) : 
+            Math.floor(tower[type] * 1.2);
+        
+        option.innerHTML = `
             <div class="upgrade-info">
-                <div class="upgrade-header">
-                    <span class="upgrade-icon">${icon}</span>
-                    <span class="upgrade-name">${name}</span>
-                </div>
-                <div class="upgrade-description">${description}</div>
-                <div class="upgrade-progress">
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${(tower[`${type}Level`] / tower.level) * 100}%"></div>
+                <span class="upgrade-icon">${upgradeIcons[index]}</span>
+                <div class="upgrade-details">
+                    <span class="upgrade-name">${upgradeNames[index]}</span>
+                    <div class="upgrade-values">
+                        <span class="current-value">${currentValue}</span>
+                        <span class="arrow">→</span>
+                        <span class="next-value">${nextValue}</span>
                     </div>
-                    <span class="progress-text">${tower[`${type}Level`]}/${tower.level}</span>
                 </div>
             </div>
-            <button class="upgrade-button" ${!canUpgrade || gameState.gold < cost ? 'disabled' : ''}>
-                ${cost} 골드
-            </button>
+            <div class="upgrade-cost ${canUpgrade ? '' : 'insufficient'}">
+                <span class="cost-icon">💰</span>
+                <span class="cost-value">${cost}</span>
+            </div>
         `;
         
-        const upgradeButton = upgradeItem.querySelector('.upgrade-button');
-        if (!canUpgrade) {
-            upgradeButton.title = '타워 레벨을 올려야 더 업그레이드할 수 있습니다.';
+        if (canUpgrade) {
+            option.addEventListener('click', () => {
+                tower.upgrade(type);
+                showUpgradeEffect(tower.x, tower.y);
+                updateInfoBar();
+                menu.remove();
+            });
         }
         
-        upgradeButton.onclick = () => {
-            if (tower.upgrade(type)) {
-                showTowerUpgradeMenu(tower, clientX, clientY);
-            }
-        };
-        
-        upgradeSection.appendChild(upgradeItem);
+        menu.appendChild(option);
     });
     
-    towerMenu.appendChild(upgradeSection);
-
+    // 특수능력 업그레이드 (레벨 3 이상)
+    if (tower.level >= 3) {
+        const specialOption = document.createElement('div');
+        specialOption.className = 'upgrade-option special';
+        
+        const specialCost = tower.getUpgradeCost('special');
+        const canUpgradeSpecial = tower.canUpgrade('special');
+        
+        specialOption.innerHTML = `
+            <div class="upgrade-info">
+                <span class="upgrade-icon">✨</span>
+                <div class="upgrade-details">
+                    <span class="upgrade-name">특수능력 강화</span>
+                    <div class="upgrade-description">
+                        ${getSpecialDescription(tower.type)}
+                    </div>
+                </div>
+            </div>
+            <div class="upgrade-cost ${canUpgradeSpecial ? '' : 'insufficient'}">
+                <span class="cost-icon">💰</span>
+                <span class="cost-value">${specialCost}</span>
+            </div>
+        `;
+        
+        if (canUpgradeSpecial) {
+            specialOption.addEventListener('click', () => {
+                tower.upgrade('special');
+                showUpgradeEffect(tower.x, tower.y);
+                updateInfoBar();
+                menu.remove();
+            });
+        }
+        
+        menu.appendChild(specialOption);
+    }
+    
     // 판매 버튼
-    const sellSection = document.createElement('div');
-    sellSection.className = 'sell-section';
-    const sellValue = tower.getSellValue();
-    sellSection.innerHTML = `
-        <button class="sell-button">
-            <span class="sell-icon">💰</span>
-            <span class="sell-text">판매</span>
-            <span class="sell-value">${sellValue} 골드</span>
-        </button>
+    const sellButton = document.createElement('button');
+    sellButton.className = 'sell-button';
+    sellButton.innerHTML = `
+        <span class="sell-icon">💎</span>
+        <span class="sell-text">판매</span>
+        <span class="sell-value">+${tower.getSellValue()}</span>
     `;
     
-    sellSection.querySelector('.sell-button').onclick = () => {
-        gameState.gold += sellValue;
+    sellButton.addEventListener('click', () => {
+        const sellValue = tower.getSellValue();
+        gold += sellValue;
+        showRewardPopup(sellValue);
         towers = towers.filter(t => t !== tower);
-        if (towerMenu.parentNode) {
-            towerMenu.parentNode.removeChild(towerMenu);
-        }
-    };
-
-    towerMenu.appendChild(sellSection);
-    document.body.appendChild(towerMenu);
-    setupMenuCloseHandler(towerMenu);
+        updateInfoBar();
+        menu.remove();
+    });
+    
+    menu.appendChild(sellButton);
+    document.body.appendChild(menu);
+    
+    // 메뉴 외부 클릭 시 닫기
+    setupMenuCloseHandler(menu);
 }
 
 // 게임 시작 시 로딩 화면
@@ -3007,24 +3051,22 @@ window.addEventListener('load', () => {
 function showDamageNumber(x, y, damage, isCritical = false) {
     const damageText = document.createElement('div');
     damageText.className = 'damage-number';
+    if (isCritical) damageText.classList.add('critical');
+    
+    // 타워 중심을 기준으로 계산
+    const centerX = x * TILE_SIZE + TILE_SIZE/2;
+    const centerY = y * TILE_SIZE + TILE_SIZE/2;
+    
+    damageText.style.left = `${centerX}px`;
+    damageText.style.top = `${centerY}px`;
     damageText.textContent = damage;
-    damageText.style.left = `${x * TILE_SIZE + TILE_SIZE/2}px`;
-    damageText.style.top = `${y * TILE_SIZE}px`;
-    damageText.style.color = isCritical ? '#ff0000' : '#ffffff';
-    damageText.style.fontSize = isCritical ? '24px' : '16px';
-    damageText.style.fontWeight = isCritical ? 'bold' : 'normal';
+    
     document.querySelector('.game-area').appendChild(damageText);
-
-    const animation = damageText.animate([
-        { transform: 'translateY(0) scale(1)', opacity: 1 },
-        { transform: 'translateY(-30px) scale(1.2)', opacity: 0.8 },
-        { transform: 'translateY(-60px) scale(1)', opacity: 0 }
-    ], {
-        duration: 1000,
-        easing: 'ease-out'
+    
+    // 애니메이션 종료 후 제거
+    damageText.addEventListener('animationend', () => {
+        damageText.remove();
     });
-
-    animation.onfinish = () => damageText.remove();
 }
 
 // 스킬 발동 예고 효과
@@ -5169,6 +5211,8 @@ function initializeGame() {
             }, 100);
         }
     }
+
+    initializeEffects();
 }
 // ... existing code ...
 
@@ -5329,3 +5373,208 @@ document.addEventListener('DOMContentLoaded', function() {
     // 게임 초기화
     initializeGame();
 });
+
+// 이펙트 풀 관리자
+const EffectPool = {
+    pools: {},
+    
+    // 풀 초기화
+    init(type, count = 10) {
+        if (!this.pools[type]) {
+            this.pools[type] = [];
+            for (let i = 0; i < count; i++) {
+                const element = document.createElement('div');
+                element.className = `${type}-effect`;
+                element.style.display = 'none';
+                document.querySelector('.game-area').appendChild(element);
+                this.pools[type].push(element);
+            }
+        }
+    },
+    
+    // 이펙트 가져오기
+    get(type) {
+        if (!this.pools[type]) {
+            this.init(type);
+        }
+        
+        const pool = this.pools[type];
+        const element = pool.find(el => el.style.display === 'none');
+        
+        if (element) {
+            return element;
+        }
+        
+        // 풀에 여유가 없으면 새로 생성
+        const newElement = document.createElement('div');
+        newElement.className = `${type}-effect`;
+        document.querySelector('.game-area').appendChild(newElement);
+        pool.push(newElement);
+        return newElement;
+    },
+    
+    // 이펙트 반환
+    release(element) {
+        element.style.display = 'none';
+        element.className = element.className.split(' ')[0]; // 기본 클래스만 유지
+        element.style = ''; // 스타일 초기화
+        element.innerHTML = ''; // 내용 초기화
+    }
+};
+
+// 이펙트 초기화
+function initializeEffects() {
+    EffectPool.init('attack', 20);
+    EffectPool.init('damage', 30);
+    EffectPool.init('special', 5);
+    EffectPool.init('upgrade', 5);
+}
+
+// 공격 이펙트 표시 (최적화)
+function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
+    const effect = EffectPool.get('attack');
+    
+    // 시작점과 목표점의 중심 좌표 계산
+    const startX = x * TILE_SIZE + TILE_SIZE/2;
+    const startY = y * TILE_SIZE + TILE_SIZE/2;
+    const endX = targetX * TILE_SIZE + TILE_SIZE/2;
+    const endY = targetY * TILE_SIZE + TILE_SIZE/2;
+    
+    // 공격선의 각도와 거리 계산
+    const angle = Math.atan2(endY - startY, endX - startX);
+    const distance = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+    
+    effect.style.cssText = `
+        display: block;
+        left: ${startX}px;
+        top: ${startY}px;
+        width: ${distance}px;
+        transform: rotate(${angle}rad);
+    `;
+    
+    if (isCritical) {
+        effect.classList.add('critical');
+    }
+    
+    // 사운드 재생
+    playSound(isCritical ? 'critical' : 'attack');
+    
+    // 애니메이션 종료 후 풀로 반환
+    effect.addEventListener('animationend', () => {
+        EffectPool.release(effect);
+    }, { once: true });
+}
+
+// 데미지 숫자 표시 (최적화)
+function showDamageNumber(x, y, damage, isCritical = false) {
+    const damageText = EffectPool.get('damage');
+    
+    // 랜덤한 회전과 이동
+    const rotation = (Math.random() - 0.5) * 30;
+    const offsetX = (Math.random() - 0.5) * 20;
+    
+    damageText.style.cssText = `
+        display: block;
+        left: ${x * TILE_SIZE + TILE_SIZE/2 + offsetX}px;
+        top: ${y * TILE_SIZE + TILE_SIZE/2}px;
+        transform: translate(-50%, -50%) rotate(${rotation}deg);
+    `;
+    
+    damageText.className = `damage-number ${isCritical ? 'critical' : ''}`;
+    damageText.textContent = damage.toLocaleString();
+    
+    // 애니메이션 종료 후 풀로 반환
+    damageText.addEventListener('animationend', () => {
+        EffectPool.release(damageText);
+    }, { once: true });
+}
+
+// 특수능력 이펙트 표시 (최적화)
+function showSpecialEffect(x, y, name) {
+    const effect = EffectPool.get('special');
+    
+    const centerX = x * TILE_SIZE + TILE_SIZE/2;
+    const centerY = y * TILE_SIZE + TILE_SIZE/2;
+    
+    effect.style.cssText = `
+        display: block;
+        left: ${centerX}px;
+        top: ${centerY}px;
+    `;
+    
+    effect.innerHTML = `
+        <div class="special-ring"></div>
+        <div class="special-particles">
+            ${Array(12).fill().map(() => '<div class="particle"></div>').join('')}
+        </div>
+        <div class="special-text">${name}</div>
+    `;
+    
+    // 사운드 재생
+    playSound('special');
+    
+    // 애니메이션 종료 후 풀로 반환
+    effect.addEventListener('animationend', () => {
+        EffectPool.release(effect);
+    }, { once: true });
+}
+
+// 저사양 모드 상태
+let lowSpecMode = false;
+
+function applyLowSpecMode(enabled) {
+    lowSpecMode = enabled;
+    document.body.classList.toggle('low-spec-mode', enabled);
+    localStorage.setItem('lowSpecMode', enabled ? '1' : '0');
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+    // ... 기존 초기화 코드 ...
+    // 저사양 모드 체크박스 연동
+    const lowSpecToggle = document.getElementById('lowSpecToggle');
+    if (lowSpecToggle) {
+        // 저장된 값 불러오기
+        const saved = localStorage.getItem('lowSpecMode');
+        if (saved === '1') {
+            lowSpecToggle.checked = true;
+            applyLowSpecMode(true);
+        }
+        lowSpecToggle.addEventListener('change', function() {
+            applyLowSpecMode(this.checked);
+        });
+    }
+});
+
+// 이펙트 생성 함수들에서 저사양 모드 분기 추가
+function showTowerEffect(x, y) {
+    if (lowSpecMode) return;
+    // ... 기존 코드 ...
+}
+function showUpgradeEffect(x, y) {
+    if (lowSpecMode) return;
+    // ... 기존 코드 ...
+}
+function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
+    if (lowSpecMode) return;
+    // ... 기존 코드 ...
+}
+function showDamageNumber(x, y, damage, isCritical = false) {
+    if (lowSpecMode) return;
+    // ... 기존 코드 ...
+}
+function showSpecialEffect(x, y, name) {
+    if (lowSpecMode) return;
+    // ... 기존 코드 ...
+}
+function showComboEffect(comboName) {
+    if (lowSpecMode) return;
+    // ... 기존 코드 ...
+}
+function showLevelUpEffect(reward) {
+    if (lowSpecMode) return;
+    // ... 기존 코드 ...
+}
+function showEventNotification(message) {
+    if (lowSpecMode) return;
+    // ... 기존 코드 ...
+}
