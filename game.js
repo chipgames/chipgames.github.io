@@ -1607,6 +1607,21 @@ class Tower {
             rangePreview = null;
         }
     }
+
+    canUpgrade(upgradeType) {
+        if (upgradeType === 'special') {
+            // 특수 업그레이드는 레벨 3 이상, 골드 충분해야 가능
+            if (this.level < 3) return false;
+            const upgradeCost = this.getUpgradeCost('special');
+            if (gameState.gold < upgradeCost) return false;
+            return true;
+        }
+        // 일반 업그레이드
+        if (this[`${upgradeType}Level`] >= this.maxUpgradeLevel) return false;
+        const upgradeCost = this.getUpgradeCost(upgradeType);
+        if (gameState.gold < upgradeCost) return false;
+        return true;
+    }
 } // ← class Tower 끝에 중괄호 추가
 
 // 이제 class Enemy를 전역에 선언
@@ -2977,7 +2992,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
             </div>
             <div class="stat">
                 <span class="stat-icon">⚡</span>
-                <span class="stat-value">${tower.attackSpeed.toFixed(1)}</span>
+                <span class="stat-value">${(60 / tower.maxCooldown).toFixed(1)}</span>
             </div>
         </div>
     `;
@@ -2996,11 +3011,11 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
         option.className = `upgrade-option ${canUpgrade ? '' : 'disabled'}`;
         
         const currentValue = type === 'speed' ? 
-            tower.attackSpeed.toFixed(1) : 
+            (60 / tower.maxCooldown).toFixed(1) : 
             tower[type];
         
         const nextValue = type === 'speed' ? 
-            (tower.attackSpeed * 1.2).toFixed(1) : 
+            (60 / Math.max(10, tower.maxCooldown * 0.9)).toFixed(1) : 
             Math.floor(tower[type] * 1.2);
         
         option.innerHTML = `
