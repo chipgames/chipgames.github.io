@@ -3393,6 +3393,10 @@ function showBossPatternEffect(x, y, name) {
 
 // 맵 선택 함수
 function selectMap(mapKey) {
+    if (!MAPS[mapKey]) {
+        alert('맵 데이터가 없습니다.');
+        return;
+    }
     currentMap = MAPS[mapKey];
     path = [...currentMap.path];
     // 게임 재시작
