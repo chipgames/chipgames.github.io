@@ -21,9 +21,9 @@
             <ul class="nav-links">
                 <li><a href="#game">게임하기</a></li>
                 <li><a href="#guides">가이드</a></li>
-                <li><a href="#" id="nav-description">게임 설명</a></li>
-                <li><a href="#" id="nav-howto">이용 방법</a></li>
-                <li><a href="#" id="nav-help">도움말</a></li>
+                <li><a href="#" id="descriptionBtn">게임 설명</a></li>
+                <li><a href="#" id="howtoBtn">이용 방법</a></li>
+                <li><a href="#" id="helpBtn">도움말</a></li>
             </ul>
         </nav>
     </header>
@@ -39,10 +39,6 @@
                     <li><a href="#tower-guide">타워 종류 설명</a></li>
                     <li><a href="#strategy-guide">전략 가이드</a></li>
                 </ul>
-            </div>
-            <!-- 광고 위치 1 -->
-            <div class="ad-container">
-                <!-- AdSense 코드 -->
             </div>
         </aside>
 
@@ -67,10 +63,6 @@
                 <button id="startBtn" class="control-button">게임 시작</button>
                 <button id="pauseBtn" class="control-button">일시정지</button>
                 <button id="waveStartButton" class="wave-start-button">다음 웨이브</button>
-                <button id="descriptionBtn" class="control-button">게임 설명</button>
-                <button id="howtoBtn" class="control-button">이용 방법</button>
-                <button id="aboutBtn" class="control-button">개발자 소개</button>
-                <button id="helpBtn" class="control-button">도움말</button>
                 <button id="saveBtn" class="control-button">저장</button>
                 <button id="loadBtn" class="control-button">불러오기</button>
                 <button id="soundToggleBtn">🔊 효과음</button>
@@ -143,43 +135,13 @@
                     </li>
                 </ul>
             </div>
-            <!-- 광고 위치 2 -->
-            <div class="ad-container">
-                <!-- AdSense 코드 -->
-            </div>
         </aside>
     </div>
 
-    <!-- 하단 콘텐츠 영역 -->
-    <section class="bottom-content" id="guides">
-        <div class="articles">
-            <h2>게임 전략 가이드</h2>
-            <div class="article-grid">
-                <article>
-                    <h3>초보자를 위한 타워 배치 전략</h3>
-                    <p>
-                        초보자분들을 위한 구체적인 타워 배치, 자원 관리, 업그레이드 팁을 안내합니다.<br>
-                        각 웨이브별로 어떤 타워를 우선 배치해야 하는지, 골드 관리법, 업그레이드 타이밍 등 실전 팁을 확인하세요!
-                    </p>
-                </article>
-                <article>
-                    <h3>고급 플레이어를 위한 팁</h3>
-                    <p>
-                        상위 랭커들의 전략, 최적의 타워 조합, 웨이브별 대응법 등 심화 전략을 안내합니다.<br>
-                        효율적인 파워업 활용, 보스 웨이브 대응, 다양한 맵별 전략까지 모두 확인해보세요!
-                    </p>
-                </article>
-            </div>
-        </div>
-        <!-- 광고 위치 3 -->
-        <div class="ad-container">
-            <!-- AdSense 코드 -->
-        </div>
-    </section>
-
     <!-- 게임 설명 모달 -->
-    <div id="descriptionModal" class="modal" style="display:none;">
+    <div id="descriptionModal" class="modal">
       <div class="modal-content">
+        <button class="modal-close" aria-label="닫기">×</button>
         <h2>게임 설명</h2>
         <p><b>타워 디펜스 게임</b>은 다양한 타워와 맵, 전략적 업그레이드, 특수 이벤트가 어우러진 전략 시뮬레이션 게임입니다.<br>
         플레이어는 각기 다른 특성을 가진 타워를 설치하고 업그레이드하여, 웨이브마다 몰려오는 적과 강력한 보스를 막아내야 합니다.<br>
@@ -196,13 +158,13 @@
         <div style="margin-top:18px; color:#a5b4fc; font-size:0.98em;">
           목표: 제한된 자원으로 최적의 타워 조합과 배치로 최대한 많은 웨이브를 방어하세요!
         </div>
-        <button id="closeDescription" class="control-button" style="margin-top:20px;">닫기</button>
       </div>
     </div>
 
     <!-- 게임 이용 방법 모달 -->
-    <div id="howtoModal" class="modal" style="display:none;">
+    <div id="howtoModal" class="modal">
       <div class="modal-content">
+        <button class="modal-close" aria-label="닫기">×</button>
         <h2>이용 방법</h2>
         <p><b>타워 디펜스 게임</b>은 전략적으로 타워를 설치하고 업그레이드하여 몰려오는 적을 막는 게임입니다.<br>
         아래 안내를 참고하여 최고의 기록에 도전해보세요!</p>
@@ -220,28 +182,47 @@
         <div style="margin-top:18px; color:#a5b4fc; font-size:0.98em;">
           다양한 맵과 난이도, 특수 이벤트, 업적 시스템을 활용해 최고의 기록에 도전해보세요!
         </div>
-        <button id="closeHowto" class="control-button" style="margin-top:20px;">닫기</button>
       </div>
     </div>
 
-    <!-- 모달 창들 -->
+    <!-- 도움말 모달 -->
     <div id="helpModal" class="modal">
         <div class="modal-content">
+            <button class="modal-close" aria-label="닫기">×</button>
             <h2>게임 도움말</h2>
-            <div class="help-shortcuts">
-                <p><b>스페이스바</b>: 다음 웨이브 시작</p>
-                <p><b>P</b>: 일시정지/재개</p>
-                <p><b>H</b>: 도움말 열기</p>
+            <div class="help-section">
+                <h3>단축키</h3>
+                <ul>
+                    <li><b>스페이스바</b>: 다음 웨이브 시작</li>
+                    <li><b>P</b>: 일시정지/재개</li>
+                    <li><b>H</b>: 도움말 열기</li>
+                </ul>
             </div>
-            <hr>
-            <div class="help-faq">
-                <p><b>타워가 설치되지 않아요</b>: 경로 위에는 타워를 설치할 수 없습니다. 빈 칸을 클릭해 주세요.</p>
-                <p><b>골드가 부족해요</b>: 적을 처치하거나 웨이브를 클리어하면 골드를 얻을 수 있습니다.</p>
-                <p><b>특수 이벤트 확인</b>: 화면 하단 '발생한 특수 이벤트' 영역에서 확인할 수 있습니다.</p>
-                <p><b>저장/불러오기</b>: 하단의 저장/불러오기 버튼을 이용하세요.</p>
-                <p><b>게임이 멈췄을 때</b>: 새로고침 후 불러오기 버튼으로 이어서 플레이할 수 있습니다.</p>
+            <div class="help-section">
+                <h3>자주 묻는 질문</h3>
+                <ul>
+                    <li>
+                        <b>타워가 설치되지 않아요</b>
+                        <p>경로 위에는 타워를 설치할 수 없습니다. 빈 칸을 클릭해 주세요.</p>
+                    </li>
+                    <li>
+                        <b>골드가 부족해요</b>
+                        <p>적을 처치하거나 웨이브를 클리어하면 골드를 얻을 수 있습니다.</p>
+                    </li>
+                    <li>
+                        <b>특수 이벤트 확인</b>
+                        <p>화면 하단 '발생한 특수 이벤트' 영역에서 확인할 수 있습니다.</p>
+                    </li>
+                    <li>
+                        <b>저장/불러오기</b>
+                        <p>하단의 저장/불러오기 버튼을 이용하세요.</p>
+                    </li>
+                    <li>
+                        <b>게임이 멈췄을 때</b>
+                        <p>새로고침 후 불러오기 버튼으로 이어서 플레이할 수 있습니다.</p>
+                    </li>
+                </ul>
             </div>
-            <button id="closeHelp" class="control-button">닫기</button>
         </div>
     </div>
 
@@ -267,115 +248,268 @@
     <!-- 개발자 소개 모달 -->
     <div id="aboutModal" class="modal" style="display:none;">
       <div class="modal-content">
+        <button class="modal-close" aria-label="닫기">×</button>
         <h2>개발자 소개</h2>
         <p>이 게임은 전략 게임과 웹 기술을 사랑하는 1인 개발자에 의해 제작되었습니다.<br>
         <b>ChipGames</b>은 누구나 쉽고 재미있게 즐길 수 있는 디펜스 게임을 목표로 하며, 지속적으로 업데이트될 예정입니다.<br>
         문의/제안/버그 신고는 <a href="contact.html" style="color:#a5b4fc;">문의하기</a>를 이용해 주세요!</p>
-        <button id="closeAbout" class="control-button" style="margin-top:20px;">닫기</button>
+      </div>
+    </div>
+
+    <!-- 초보자 가이드 모달 -->
+    <div id="beginnerGuideModal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" aria-label="닫기">×</button>
+        <h2>초보자 가이드</h2>
+        <p>
+          <b>타워 디펜스 게임의 기본 목표</b><br>
+          몰려오는 적을 타워로 막아내고, 생명(❤️)이 0이 되지 않도록 최대한 오래 버티는 것이 목표입니다.<br><br>
+          <b>게임 진행 방법</b><br>
+          1. <b>타워 설치</b>: 게임 영역의 빈 칸을 클릭하면 타워 설치 메뉴가 열립니다. 골드를 사용해 다양한 타워를 설치하세요.<br>
+          2. <b>웨이브 시작</b>: '게임 시작' 또는 '다음 웨이브' 버튼을 눌러 적의 공격을 시작할 수 있습니다.<br>
+          3. <b>타워 업그레이드</b>: 이미 설치한 타워를 클릭하면 업그레이드 메뉴가 열립니다. 골드를 사용해 타워를 강화하세요.<br>
+          4. <b>자원 관리</b>: 적을 처치하거나 웨이브를 클리어하면 골드를 얻을 수 있습니다. 골드를 아껴 쓰고, 필요한 곳에 투자하세요.<br><br>
+          <b>초보자 추천 전략</b><br>
+          - 초반에는 <b>기본 타워</b>를 여러 개 설치해 적을 분산시켜 막는 것이 좋습니다.<br>
+          - 타워를 한 곳에 몰아두기보다는, 경로를 따라 고르게 배치하세요.<br>
+          - 업그레이드는 골드가 여유 있을 때, 자주 공격하는 타워부터 우선적으로 강화하세요.<br>
+          - 웨이브가 시작되기 전, 타워 설치와 업그레이드를 미리 준비하세요.<br>
+          - <b>생명(❤️) 관리</b>에 신경 쓰세요. 한 번에 많은 적이 지나가면 게임 오버가 될 수 있습니다.<br><br>
+          <b>실수하기 쉬운 점</b><br>
+          - 경로 위에는 타워를 설치할 수 없습니다.<br>
+          - 골드가 부족할 때는 무리하게 업그레이드하지 말고, 다음 웨이브를 기다리세요.<br>
+          - 다양한 타워를 조합해보며, 각 타워의 특성을 익혀보세요.<br>
+        </p>
+      </div>
+    </div>
+    <!-- 타워 종류 설명 모달 -->
+    <div id="towerGuideModal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" aria-label="닫기">×</button>
+        <h2>타워 종류 설명</h2>
+        <p>
+          <b>기본 타워</b><br>
+          - 저렴한 비용, 빠른 공격 속도, 범용적으로 사용 가능<br>
+          - 초반 방어선 구축에 적합<br><br>
+          <b>얼음 타워</b><br>
+          - 적을 느리게 만드는 빙결 효과<br>
+          - 빠른 적이나 보스의 이동을 늦추는 데 효과적<br><br>
+          <b>독 타워</b><br>
+          - 지속적인 독 데미지 부여<br>
+          - 체력이 높은 적이나 보스에게 효과적<br><br>
+          <b>레이저 타워</b><br>
+          - 강력한 단일 공격, 연속 데미지<br>
+          - 업그레이드 시 보스 처치에 매우 유용<br><br>
+          <b>스플래시 타워</b><br>
+          - 범위 공격 및 감속 효과<br>
+          - 적이 몰려올 때 효율적<br><br>
+          <b>지원 타워</b><br>
+          - 주변 타워의 공격력을 강화<br>
+          - 여러 타워와 조합 시 전체 방어력 상승<br><br>
+          <b>업그레이드 효과</b><br>
+          - 각 타워는 공격력, 사거리, 공격속도, 특수 효과 등 다양한 업그레이드가 가능합니다.<br>
+          - 업그레이드 시 골드가 소모되며, 타워의 성능이 크게 향상됩니다.<br><br>
+          <b>추천 조합</b><br>
+          - <b>얼음 타워 + 독 타워</b>: 적을 느리게 하면서 지속 데미지<br>
+          - <b>지원 타워 + 레이저/스플래시 타워</b>: 강력한 타워의 화력을 극대화<br>
+          - <b>기본 타워 + 스플래시 타워</b>: 초반 적 처치와 다수 적 대응<br>
+        </p>
+      </div>
+    </div>
+    <!-- 전략 가이드 모달 -->
+    <div id="strategyGuideModal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" aria-label="닫기">×</button>
+        <h2>전략 가이드</h2>
+        <p>
+          <b>자원(골드) 관리</b><br>
+          - 초반에는 타워 설치에 집중, 중반 이후 업그레이드에 투자<br>
+          - 불필요한 업그레이드는 피하고, 효율적인 타워에 집중 투자<br><br>
+          <b>타워 배치 전략</b><br>
+          - 경로가 꺾이는 지점, 적이 오래 머무는 곳에 강력한 타워 배치<br>
+          - 범위 공격 타워는 적이 많이 모이는 곳에 설치<br>
+          - 지원 타워는 여러 공격 타워가 닿는 위치에 설치<br><br>
+          <b>웨이브별 대응</b><br>
+          - 웨이브가 시작되기 전, 타워 업그레이드와 배치를 미리 점검<br>
+          - 보스 웨이브에는 단일 공격력이 높은 타워(레이저 등) 집중 강화<br>
+          - 특수 이벤트(골드 러시, 타워 강화 등) 발생 시 적극 활용<br><br>
+          <b>고급 플레이 크</b><br>
+          - 다양한 타워 조합을 실험해보고, 맵에 따라 최적의 조합을 찾으세요.<br>
+          - 파워업과 업적 시스템을 적극 활용해 추가 보상을 노리세요.<br>
+          - 저장/불러오기 기능을 활용해 여러 전략을 시도해보세요.<br>
+        </p>
+      </div>
+    </div>
+
+    <!-- 상단 가이드 모달 -->
+    <div id="mainGuideModal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" aria-label="닫기">×</button>
+        <h2>게임 가이드</h2>
+        <div class="guide-intro">
+          <p>타워 디펜스 게임의 전반적인 규칙, 진행 방법, 주요 전략을 한눈에 확인하세요.</p>
+        </div>
+        <div class="guide-links">
+          <h3>주요 가이드 바로가기</h3>
+          <ul>
+            <li><a href="#" id="openBeginnerGuideFromMain">초보자 가이드</a></li>
+            <li><a href="#" id="openTowerGuideFromMain">타워 종류 설명</a></li>
+            <li><a href="#" id="openStrategyGuideFromMain">전략 가이드</a></li>
+          </ul>
+        </div>
       </div>
     </div>
 
     <!-- 푸터 -->
     <footer class="main-footer">
         <div class="footer-links">
-            <a href="privacy.html">개인정보 처리방침</a>
-            <a href="terms.html">이용약관</a>
+            <a href="#" id="aboutBtn">개발자 소개</a>
+            <a href="privacy.html">개인정보처리방침</a>
             <a href="contact.html">문의하기</a>
         </div>
-        <div class="copyright">
-            © 2025 ChipGames. All rights reserved.
-        </div>
+        <p>&copy; 2024 ChipGames. All rights reserved.</p>
     </footer>
 
     <script src="game.js"></script>
     <script>
-    // DOM이 완전히 로드된 후 실행
     document.addEventListener('DOMContentLoaded', function() {
         // 게임 설명 모달
         const descriptionBtn = document.getElementById('descriptionBtn');
         const descriptionModal = document.getElementById('descriptionModal');
-        const closeDescription = document.getElementById('closeDescription');
 
-        if (descriptionBtn && descriptionModal && closeDescription) {
-            descriptionBtn.onclick = function() {
+        if (descriptionBtn && descriptionModal) {
+            descriptionBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 descriptionModal.classList.add('show');
-                descriptionModal.style.display = 'flex';
-            };
-            closeDescription.onclick = function() {
-                descriptionModal.classList.remove('show');
-                descriptionModal.style.display = 'none';
-            };
-            descriptionModal.onclick = function(e) {
-                if (e.target === this) {
-                    this.classList.remove('show');
-                    this.style.display = 'none';
-                }
-            };
+            });
         }
 
         // 이용 방법 모달
         const howtoBtn = document.getElementById('howtoBtn');
         const howtoModal = document.getElementById('howtoModal');
-        const closeHowto = document.getElementById('closeHowto');
 
-        if (howtoBtn && howtoModal && closeHowto) {
-            howtoBtn.onclick = function() {
+        if (howtoBtn && howtoModal) {
+            howtoBtn.addEventListener('click', function(e) {
+                e.preventDefault();
                 howtoModal.classList.add('show');
-                howtoModal.style.display = 'flex';
-            };
-            closeHowto.onclick = function() {
-                howtoModal.classList.remove('show');
-                howtoModal.style.display = 'none';
-            };
-            howtoModal.onclick = function(e) {
-                if (e.target === this) {
-                    this.classList.remove('show');
-                    this.style.display = 'none';
-                }
-            };
+            });
         }
 
-        // 개발자 소개 모달
-        const aboutBtn = document.getElementById('aboutBtn');
-        const aboutModal = document.getElementById('aboutModal');
-        const closeAbout = document.getElementById('closeAbout');
+        // 도움말 모달
+        const helpBtn = document.getElementById('helpBtn');
+        const helpModal = document.getElementById('helpModal');
 
-        if (aboutBtn && aboutModal && closeAbout) {
-            aboutBtn.onclick = function() {
-                aboutModal.classList.add('show');
-                aboutModal.style.display = 'flex';
-            };
-            closeAbout.onclick = function() {
-                aboutModal.classList.remove('show');
-                aboutModal.style.display = 'none';
-            };
-            aboutModal.onclick = function(e) {
-                if (e.target === this) {
-                    this.classList.remove('show');
-                    this.style.display = 'none';
-                }
-            };
+        if (helpBtn && helpModal) {
+            helpBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                helpModal.classList.add('show');
+            });
         }
 
-        // 네비게이션 메뉴에서 모달 열기
-        const navDescription = document.getElementById('nav-description');
-        const navHowto = document.getElementById('nav-howto');
-        const navHelp = document.getElementById('nav-help');
-        if (navDescription) navDescription.onclick = function(e) {
-            e.preventDefault();
-            const modal = document.getElementById('descriptionModal');
-            if (modal) { modal.classList.add('show'); modal.style.display = 'flex'; }
-        };
-        if (navHowto) navHowto.onclick = function(e) {
-            e.preventDefault();
-            const modal = document.getElementById('howtoModal');
-            if (modal) { modal.classList.add('show'); modal.style.display = 'flex'; }
-        };
-        if (navHelp) navHelp.onclick = function(e) {
-            e.preventDefault();
-            const modal = document.getElementById('helpModal');
-            if (modal) { modal.classList.add('show'); modal.style.display = 'flex'; }
-        };
+        // 상단 가이드 메뉴 클릭 시 메인 가이드 모달 열기
+        const navGuide = document.querySelector('a[href="#guides"]');
+        const mainGuideModal = document.getElementById('mainGuideModal');
+
+        if (navGuide && mainGuideModal) {
+            navGuide.addEventListener('click', function(e) {
+                e.preventDefault();
+                mainGuideModal.classList.add('show');
+            });
+        }
+
+        // 메인 가이드 모달에서 각 상세 가이드로 이동
+        const openBeginnerGuideFromMain = document.getElementById('openBeginnerGuideFromMain');
+        const openTowerGuideFromMain = document.getElementById('openTowerGuideFromMain');
+        const openStrategyGuideFromMain = document.getElementById('openStrategyGuideFromMain');
+        const beginnerGuideModal = document.getElementById('beginnerGuideModal');
+        const towerGuideModal = document.getElementById('towerGuideModal');
+        const strategyGuideModal = document.getElementById('strategyGuideModal');
+
+        if (openBeginnerGuideFromMain && beginnerGuideModal) {
+            openBeginnerGuideFromMain.addEventListener('click', function(e) {
+                e.preventDefault();
+                mainGuideModal.classList.remove('show');
+                beginnerGuideModal.classList.add('show');
+            });
+        }
+
+        if (openTowerGuideFromMain && towerGuideModal) {
+            openTowerGuideFromMain.addEventListener('click', function(e) {
+                e.preventDefault();
+                mainGuideModal.classList.remove('show');
+                towerGuideModal.classList.add('show');
+            });
+        }
+
+        if (openStrategyGuideFromMain && strategyGuideModal) {
+            openStrategyGuideFromMain.addEventListener('click', function(e) {
+                e.preventDefault();
+                mainGuideModal.classList.remove('show');
+                strategyGuideModal.classList.add('show');
+            });
+        }
+
+        // 왼쪽 메뉴 클릭 시 가이드 모달 열기
+        const beginnerGuideLink = document.querySelector('a[href="#beginner-guide"]');
+        const towerGuideLink = document.querySelector('a[href="#tower-guide"]');
+        const strategyGuideLink = document.querySelector('a[href="#strategy-guide"]');
+
+        if (beginnerGuideLink && beginnerGuideModal) {
+            beginnerGuideLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                beginnerGuideModal.classList.add('show');
+            });
+        }
+
+        if (towerGuideLink && towerGuideModal) {
+            towerGuideLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                towerGuideModal.classList.add('show');
+            });
+        }
+
+        if (strategyGuideLink && strategyGuideModal) {
+            strategyGuideLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                strategyGuideModal.classList.add('show');
+            });
+        }
+
+        // 각 가이드 모달의 닫기 버튼
+        const closeBeginnerGuide = document.getElementById('closeBeginnerGuide');
+        const closeTowerGuide = document.getElementById('closeTowerGuide');
+        const closeStrategyGuide = document.getElementById('closeStrategyGuide');
+
+        if (closeBeginnerGuide && beginnerGuideModal) {
+            closeBeginnerGuide.addEventListener('click', function() {
+                beginnerGuideModal.classList.remove('show');
+            });
+        }
+
+        if (closeTowerGuide && towerGuideModal) {
+            closeTowerGuide.addEventListener('click', function() {
+                towerGuideModal.classList.remove('show');
+            });
+        }
+
+        if (closeStrategyGuide && strategyGuideModal) {
+            closeStrategyGuide.addEventListener('click', function() {
+                strategyGuideModal.classList.remove('show');
+            });
+        }
+
+        // X 버튼 및 모달 배경 클릭 시 닫기 (이벤트 위임)
+        document.addEventListener('click', function(e) {
+            // X 버튼 클릭
+            if (e.target.classList.contains('modal-close')) {
+                const modal = e.target.closest('.modal');
+                if (modal) modal.classList.remove('show');
+            }
+            // 모달 배경 클릭 (modal-content 바깥)
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('show');
+            }
+        });
     });
     </script>
 </body>

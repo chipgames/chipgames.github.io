@@ -2501,7 +2501,7 @@ document.addEventListener('keydown', (e) => {
         }
     } else if (e.code === 'KeyH') {
         e.preventDefault();
-        document.getElementById('helpModal').style.display = 'block';
+        helpModal.classList.add('show');
     }
 });
 
@@ -2555,14 +2555,6 @@ document.getElementById('pauseBtn').addEventListener('click', () => {
         gameState.isPaused = !gameState.isPaused;
         document.getElementById('pauseBtn').textContent = gameState.isPaused ? '계속하기' : '일시정지';
     }
-});
-
-document.getElementById('helpBtn').addEventListener('click', () => {
-    document.getElementById('helpModal').style.display = 'block';
-});
-
-document.getElementById('closeHelp').addEventListener('click', () => {
-    document.getElementById('helpModal').style.display = 'none';
 });
 
 // 난이도 선택 이벤트 수정
@@ -5252,22 +5244,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (gameState.isStarted) {
                 gameState.isPaused = !gameState.isPaused;
                 pauseBtn.textContent = gameState.isPaused ? '계속하기' : '일시정지';
-            }
-        });
-    }
-
-    if (helpBtn && closeHelp) {
-        helpBtn.addEventListener('click', () => {
-            const helpModal = document.getElementById('helpModal');
-            if (helpModal) {
-                helpModal.style.display = 'block';
-            }
-        });
-
-        closeHelp.addEventListener('click', () => {
-            const helpModal = document.getElementById('helpModal');
-            if (helpModal) {
-                helpModal.style.display = 'none';
             }
         });
     }

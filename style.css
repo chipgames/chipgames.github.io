@@ -107,6 +107,21 @@ body {
     background-color: var(--primary-color);
 }
 
+.nav-button {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+.nav-button:hover {
+    background-color: var(--primary-color);
+}
+
 /* 메인 컨테이너 그리드 레이아웃 */
 .main-container {
     display: grid;
@@ -325,34 +340,179 @@ body {
     }
 }
 
-/* 모달 기본 스타일 - 항상 숨김 */
+/* 모달 기본 스타일 */
 .modal {
-    display: none !important;
+    display: none;
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    width: 100vw;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0,0,0,0.7);
-    z-index: 2000;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    overflow-y: auto;
 }
 
-/* 모달이 활성화(show 클래스 등)일 때만 보이기 */
 .modal.show {
-    display: flex !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* 모달 내부 콘텐츠 스타일 개선 */
-.modal .modal-content {
-    background: #232526;
-    border-radius: 12px;
-    padding: 32px 24px;
-    color: #fff;
-    min-width: 320px;
-    max-width: 90vw;
+.modal-content {
+    background-color: #1e293b;
+    padding: 25px;
+    border-radius: 8px;
+    max-width: 600px;
+    width: 90%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 4px 32px #000a;
     position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.modal-content h2 {
+    color: #a5b4fc;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.modal-content p {
+    color: #e2e8f0;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.modal-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.modal-content li {
+    margin-bottom: 10px;
+    color: #e2e8f0;
+}
+
+/* 모달 닫기(X) 버튼 스타일 */
+.modal-close {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    background: transparent;
+    border: none;
+    font-size: 1.7em;
+    color: #a5b4fc;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.2s, background 0.2s;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-close:hover {
+    color: #fff;
+    background: #4f46e5;
+}
+
+/* 기존 닫기 버튼(하단)도 더 세련되게 */
+.modal-content .control-button {
+    display: block;
+    width: 100%;
+    max-width: 200px;
+    margin: 24px auto 0;
+    padding: 12px 0;
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.08em;
+    font-weight: bold;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 8px #0002;
+    transition: background 0.3s, color 0.2s;
+}
+.modal-content .control-button:hover {
+    background-color: #6366f1;
+    color: #fff;
+}
+
+/* 게임 가이드 모달 스타일 */
+.guide-intro {
+  margin-bottom: 20px;
+  color: #666;
+}
+
+.guide-links {
+  margin-bottom: 20px;
+}
+
+.guide-links h3 {
+  color: #a5b4fc;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.guide-links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.guide-links li {
+  margin-bottom: 10px;
+}
+
+.guide-links a {
+  color: #4a5568;
+  text-decoration: none;
+  transition: color 0.3s;
+  display: block;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background-color: #f7fafc;
+}
+
+.guide-links a:hover {
+  color: #a5b4fc;
+  background-color: #edf2f7;
+}
+
+/* 도움말 모달 스타일 */
+.help-section {
+    margin-bottom: 20px;
+}
+
+.help-section h3 {
+    color: #a5b4fc;
+    margin-bottom: 10px;
+    font-size: 1.1em;
+}
+
+.help-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.help-section li {
+    margin-bottom: 15px;
+}
+
+.help-section li b {
+    color: #a5b4fc;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.help-section li p {
+    margin: 0;
+    color: #e2e8f0;
+    font-size: 0.95em;
+    line-height: 1.4;
 }
