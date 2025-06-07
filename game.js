@@ -5766,3 +5766,36 @@ if (startBtn) {
 
 // 페이지 로드 시 초기 상태 설정
 window.addEventListener('DOMContentLoaded', updateControlVisibility);
+
+function showTowerRangePreview(x, y, range, type) {
+    if (rangePreview) {
+        rangePreview.remove();
+    }
+
+    rangePreview = document.createElement('div');
+    rangePreview.className = 'tower-range-preview';
+
+    // 타워 중심을 기준으로 계산
+    const centerX = x * TILE_SIZE + TILE_SIZE/2;
+    const centerY = y * TILE_SIZE + TILE_SIZE/2;
+    const diameter = range * TILE_SIZE * 2;
+
+    // 캔버스의 위치(오프셋) 보정
+    const canvas = document.getElementById('gameCanvas');
+    const canvasRect = canvas.getBoundingClientRect();
+    const parentRect = canvas.parentElement.getBoundingClientRect();
+    const offsetX = canvasRect.left - parentRect.left;
+    const offsetY = canvasRect.top - parentRect.top;
+
+    rangePreview.style.left = `${offsetX + centerX - diameter/2}px`;
+    rangePreview.style.top = `${offsetY + centerY - diameter/2}px`;
+    rangePreview.style.width = `${diameter}px`;
+    rangePreview.style.height = `${diameter}px`;
+
+    // 타워 종류에 따른 색상 설정
+    const tower = TOWER_TYPES[type];
+    rangePreview.style.backgroundColor = `${tower.color}20`;
+    rangePreview.style.borderColor = tower.color;
+
+    document.querySelector('.game-area').appendChild(rangePreview);
+}
