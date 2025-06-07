@@ -5148,26 +5148,31 @@ function initializeGame() {
 
     // 로딩 화면 처리
     const loadingScreen = document.getElementById('loadingScreen');
-    const progressBar = loadingScreen.querySelector('.progress-bar');
-    
-    // 로딩 진행률 표시
-    let progress = 0;
-    const loadingInterval = setInterval(() => {
-        progress += 5;
-        progressBar.style.width = `${progress}%`;
-        
-        if (progress >= 100) {
-            clearInterval(loadingInterval);
-            loadingScreen.style.display = 'none';
-            
-            // 게임 소개 표시
-            const introWrap = document.querySelector('.intro-wrap');
-            introWrap.style.display = 'block';
-            
-            // 게임 시작
-            gameLoop();
+    if (loadingScreen) {
+        const progressBar = loadingScreen.querySelector('.progress-bar');
+        if (progressBar) {
+            // 로딩 진행률 표시
+            let progress = 0;
+            const loadingInterval = setInterval(() => {
+                progress += 5;
+                progressBar.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(loadingInterval);
+                    loadingScreen.style.display = 'none';
+                    
+                    // 게임 소개 표시
+                    const introWrap = document.querySelector('.intro-wrap');
+                    if (introWrap) {
+                        introWrap.style.display = 'block';
+                    }
+                    
+                    // 게임 시작
+                    gameLoop();
+                }
+            }, 100);
         }
-    }, 100);
+    }
 }
 // ... existing code ...
 
@@ -5225,3 +5230,122 @@ function startWave() {
     showWaveStartEffect();
     playSound('wave_start');
 }
+
+// ... existing code ...
+
+// 게임 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    // 게임 컨트롤 이벤트
+    const pauseBtn = document.getElementById('pauseBtn');
+    const helpBtn = document.getElementById('helpBtn');
+    const closeHelp = document.getElementById('closeHelp');
+    const difficultySelect = document.getElementById('difficultySelect');
+    const saveBtn = document.getElementById('saveBtn');
+    const loadBtn = document.getElementById('loadBtn');
+    const mapSelect = document.getElementById('mapSelect');
+    const waveStartButton = document.getElementById('waveStartButton');
+    const soundToggleBtn = document.getElementById('soundToggleBtn');
+    const musicToggleBtn = document.getElementById('musicToggleBtn');
+
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', () => {
+            if (gameState.isStarted) {
+                gameState.isPaused = !gameState.isPaused;
+                pauseBtn.textContent = gameState.isPaused ? '계속하기' : '일시정지';
+            }
+        });
+    }
+
+    if (helpBtn && closeHelp) {
+        helpBtn.addEventListener('click', () => {
+            const helpModal = document.getElementById('helpModal');
+            if (helpModal) {
+                helpModal.style.display = 'block';
+            }
+        });
+
+        closeHelp.addEventListener('click', () => {
+            const helpModal = document.getElementById('helpModal');
+            if (helpModal) {
+                helpModal.style.display = 'none';
+            }
+        });
+    }
+
+    if (difficultySelect) {
+        difficultySelect.addEventListener('change', (e) => {
+            if (!gameState.isStarted) {
+                gameState.difficulty = e.target.value;
+                const settings = DIFFICULTY_SETTINGS[gameState.difficulty];
+                gameState.gold = settings.gold;
+                gameState.lives = settings.lives;
+                gameState.maxTowers = settings.maxTowers;
+                updateTowerLimit();
+            }
+        });
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            saveGame();
+        });
+    }
+
+    if (loadBtn) {
+        loadBtn.addEventListener('click', () => {
+            loadGame();
+        });
+    }
+
+    if (mapSelect) {
+        mapSelect.addEventListener('change', (e) => {
+            if (!gameState.isStarted) {
+                selectMap(e.target.value);
+                gameState.currentMap = e.target.value;
+                drawMinimap();
+            }
+        });
+    }
+
+    if (waveStartButton) {
+        waveStartButton.addEventListener('click', () => {
+            showCountdown();
+        });
+    }
+
+    if (soundToggleBtn) {
+        soundToggleBtn.addEventListener('click', function() {
+            toggleSound();
+            this.classList.toggle('muted');
+            this.textContent = soundEnabled ? '🔊 효과음' : '🔇 효과음';
+        });
+    }
+
+    if (musicToggleBtn) {
+        musicToggleBtn.addEventListener('click', function() {
+            toggleMusic();
+            this.classList.toggle('muted');
+            this.textContent = musicEnabled ? '🎵 배경음악' : '🎵 배경음악';
+        });
+    }
+
+    // 파워업 메뉴 이벤트
+    const powerupItems = document.querySelectorAll('.powerup-item');
+    if (powerupItems.length > 0) {
+        powerupItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const powerupType = item.dataset.powerup.toUpperCase();
+                const powerup = POWERUPS[powerupType];
+                
+                if (gameState.gold >= powerup.cost) {
+                    gameState.gold -= powerup.cost;
+                    powerup.effect();
+                    playSound('powerup');
+                }
+            });
+        });
+    }
+
+    // 게임 초기화
+    initializeGame();
+});

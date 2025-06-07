@@ -3,172 +3,179 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>타워 디펜스 게임</title>
+    <title>타워 디펜스 게임 - 전략과 전술의 세계</title>
+    <meta name="description" content="전략적인 타워 배치와 업그레이드를 통해 적을 막는 타워 디펜스 게임. 다양한 타워, 맵, 전략을 경험하세요.">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="data:,">
+    <style>
+        html { scroll-behavior: smooth; }
+    </style>
 </head>
 <body>
-    <!-- 로딩 화면 - 광고 관련 코드 제거 -->
-    <div id="loadingScreen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 9999;">
-        <div style="color: white; text-align: center;">
-            <h2>게임 로딩 중...</h2>
-            <p>잠시만 기다려주세요.</p>
-            <div class="loading-progress">
-                <div class="progress-bar"></div>
+    <!-- 헤더 영역 -->
+    <header class="main-header">
+        <nav class="main-nav">
+            <div class="logo">
+                <h1>타워 디펜스</h1>
             </div>
-        </div>
-    </div>
-
-    <!-- 게임 소개 - 광고 컨테이너 제거 -->
-    <div class="intro-wrap" style="display: none;">
-        <div class="game-intro">
-            <h2>타워 디펜스 게임</h2>
-            <p>전략적인 타워 배치와 업그레이드를 통해 적을 막으세요!</p>
-            <ul class="feature-list">
-                <li>🏰 다양한 타워와 업그레이드</li>
-                <li>🗺️ 여러 맵과 난이도</li>
-                <li>👾 보스/특수 이벤트</li>
-                <li>💾 저장/불러오기 지원</li>
+            <ul class="nav-links">
+                <li><a href="#game">게임하기</a></li>
+                <li><a href="#guides">가이드</a></li>
+                <li><a href="#" id="nav-description">게임 설명</a></li>
+                <li><a href="#" id="nav-howto">이용 방법</a></li>
+                <li><a href="#" id="nav-help">도움말</a></li>
             </ul>
-        </div>
-    </div>
+        </nav>
+    </header>
 
-    <div class="game-container">
-        <!-- 게임 정보 바 -->
-        <div class="info-bar">
-            <div class="info-item">
-                <span class="info-icon">💰</span>
-                <span id="infoGold">골드: 100</span>
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <!-- 좌측 사이드바 -->
+        <aside class="left-sidebar">
+            <div class="game-info">
+                <h3>게임 가이드</h3>
+                <ul>
+                    <li><a href="#beginner-guide">초보자 가이드</a></li>
+                    <li><a href="#tower-guide">타워 종류 설명</a></li>
+                    <li><a href="#strategy-guide">전략 가이드</a></li>
+                </ul>
             </div>
-            <div class="info-item">
-                <span class="info-icon">❤️</span>
-                <span id="infoLives">생명: 20</span>
+            <!-- 광고 위치 1 -->
+            <div class="ad-container">
+                <!-- AdSense 코드 -->
             </div>
-            <div class="info-item">
-                <span class="info-icon">🌊</span>
-                <span id="infoWave">웨이브: 1</span>
-            </div>
-            <div class="info-item">
-                <span class="info-icon">⭐</span>
-                <span id="infoScore">점수: 0</span>
-            </div>
-            <div class="info-item">
-                <span class="info-icon">🎯</span>
-                <span id="infoTowerCount">타워: <span id="towerLimitCount">0</span>/<span id="towerLimitMax">10</span></span>
-            </div>
-            <div class="info-item">
-                <span class="info-icon">💀</span>
-                <span id="enemiesKilled">처치한 적: 0</span>
-            </div>
-            <div class="info-item">
-                <span class="info-icon">👑</span>
-                <span id="bossesKilled">처치한 보스: 0</span>
-            </div>
-            <div class="info-item">
-                <span class="info-icon">💰</span>
-                <span id="totalGold">총 획득 골드: 0</span>
-            </div>
-            <div class="info-item">
-                <span class="info-icon">🌊</span>
-                <span id="highestWave">최고 웨이브: 0</span>
-            </div>
-        </div>
+        </aside>
 
-        <!-- 게임 영역 -->
-        <div class="game-area">
-            <canvas id="gameCanvas" width="800" height="600"></canvas>
-            
-            <!-- 미니맵 -->
-            <div class="minimap-container">
-                <canvas id="minimapCanvas" width="150" height="150"></canvas>
-                <div class="game-settings">
-                    <div class="settings-row">
-                        <div class="setting-item">
-                            <label for="difficultySelect">난이도</label>
-                            <select id="difficultySelect">
-                                <option value="EASY">쉬움</option>
-                                <option value="NORMAL" selected>보통</option>
-                                <option value="HARD">어려움</option>
-                            </select>
-                        </div>
-                        <div class="setting-item">
-                            <label for="mapSelect">맵</label>
-                            <select id="mapSelect">
-                                <option value="STRAIGHT" selected>직선</option>
-                                <option value="ZIGZAG">지그재그</option>
-                                <option value="SPIRAL">나선형</option>
-                                <option value="MAZE">미로</option>
-                                <option value="CROSS">십자형</option>
-                                <option value="SNAKE">뱀형</option>
-                                <option value="DIAMOND">다이아몬드</option>
-                                <option value="LABYRINTH">맵3</option>
-                                <option value="DOUBLE_SPIRAL">맵4</option>
-                                <option value="PYRAMID">맵5</option>
-                                <option value="WAVE">맵6</option>
-                                <option value="STAIRS">맵7</option>
-                                <option value="CROSSROADS">맵8</option>
-                                <option value="INFINITY">맵9</option>
-                                <option value="BUTTERFLY">맵10</option>
-                                <option value="HOURGLASS">맵11</option>
-                                <option value="STAR">별형</option>
-                                <option value="VORTEX">소용돌이</option>
-                                <option value="MAZE2">맵14</option>
-                                <option value="SNAKE2">맵15</option>
-                                <option value="TRIANGLE">맵12</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="game-controls">
-                        <button id="waveStartButton" class="wave-start-button" style="display: none;">다음 웨이브</button>
-                        <button id="startBtn" class="control-button">게임 시작</button>
-                        <button id="pauseBtn" class="control-button">일시정지</button>
-                    </div>
-                    <div class="sound-controls">
-                        <button id="soundToggleBtn" class="sound-button">
-                            <span class="sound-icon">🔊</span>
-                            <span class="sound-label">효과음</span>
-                            <span class="sound-status">켜짐</span>
-                        </button>
-                        <button id="musicToggleBtn" class="sound-button">
-                            <span class="sound-icon">🎵</span>
-                            <span class="sound-label">배경음악</span>
-                            <span class="sound-status">켜짐</span>
-                        </button>
+        <!-- 중앙 게임 영역 -->
+        <main class="game-area" id="game">
+            <!-- 로딩 화면 -->
+            <div id="loadingScreen" class="loading-screen">
+                <div class="loading-content">
+                    <h2>게임 로딩 중...</h2>
+                    <p>잠시만 기다려주세요.</p>
+                    <div class="loading-progress">
+                        <div class="progress-bar"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- 웨이브 진행 바 -->
-            <div id="waveProgress" class="wave-progress">
-                <div class="fill"></div>
+            <!-- 게임 캔버스 -->
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+            
+            <!-- 게임 컨트롤 -->
+            <div class="game-controls">
+                <button id="startBtn" class="control-button">게임 시작</button>
+                <button id="pauseBtn" class="control-button">일시정지</button>
+                <button id="waveStartButton" class="wave-start-button">다음 웨이브</button>
+                <button id="descriptionBtn" class="control-button">게임 설명</button>
+                <button id="howtoBtn" class="control-button">이용 방법</button>
+                <button id="aboutBtn" class="control-button">개발자 소개</button>
+                <button id="helpBtn" class="control-button">도움말</button>
+                <button id="saveBtn" class="control-button">저장</button>
+                <button id="loadBtn" class="control-button">불러오기</button>
+                <button id="soundToggleBtn">🔊 효과음</button>
+                <button id="musicToggleBtn">🎵 배경음악</button>
+                <select id="difficultySelect" class="control-button">
+                    <option value="easy">쉬움</option>
+                    <option value="normal" selected>보통</option>
+                    <option value="hard">어려움</option>
+                </select>
+                <select id="mapSelect" class="control-button">
+                    <option value="map1">맵 1</option>
+                    <option value="map2">맵 2</option>
+                    <option value="map3">맵 3</option>
+                </select>
             </div>
 
-            <!-- 카운트다운 -->
-            <div id="countdown" class="countdown"></div>
-        </div>
+            <!-- 게임 정보 -->
+            <div class="info-bar">
+                <div class="info-item">
+                    <span class="info-icon">💰</span>
+                    <span id="infoGold">골드: 100</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">❤️</span>
+                    <span id="infoLives">생명: 20</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🌊</span>
+                    <span id="infoWave">웨이브: 1</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">⭐</span>
+                    <span id="infoScore">점수: 0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🎯</span>
+                    <span id="infoTowerCount">타워: <span id="towerLimitCount">0</span>/<span id="towerLimitMax">10</span></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">💀</span>
+                    <span id="enemiesKilled">처치한 적: 0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">👑</span>
+                    <span id="bossesKilled">처치한 보스: 0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">💰</span>
+                    <span id="totalGold">총 획득 골드: 0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🌊</span>
+                    <span id="highestWave">최고 웨이브: 0</span>
+                </div>
+            </div>
+        </main>
 
-        <!-- 컨트롤 버튼 -->
-        <div class="control-buttons">
-            <button id="descriptionBtn" class="control-button">게임 설명</button>
-            <button id="howtoBtn" class="control-button">이용 방법</button>
-            <button id="helpBtn" class="control-button">도움말</button>
-            <button id="saveBtn" class="control-button">저장</button>
-            <button id="loadBtn" class="control-button">불러오기</button>
-        </div>
-
-        <!-- 게임 설정 -->
-        <div class="game-settings">
-        </div>
-
-        <!-- 저장/불러오기 알림 -->
-        <div id="saveLoadNotification" class="save-load-notification"></div>
-
-        <!-- 특수 이벤트 목록 -->
-        <div class="events-list">
-            <h3>발생한 특수 이벤트</h3>
-            <ul id="eventsList"></ul>
-        </div>
+        <!-- 우측 사이드바 -->
+        <aside class="right-sidebar">
+            <div class="game-news">
+                <h3>최신 업데이트</h3>
+                <ul>
+                    <li>
+                        <h4>새로운 타워 추가</h4>
+                        <p>강력한 새로운 타워가 추가되었습니다!</p>
+                    </li>
+                    <li>
+                        <h4>시즌 이벤트 안내</h4>
+                        <p>특별한 보상이 기다리는 시즌 이벤트가 시작됩니다.</p>
+                    </li>
+                </ul>
+            </div>
+            <!-- 광고 위치 2 -->
+            <div class="ad-container">
+                <!-- AdSense 코드 -->
+            </div>
+        </aside>
     </div>
+
+    <!-- 하단 콘텐츠 영역 -->
+    <section class="bottom-content" id="guides">
+        <div class="articles">
+            <h2>게임 전략 가이드</h2>
+            <div class="article-grid">
+                <article>
+                    <h3>초보자를 위한 타워 배치 전략</h3>
+                    <p>
+                        초보자분들을 위한 구체적인 타워 배치, 자원 관리, 업그레이드 팁을 안내합니다.<br>
+                        각 웨이브별로 어떤 타워를 우선 배치해야 하는지, 골드 관리법, 업그레이드 타이밍 등 실전 팁을 확인하세요!
+                    </p>
+                </article>
+                <article>
+                    <h3>고급 플레이어를 위한 팁</h3>
+                    <p>
+                        상위 랭커들의 전략, 최적의 타워 조합, 웨이브별 대응법 등 심화 전략을 안내합니다.<br>
+                        효율적인 파워업 활용, 보스 웨이브 대응, 다양한 맵별 전략까지 모두 확인해보세요!
+                    </p>
+                </article>
+            </div>
+        </div>
+        <!-- 광고 위치 3 -->
+        <div class="ad-container">
+            <!-- AdSense 코드 -->
+        </div>
+    </section>
 
     <!-- 게임 설명 모달 -->
     <div id="descriptionModal" class="modal" style="display:none;">
@@ -257,19 +264,6 @@
         </div>
     </div>
 
-    <!-- 푸터 -->
-    <footer class="game-footer">
-        <div class="footer-links">
-            <a href="privacy.html">개인정보 처리방침</a>
-            <a href="terms.html">이용약관</a>
-            <a href="contact.html" style="font-weight:bold;color:#a5b4fc;">문의하기</a>
-            <a href="#" id="aboutBtn" style="font-weight:bold;color:#a5b4fc;">개발자 소개</a>
-        </div>
-        <div class="copyright">
-            © 2025 ChipGames. All rights reserved.
-        </div>
-    </footer>
-
     <!-- 개발자 소개 모달 -->
     <div id="aboutModal" class="modal" style="display:none;">
       <div class="modal-content">
@@ -281,53 +275,108 @@
       </div>
     </div>
 
+    <!-- 푸터 -->
+    <footer class="main-footer">
+        <div class="footer-links">
+            <a href="privacy.html">개인정보 처리방침</a>
+            <a href="terms.html">이용약관</a>
+            <a href="contact.html">문의하기</a>
+        </div>
+        <div class="copyright">
+            © 2025 ChipGames. All rights reserved.
+        </div>
+    </footer>
+
     <script src="game.js"></script>
     <script>
-    // 게임 설명 모달
-    document.getElementById('descriptionBtn').onclick = function() {
-        document.getElementById('descriptionModal').classList.add('show');
-        document.getElementById('descriptionModal').style.display = 'flex';
-    };
-    document.getElementById('closeDescription').onclick = function() {
-        document.getElementById('descriptionModal').classList.remove('show');
-        document.getElementById('descriptionModal').style.display = 'none';
-    };
-    document.getElementById('descriptionModal').onclick = function(e) {
-        if (e.target === this) {
-            this.classList.remove('show');
-            this.style.display = 'none';
+    // DOM이 완전히 로드된 후 실행
+    document.addEventListener('DOMContentLoaded', function() {
+        // 게임 설명 모달
+        const descriptionBtn = document.getElementById('descriptionBtn');
+        const descriptionModal = document.getElementById('descriptionModal');
+        const closeDescription = document.getElementById('closeDescription');
+
+        if (descriptionBtn && descriptionModal && closeDescription) {
+            descriptionBtn.onclick = function() {
+                descriptionModal.classList.add('show');
+                descriptionModal.style.display = 'flex';
+            };
+            closeDescription.onclick = function() {
+                descriptionModal.classList.remove('show');
+                descriptionModal.style.display = 'none';
+            };
+            descriptionModal.onclick = function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                    this.style.display = 'none';
+                }
+            };
         }
-    };
-    // 이용 방법 모달
-    document.getElementById('howtoBtn').onclick = function() {
-        document.getElementById('howtoModal').classList.add('show');
-        document.getElementById('howtoModal').style.display = 'flex';
-    };
-    document.getElementById('closeHowto').onclick = function() {
-        document.getElementById('howtoModal').classList.remove('show');
-        document.getElementById('howtoModal').style.display = 'none';
-    };
-    document.getElementById('howtoModal').onclick = function(e) {
-        if (e.target === this) {
-            this.classList.remove('show');
-            this.style.display = 'none';
+
+        // 이용 방법 모달
+        const howtoBtn = document.getElementById('howtoBtn');
+        const howtoModal = document.getElementById('howtoModal');
+        const closeHowto = document.getElementById('closeHowto');
+
+        if (howtoBtn && howtoModal && closeHowto) {
+            howtoBtn.onclick = function() {
+                howtoModal.classList.add('show');
+                howtoModal.style.display = 'flex';
+            };
+            closeHowto.onclick = function() {
+                howtoModal.classList.remove('show');
+                howtoModal.style.display = 'none';
+            };
+            howtoModal.onclick = function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                    this.style.display = 'none';
+                }
+            };
         }
-    };
-    // 개발자 소개 모달
-    document.getElementById('aboutBtn').onclick = function() {
-        document.getElementById('aboutModal').classList.add('show');
-        document.getElementById('aboutModal').style.display = 'flex';
-    };
-    document.getElementById('closeAbout').onclick = function() {
-        document.getElementById('aboutModal').classList.remove('show');
-        document.getElementById('aboutModal').style.display = 'none';
-    };
-    document.getElementById('aboutModal').onclick = function(e) {
-        if (e.target === this) {
-            this.classList.remove('show');
-            this.style.display = 'none';
+
+        // 개발자 소개 모달
+        const aboutBtn = document.getElementById('aboutBtn');
+        const aboutModal = document.getElementById('aboutModal');
+        const closeAbout = document.getElementById('closeAbout');
+
+        if (aboutBtn && aboutModal && closeAbout) {
+            aboutBtn.onclick = function() {
+                aboutModal.classList.add('show');
+                aboutModal.style.display = 'flex';
+            };
+            closeAbout.onclick = function() {
+                aboutModal.classList.remove('show');
+                aboutModal.style.display = 'none';
+            };
+            aboutModal.onclick = function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                    this.style.display = 'none';
+                }
+            };
         }
-    };
+
+        // 네비게이션 메뉴에서 모달 열기
+        const navDescription = document.getElementById('nav-description');
+        const navHowto = document.getElementById('nav-howto');
+        const navHelp = document.getElementById('nav-help');
+        if (navDescription) navDescription.onclick = function(e) {
+            e.preventDefault();
+            const modal = document.getElementById('descriptionModal');
+            if (modal) { modal.classList.add('show'); modal.style.display = 'flex'; }
+        };
+        if (navHowto) navHowto.onclick = function(e) {
+            e.preventDefault();
+            const modal = document.getElementById('howtoModal');
+            if (modal) { modal.classList.add('show'); modal.style.display = 'flex'; }
+        };
+        if (navHelp) navHelp.onclick = function(e) {
+            e.preventDefault();
+            const modal = document.getElementById('helpModal');
+            if (modal) { modal.classList.add('show'); modal.style.display = 'flex'; }
+        };
+    });
     </script>
 </body>
 </html> 
