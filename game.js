@@ -18,8 +18,8 @@ const ENEMY_LEVEL_SETTINGS = {
 
 // 게임 상태
 const gameState = {
-    gold: 100,
-    lives: 20,
+    gold: 200, // EASY 난이도 초기 골드
+    lives: 25, // EASY 난이도 초기 생명력
     wave: 1,
     isGameOver: false,
     waveInProgress: false,
@@ -27,11 +27,11 @@ const gameState = {
     isPaused: false,
     isStarted: false,
     score: 0,
-    difficulty: 'NORMAL', // EASY, NORMAL, HARD
+    difficulty: 'EASY', // EASY, NORMAL, HARD
     bossWave: 5, // 5웨이브마다 보스 등장
     bossKilled: false,
     goldMultiplier: 1,
-    maxTowers: 10, // 최대 타워 수
+    maxTowers: 12, // EASY 난이도 최대 타워 수
     towerCount: 0, // 현재 설치된 타워 수
     experience: 0,
     level: 1,
