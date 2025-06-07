@@ -130,6 +130,7 @@ body {
     min-height: 70vh;
     width: 100%;
     padding-top: calc(var(--header-height) + 20px);
+    gap: 24px;
 }
 
 .left-sidebar, .right-sidebar {
