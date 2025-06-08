@@ -2403,25 +2403,60 @@ class Enemy {
             this.y * TILE_SIZE + TILE_SIZE / 2
         );
 
-        // 체력바
-        const healthBarWidth = TILE_SIZE - 10;
-        const healthBarHeight = 5;
-        const healthPercentage = Math.max(0, this.health / this.maxHealth);
-        
-        ctx.fillStyle = 'red';
-        ctx.fillRect(
-            this.x * TILE_SIZE + 5,
-            this.y * TILE_SIZE,
-            healthBarWidth,
-            healthBarHeight
-        );
-        
-        ctx.fillStyle = 'green';
-        ctx.fillRect(
-            this.x * TILE_SIZE + 5,
-            this.y * TILE_SIZE,
-            healthBarWidth * healthPercentage,
-            healthBarHeight
+        // HP바 (적 사각형 내부 상단, 굵고 진하게, 테두리+숫자)
+        const barX = this.x * TILE_SIZE + 5;
+        const barY = this.y * TILE_SIZE + 7;
+        const barW = TILE_SIZE - 10;
+        const barH = 7;
+        const percent = Math.max(0, this.health / this.maxHealth);
+
+        // 배경(검정)
+        ctx.fillStyle = 'rgba(0,0,0,0.7)';
+        ctx.fillRect(barX-1, barY-1, barW+2, barH+2);
+        // HP바(빨간색)
+        ctx.fillStyle = '#c0392b';
+        ctx.fillRect(barX, barY, barW, barH);
+        // HP바(초록색, 현재 체력)
+        ctx.fillStyle = '#27ae60';
+        ctx.fillRect(barX, barY, barW * percent, barH);
+        // 테두리(흰색)
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(barX-1, barY-1, barW+2, barH+2);
+        // HP 숫자 표시(중앙)
+        ctx.font = 'bold 10px Arial';
+        ctx.fillStyle = '#fff';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${Math.ceil(this.health)}/${this.maxHealth}`, barX + barW/2, barY + barH - 1);
+
+        ctx.restore();
+
+        // 상태이상/스킬/쿨다운 아이콘 표시
+        if (statusIcons.length > 0 || (this.skill && this.skillCooldown > 0)) {
+            ctx.save();
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            let icons = statusIcons.join(' ');
+            if (this.skill && this.skillCooldown > 0) {
+                icons += ' ⏳';
+            }
+            ctx.fillStyle = '#fff';
+            ctx.fillText(
+                icons,
+                this.x * TILE_SIZE + TILE_SIZE / 2,
+                this.y * TILE_SIZE - 18
+            );
+            ctx.restore();
+        }
+
+        // 레벨 표시
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 10px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(
+            `Lv.${this.level}${this.pattern ? ' [' + this.pattern.name + ']' : ''}`,
+            this.x * TILE_SIZE + TILE_SIZE / 2,
+            this.y * TILE_SIZE + TILE_SIZE / 2
         );
 
         // 상태 효과 표시
@@ -5403,7 +5438,10 @@ function showSkillEffect(x, y, name) {
         effect.setAttribute('data-x', x);
         effect.setAttribute('data-y', y);
         effect.setAttribute('data-name', name);
-        parent.appendChild(effect);
+        // DOM에 없을 때만 append
+        if (!effect.parentNode) {
+            parent.appendChild(effect);
+        }
     }
     effect.textContent = name;
     effect.style.display = 'block';
@@ -5661,8 +5699,12 @@ const EffectPool = {
     release(element) {
         element.style.display = 'none';
         element.className = element.className.split(' ')[0]; // 기본 클래스만 유지
-        element.style = ''; // 스타일 초기화
-        element.innerHTML = ''; // 내용 초기화
+        element.style = '';
+        element.innerHTML = '';
+        // DOM에서 완전히 제거
+        if (element.parentNode) {
+            element.parentNode.removeChild(element);
+        }
     }
 };
 
@@ -5997,14 +6039,14 @@ Enemy.prototype.draw = function() {
         this.x * TILE_SIZE + TILE_SIZE / 2,
         this.y * TILE_SIZE + TILE_SIZE / 2
     );
-    // 쿨다운/상태이상 실시간 표시
-    ctx.fillStyle = 'yellow';
-    ctx.font = '10px Arial';
-    ctx.fillText(
-        `패턴쿨:${this.patternCooldown} 스킬쿨:${this.skillCooldown} ${[...this.statusEffects.keys()].join(',')}`,
-        this.x * TILE_SIZE + TILE_SIZE / 2,
-        this.y * TILE_SIZE - 30
-    );
+    //// 쿨다운/상태이상 실시간 표시
+    //ctx.fillStyle = 'yellow';
+    //ctx.font = '10px Arial';
+    //ctx.fillText(
+    //    `패턴쿨:${this.patternCooldown} 스킬쿨:${this.skillCooldown} ${[...this.statusEffects.keys()].join(',')}`,
+    //    this.x * TILE_SIZE + TILE_SIZE / 2,
+    //    this.y * TILE_SIZE - 30
+    //);
     // ... 체력바/상태이상/이름/크리티컬 ...
 };
 
