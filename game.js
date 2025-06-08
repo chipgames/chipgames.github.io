@@ -780,34 +780,6 @@ const TOWER_TYPES = {
     }
 };
 
-// 보스 몬스터 정의
-const BOSS_TYPES = {
-    TANK: {
-        name: '탱크 보스',
-        health: 1000,
-        speed: 0.01,
-        reward: 100,
-        color: 'brown',
-        ability: 'shield' // 일정 시간 무적
-    },
-    SPEED: {
-        name: '스피드 보스',
-        health: 500,
-        speed: 0.03,
-        reward: 150,
-        color: 'cyan',
-        ability: 'dash' // 순간 이동
-    },
-    SUMMONER: {
-        name: '소환사 보스',
-        health: 800,
-        speed: 0.015,
-        reward: 200,
-        color: 'green',
-        ability: 'summon' // 적 소환
-    }
-};
-
 // 파워업 정의
 const POWERUPS = {
     GOLD: {
@@ -1326,6 +1298,9 @@ class Tower {
         target.lastDamage = { amount: damage, isCritical };
         playSound('tower_attack');
 
+        // 공격 이펙트 표시
+        showAttackEffect(this.x, this.y, target.x, target.y, isCritical);
+
         switch(this.type) {
             case 'BASIC':
                 target.health -= damage;
@@ -1624,50 +1599,356 @@ class Tower {
     }
 } // ← class Tower 끝에 중괄호 추가
 
+// 적 유형 정의
+const ENEMY_TYPES = {
+    NORMAL: {
+        name: '일반 적',
+        health: 100,
+        speed: 0.02,
+        reward: 10,
+        color: 'red',
+        experienceValue: 10
+    },
+    FAST: {
+        name: '빠른 적',
+        health: 50,
+        speed: 0.04,
+        reward: 15,
+        color: 'yellow',
+        experienceValue: 15
+    },
+    TANK: {
+        name: '탱커',
+        health: 300,
+        speed: 0.01,
+        reward: 20,
+        color: 'purple',
+        experienceValue: 20
+    },
+    HEALER: {
+        name: '치유사',
+        health: 80,
+        speed: 0.015,
+        reward: 25,
+        color: 'green',
+        experienceValue: 25,
+        healAmount: 10,
+        healRange: 2
+    }
+};
+
+// 적 AI 패턴 상수
+const ENEMY_PATTERNS = {
+    NORMAL: {
+        name: '일반',
+        description: '기본 경로를 따라 이동',
+        update: function (enemy) {
+            if (enemy.pathIndex >= currentMap.path.length - 1) {
+                gameState.lives--;
+                return true;
+            }
+            const target = currentMap.path[enemy.pathIndex + 1];
+            const dx = target.x - enemy.x;
+            const dy = target.y - enemy.y;
+            if (Math.abs(dx) < enemy.speed && Math.abs(dy) < enemy.speed) {
+                enemy.pathIndex++;
+            } else {
+                enemy.x += dx * enemy.speed;
+                enemy.y += dy * enemy.speed;
+            }
+            return false;
+        }
+    },
+    ZIGZAG: {
+        name: '지그재그',
+        description: '경로를 따라가면서 좌우로 살짝 흔들림',
+        update: function (enemy) {
+            if (enemy.pathIndex >= currentMap.path.length - 1) {
+                gameState.lives--;
+                return true;
+            }
+            const prev = currentMap.path[enemy.pathIndex];
+            const target = currentMap.path[enemy.pathIndex + 1];
+            const dx = target.x - prev.x;
+            const dy = target.y - prev.y;
+            // 경로의 법선 벡터(좌우 흔들림)
+            const nx = -dy;
+            const ny = dx;
+            if (enemy.zigzagFrame === undefined) enemy.zigzagFrame = 0;
+            enemy.zigzagFrame++;
+            const offset = Math.sin(enemy.zigzagFrame * 0.2) * 0.2; // 0.2칸 이내로 흔들림
+            // 목표 위치 계산 (경로 + 흔들림)
+            const tx = target.x + nx * offset;
+            const ty = target.y + ny * offset;
+            const ddx = tx - enemy.x;
+            const ddy = ty - enemy.y;
+            if (Math.abs(ddx) < enemy.speed && Math.abs(ddy) < enemy.speed) {
+                enemy.pathIndex++;
+            } else {
+                enemy.x += ddx * enemy.speed;
+                enemy.y += ddy * enemy.speed;
+            }
+            return false;
+        }
+    },
+    SWARM: {
+        name: '무리',
+        description: '경로를 따라가면서 가까운 적과 뭉침',
+        update: function (enemy) {
+            if (enemy.pathIndex >= currentMap.path.length - 1) {
+                gameState.lives--;
+                return true;
+            }
+            // 경로 기본 이동
+            const target = currentMap.path[enemy.pathIndex + 1];
+            let dx = target.x - enemy.x;
+            let dy = target.y - enemy.y;
+            // 가까운 적과의 거리 보정(경로에서 크게 벗어나지 않게 0.1칸 이내로만 영향)
+            let minDist = Infinity;
+            let closest = null;
+            enemies.forEach(other => {
+                if (other !== enemy) {
+                    const dist = Math.sqrt((other.x - enemy.x) ** 2 + (other.y - enemy.y) ** 2);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closest = other;
+                    }
+                }
+            });
+            if (closest && minDist > 0.1 && minDist < 2) {
+                dx += (closest.x - enemy.x) * 0.05;
+                dy += (closest.y - enemy.y) * 0.05;
+            }
+            if (Math.abs(dx) < enemy.speed && Math.abs(dy) < enemy.speed) {
+                enemy.pathIndex++;
+            } else {
+                enemy.x += dx * enemy.speed;
+                enemy.y += dy * enemy.speed;
+            }
+            return false;
+        }
+    },
+    AMBUSH: {
+        name: '매복',
+        description: '경로에서 잠시 멈췄다가 빠르게 돌진',
+        update: function (enemy) {
+            if (enemy.pathIndex >= currentMap.path.length - 1) {
+                gameState.lives--;
+                return true;
+            }
+            if (!enemy.ambushState) {
+                enemy.ambushState = 'hiding';
+                enemy.ambushTimer = 60;
+                enemy.originalSpeed = enemy.speed;
+            }
+            switch (enemy.ambushState) {
+                case 'hiding':
+                    enemy.ambushTimer--;
+                    if (enemy.ambushTimer <= 0) {
+                        enemy.ambushState = 'charging';
+                        enemy.speed = enemy.originalSpeed * 2;
+                        showAmbushEffect(enemy.x, enemy.y);
+                    }
+                    break;
+                case 'charging':
+                    const target = currentMap.path[enemy.pathIndex + 1];
+                    const dx = target.x - enemy.x;
+                    const dy = target.y - enemy.y;
+                    if (Math.abs(dx) < enemy.speed && Math.abs(dy) < enemy.speed) {
+                        enemy.pathIndex++;
+                        enemy.ambushState = 'hiding';
+                        enemy.speed = enemy.originalSpeed;
+                        enemy.ambushTimer = 60;
+                    } else {
+                        enemy.x += dx * enemy.speed;
+                        enemy.y += dy * enemy.speed;
+                    }
+                    break;
+            }
+            return false;
+        }
+    },
+    // ... existing code ...
+    GROUP_RUSH: {
+        name: '집단 돌진',
+        description: '그룹 신호에 맞춰 동시에 돌진',
+        update: function (enemy) {
+            if (enemy.pathIndex >= currentMap.path.length - 1) {
+                gameState.lives--;
+                return true;
+            }
+            // 그룹 신호: 그룹 전체가 일정 거리 이하로 모이면 돌진
+            const group = enemyGroups.find(g => g.id === enemy.groupId);
+            let rush = false;
+            if (group) {
+                const alive = group.members.filter(e => e.health > 0);
+                // 그룹 내 적이 모두 가까이 모이면 돌진
+                const close = alive.every(e => Math.abs(e.x - enemy.x) < 1 && Math.abs(e.y - enemy.y) < 1);
+                if (close) rush = true;
+            }
+            const target = currentMap.path[enemy.pathIndex + 1];
+            const dx = target.x - enemy.x;
+            const dy = target.y - enemy.y;
+            const speed = rush ? enemy.speed * 2 : enemy.speed;
+            if (Math.abs(dx) < speed && Math.abs(dy) < speed) {
+                enemy.pathIndex++;
+            } else {
+                enemy.x += dx * speed;
+                enemy.y += dy * speed;
+            }
+            return false;
+        }
+    }
+};
+
+// 보스 몬스터 정의
+const BOSS_TYPES = {
+    TANK: {
+        name: '탱크 보스',
+        health: 1000,
+        speed: 0.01,
+        reward: 100,
+        color: 'brown',
+        ability: 'shield' // 일정 시간 무적
+    },
+    SPEED: {
+        name: '스피드 보스',
+        health: 500,
+        speed: 0.03,
+        reward: 150,
+        color: 'cyan',
+        ability: 'dash' // 순간 이동
+    },
+    SUMMONER: {
+        name: '소환사 보스',
+        health: 800,
+        speed: 0.015,
+        reward: 200,
+        color: 'green',
+        ability: 'summon' // 적 소환
+    }
+};
+
+// 보스 패턴 정의
+const BOSS_PATTERNS = {
+    SHIELD: {
+        name: 'Shield',
+        cooldown: 300,
+        duration: 180,
+        update: (boss) => {
+            if (boss.isDead) return true;
+
+            if (boss.patternCooldown === 0) {
+                boss.isInvincible = true;
+                boss.defense = 50;
+                showBossPatternEffect(boss.x, boss.y, 'Shield');
+                playSound('bossShield');
+            }
+
+            if (boss.patternCooldown === boss.pattern.duration) {
+                boss.isInvincible = false;
+                boss.defense = 0;
+            }
+
+            return false;
+        }
+    },
+    TELEPORT: {
+        name: 'Teleport',
+        cooldown: 180,
+        update: (boss) => {
+            if (boss.isDead) return true;
+
+            if (boss.patternCooldown === 0) {
+                const randomIndex = Math.floor(Math.random() * currentMap.path.length);
+                boss.x = currentMap.path[randomIndex].x;
+                boss.y = currentMap.path[randomIndex].y;
+                showBossPatternEffect(boss.x, boss.y, 'Teleport');
+                playSound('bossTeleport');
+            }
+
+            return false;
+        }
+    },
+    HEAL: {
+        name: 'Heal',
+        cooldown: 240,
+        update: (boss) => {
+            if (boss.isDead) return true;
+
+            if (boss.patternCooldown === 0) {
+                const healAmount = Math.floor(boss.maxHealth * 0.3);
+                boss.health = Math.min(boss.maxHealth, boss.health + healAmount);
+                showBossPatternEffect(boss.x, boss.y, 'Heal');
+                playSound('bossHeal');
+            }
+
+            return false;
+        }
+    }
+};
+
+// 적 스킬 정의
+const ENEMY_SKILLS = {
+    SHIELD: {
+        name: '방어막',
+        cooldown: 300, // 5초
+        effect: function (enemy) {
+            enemy.isInvincible = true;
+            showSkillEffect(enemy.x, enemy.y, '방어막');
+            setTimeout(() => {
+                if (!enemy.isDead) enemy.isInvincible = false;
+            }, 2000); // 2초간 무적
+        }
+    },
+    TELEPORT: {
+        name: '순간이동',
+        cooldown: 400,
+        effect: function (enemy) {
+            if (enemy.pathIndex + 3 < currentMap.path.length - 1) {
+                enemy.pathIndex += 3;
+                const target = currentMap.path[enemy.pathIndex];
+                enemy.x = target.x;
+                enemy.y = target.y;
+                showSkillEffect(enemy.x, enemy.y, '순간이동');
+            }
+        }
+    },
+    HEAL_SELF: {
+        name: '자가회복',
+        cooldown: 350,
+        effect: function (enemy) {
+            const heal = Math.floor(enemy.maxHealth * 0.3);
+            enemy.health = Math.min(enemy.maxHealth, enemy.health + heal);
+            showSkillEffect(enemy.x, enemy.y, '자가회복');
+        }
+    },
+    HEAL_AOE: {
+        name: '광역 힐',
+        cooldown: 500,
+        effect: function (enemy) {
+            enemies.forEach(e => {
+                if (e !== enemy && Math.abs(e.x - enemy.x) < 2 && Math.abs(e.y - enemy.y) < 2) {
+                    e.health = Math.min(e.maxHealth, e.health + Math.floor(e.maxHealth * 0.2));
+                    showSkillEffect(e.x, e.y, '힐');
+                }
+            });
+            showSkillEffect(enemy.x, enemy.y, '광역힐');
+        }
+    }
+};
+
+
 // 이제 class Enemy를 전역에 선언
 class Enemy {
     constructor(wave, isBoss = false) {
+        // 기본 속성 초기화
         this.pathIndex = 0;
         this.x = currentMap.path[0].x;
         this.y = currentMap.path[0].y;
-        
-        // 레벨 시스템 초기화
-        this.level = this.calculateInitialLevel(wave);
-        this.levelUpCount = 0;
-        
-        // 적 유형 선택
-        if (!isBoss) {
-            const enemyTypes = Object.keys(ENEMY_TYPES);
-            const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-            const enemyType = ENEMY_TYPES[randomType];
-            
-            this.type = randomType;
-            this.name = `${enemyType.name} Lv.${this.level}`;
-            this.baseSpeed = enemyType.speed;
-            this.speed = this.calculateLeveledSpeed(this.baseSpeed);
-            this.health = this.calculateLeveledHealth(enemyType.health * (1 + (wave * 0.1)));
-            this.maxHealth = this.health;
-            this.reward = Math.floor(this.calculateLeveledReward(enemyType.reward * (1 + (wave * 0.1))));
-            this.color = enemyType.color;
-            this.experienceValue = Math.floor(this.calculateLeveledExperience(enemyType.experienceValue));
-        } else {
-            const bossType = Object.keys(BOSS_TYPES)[Math.floor(Math.random() * Object.keys(BOSS_TYPES).length)];
-            const boss = BOSS_TYPES[bossType];
-            this.type = 'BOSS';
-            this.name = `${boss.name} Lv.${this.level}`;
-            this.health = this.calculateLeveledHealth(boss.health);
-            this.maxHealth = this.health;
-            this.speed = this.calculateLeveledSpeed(boss.speed);
-            this.reward = Math.floor(this.calculateLeveledReward(boss.reward));
-            this.color = boss.color;
-            this.ability = boss.ability;
-            this.abilityCooldown = 0;
-            this.pattern = BOSS_PATTERNS[bossType];
-            gameState.bossKilled = false;
-            playSound('bossSpawn');
-        }
-
-        // 상태 효과 관련 속성
+        this.isDead = false;
+        this.isInvincible = false;
+        this.lastDamage = null;
         this.statusEffects = new Map();
         this.continuousDamage = 0;
         this.defense = 0;
@@ -1675,63 +1956,67 @@ class Enemy {
         this.patternCooldown = 0;
         this.healCooldown = 0;
 
-        // AI 패턴 초기화
+        // AI 패턴 및 타입/이름 초기화
         if (!isBoss) {
+            // 적 타입 랜덤 선택
+            const enemyTypes = Object.keys(ENEMY_TYPES);
+            const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+            const enemyType = ENEMY_TYPES[randomType];
+            this.type = randomType;
+            // 패턴 랜덤 선택
             const patterns = Object.keys(ENEMY_PATTERNS);
             const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
             this.pattern = ENEMY_PATTERNS[randomPattern];
-            this.name = `${this.name} (${this.pattern.name})`;
-        }
-
-        // 적 스킬 정의
-        const ENEMY_SKILLS = {
-            SHIELD: {
-                name: '방어막',
-                cooldown: 300, // 5초
-                effect: function(enemy) {
-                    enemy.isInvincible = true;
-                    showSkillEffect(enemy.x, enemy.y, '방어막');
-                    setTimeout(() => {
-                        enemy.isInvincible = false;
-                    }, 2000); // 2초간 무적
-                }
-            },
-            TELEPORT: {
-                name: '순간이동',
-                cooldown: 400,
-                effect: function(enemy) {
-                    if (enemy.pathIndex + 3 < currentMap.path.length - 1) {
-                        enemy.pathIndex += 3;
-                        const target = currentMap.path[enemy.pathIndex];
-                        enemy.x = target.x;
-                        enemy.y = target.y;
-                        showSkillEffect(enemy.x, enemy.y, '순간이동');
-                    }
-                }
-            },
-            HEAL_SELF: {
-                name: '자가회복',
-                cooldown: 350,
-                effect: function(enemy) {
-                    const heal = Math.floor(enemy.maxHealth * 0.3);
-                    enemy.health = Math.min(enemy.maxHealth, enemy.health + heal);
-                    showSkillEffect(enemy.x, enemy.y, '자가회복');
-                }
-            },
-            HEAL_AOE: {
-                name: '광역 힐',
-                cooldown: 500,
-                effect: function(enemy) {
-                    enemies.forEach(e => {
-                        if (e !== enemy && Math.abs(e.x - enemy.x) < 2 && Math.abs(e.y - enemy.y) < 2) {
-                            e.health = Math.min(e.maxHealth, e.health + Math.floor(e.maxHealth * 0.2));
-                            showSkillEffect(e.x, e.y, '힐');
-                        }
-                    });
-                    showSkillEffect(enemy.x, enemy.y, '광역힐');
-                }
+            // 레벨/스탯/이름 등 초기화
+            this.level = this.calculateInitialLevel(wave);
+            this.levelUpCount = 0;
+            this.baseSpeed = enemyType.speed;
+            this.maxHealth = this.calculateLeveledHealth(enemyType.health);
+            this.health = this.maxHealth;
+            this.speed = this.calculateLeveledSpeed(this.baseSpeed);
+            this.reward = Math.floor(this.calculateLeveledReward(enemyType.reward));
+            this.experienceValue = Math.floor(this.calculateLeveledExperience(enemyType.experienceValue));
+            this.name = `${enemyType.name} Lv.${this.level} (${this.pattern.name})`;
+            this.color = enemyType.color;
+        } else {
+            // 보스 타입 랜덤 선택
+            const bossTypes = Object.keys(BOSS_TYPES);
+            const randomBossType = bossTypes[Math.floor(Math.random() * bossTypes.length)];
+            const bossType = BOSS_TYPES[randomBossType];
+            this.type = 'BOSS';
+            this.bossType = randomBossType; // 실제 타입 저장
+            this.level = this.calculateInitialLevel(wave);
+            this.levelUpCount = 0;
+            this.baseSpeed = bossType.speed;
+            this.maxHealth = this.calculateLeveledHealth(bossType.health);
+            this.health = this.maxHealth;
+            this.speed = this.calculateLeveledSpeed(this.baseSpeed);
+            this.reward = Math.floor(this.calculateLeveledReward(bossType.reward));
+            this.experienceValue = Math.floor(this.calculateLeveledExperience(200)); // 보스 경험치 상향
+            this.name = `${bossType.name} Lv.${this.level}`;
+            this.color = bossType.color;
+            this.ability = bossType.ability;
+            // 타입별 패턴/스킬 고정
+            switch (randomBossType) {
+                case 'TANK':
+                    this.pattern = BOSS_PATTERNS.SHIELD;
+                    this.skill = ENEMY_SKILLS.SHIELD;
+                    break;
+                case 'SPEED':
+                    this.pattern = BOSS_PATTERNS.TELEPORT;
+                    this.skill = ENEMY_SKILLS.TELEPORT;
+                    break;
+                case 'SUMMONER':
+                    this.pattern = BOSS_PATTERNS.HEAL;
+                    this.skill = ENEMY_SKILLS.HEAL_AOE;
+                    break;
+                default:
+                    this.pattern = BOSS_PATTERNS.SHIELD;
+                    this.skill = ENEMY_SKILLS.SHIELD;
             }
-        };
+            this.patternCooldown = this.pattern.cooldown;
+            this.skillCooldown = this.skill.cooldown;
+        }
 
         // Enemy 생성자 내 (보스/특수 적에 스킬 부여 예시)
         // 예시: 탱커는 방어막, 보스는 순간이동, 힐러는 광역힐
@@ -1799,21 +2084,26 @@ class Enemy {
     applyStatusEffect(effectType, duration) {
         const effect = STATUS_EFFECTS[effectType];
         if (!effect) return;
-
-        this.statusEffects.set(effectType, {
-            duration: duration || effect.duration,
-            remaining: duration || effect.duration
-        });
-
-        // 효과 적용
-        switch(effectType) {
-            case 'FROZEN':
-                this.speed *= effect.speedMultiplier;
-                break;
-            case 'POISON':
-            case 'BURNING':
-                this.continuousDamage += effect.damagePerTick;
-                break;
+        // 보스는 상태이상 지속시간 50% 감소
+        let actualDuration = duration || effect.duration;
+        if (this.type === 'BOSS') actualDuration = Math.ceil(actualDuration * 0.5);
+        if (this.statusEffects.has(effectType)) {
+            const current = this.statusEffects.get(effectType);
+            current.remaining = Math.max(current.remaining, actualDuration);
+        } else {
+            this.statusEffects.set(effectType, {
+                duration: actualDuration,
+                remaining: actualDuration
+            });
+            switch(effectType) {
+                case 'FROZEN':
+                    this.speed *= effect.speedMultiplier;
+                    break;
+                case 'POISON':
+                case 'BURNING':
+                    this.continuousDamage += effect.damagePerTick;
+                    break;
+            }
         }
     }
 
@@ -1838,77 +2128,50 @@ class Enemy {
     }
 
     healNearbyEnemies() {
-        if (this.type === 'HEALER' && this.healCooldown <= 0) {
-            enemies.forEach(enemy => {
-                if (enemy !== this) {
-                    const dx = (enemy.x - this.x) * TILE_SIZE;
-                    const dy = (enemy.y - this.y) * TILE_SIZE;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance <= ENEMY_TYPES.HEALER.healRange * TILE_SIZE) {
-                        enemy.health = Math.min(enemy.maxHealth, enemy.health + ENEMY_TYPES.HEALER.healAmount);
-                        showHealEffect(enemy.x, enemy.y);
+        if (this.type !== 'HEALER' || this.healCooldown > 0 || this.isDead) return;
+        let healedAny = false;
+        enemies.forEach(enemy => {
+            if (enemy !== this && !enemy.isDead) {
+                const dx = (enemy.x - this.x) * TILE_SIZE;
+                const dy = (enemy.y - this.y) * TILE_SIZE;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                if (distance <= ENEMY_TYPES.HEALER.healRange * TILE_SIZE) {
+                    const healAmount = Math.min(ENEMY_TYPES.HEALER.healAmount, enemy.maxHealth - enemy.health);
+                    if (healAmount > 0) {
+                        enemy.health = Math.min(enemy.maxHealth, enemy.health + healAmount);
+                        // 이펙트 중복 방지: 이미 같은 위치에 이펙트가 있으면 추가하지 않음
+                        if (!document.querySelector(`.enemy-skill-effect[data-x='${enemy.x}'][data-y='${enemy.y}']`)) {
+                            showSkillEffect(enemy.x, enemy.y, 'Heal');
+                        }
+                        healedAny = true;
                     }
                 }
-            });
-            this.healCooldown = 60; // 1초 쿨다운
-        }
-        if (this.healCooldown > 0) this.healCooldown--;
+            }
+        });
+        if (healedAny) this.healCooldown = 60;
     }
 
     update() {
-        // 상태 효과 업데이트
+        if (this.isDead) return true;
+        if (this.health <= 0 && !this.isDead) {
+            this.die();
+            return true;
+        }
         this.updateStatusEffects();
-        
         // 레벨업 시도
         this.tryLevelUp();
         
         // 지속 데미지 적용
         if (this.continuousDamage > 0) {
             const damage = Math.floor(this.continuousDamage);
-            this.health -= damage;
+            this.takeDamage(damage);
             this.continuousDamage = Math.max(0, this.continuousDamage * 0.95);
         }
 
-        // 경로 종료 체크
+        // 경로 종료 체크 (pathIndex 초과 방지)
         if (this.pathIndex >= currentMap.path.length - 1) {
             gameState.lives--;
-            return true;
-        }
-
-        // 사망 체크
-        if (this.health <= 0) {
-            if (!this.isInvincible) {
-                gainExperience(this.experienceValue);
-                
-                // 타워 경험치 획득
-                towers.forEach(tower => {
-                    const dx = (this.x - tower.x) * TILE_SIZE;
-                    const dy = (this.y - tower.y) * TILE_SIZE;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance <= tower.range * TILE_SIZE) {
-                        tower.gainExperience(this.experienceValue / 2);
-                    }
-                });
-                
-                gameState.gold += this.reward * (gameState.goldMultiplier || 1);
-                gameStats.totalGold += this.reward * (gameState.goldMultiplier || 1);
-                gameStats.enemiesKilled++;
-                // 크리티컬로 처치 시 점수 2배, 보스는 3배
-                let scoreToAdd = this.reward;
-                if (this.lastDamage && this.lastDamage.isCritical) {
-                    scoreToAdd *= 2;
-                }
-                if (this.type === 'BOSS') {
-                    scoreToAdd = this.reward * 3;
-                    gameStats.bossesKilled++;
-                    gameState.bossKilled = true;
-                }
-                gameState.score += scoreToAdd;
-                playSound('enemy_death');
-                updateStats();
-            }
+            this.isDead = true;
             return true;
         }
 
@@ -1920,14 +2183,6 @@ class Enemy {
 
         // 치유사 능력 사용
         this.healNearbyEnemies();
-
-        // 보스 패턴 사용
-        if (this.type === 'BOSS' && this.patternCooldown <= 0) {
-            this.pattern.effect(this);
-            this.patternCooldown = this.pattern.cooldown;
-            showBossPatternEffect(this.x, this.y, this.pattern.name);
-        }
-        if (this.patternCooldown > 0) this.patternCooldown--;
 
         // Enemy update() 내 추가
         if (this.skill && this.skillCooldown > 0) {
@@ -1948,10 +2203,21 @@ class Enemy {
             showSkillWarning(this.x, this.y, this.skill.name);
         }
 
+        // Enemy.update 내 보스 패턴 실행 안전장치
+        if (this.type === 'BOSS' && this.patternCooldown <= 0 && !this.isDead) {
+            if (this.pattern && typeof this.pattern.effect === 'function') {
+                this.pattern.effect(this);
+                this.patternCooldown = this.pattern.cooldown;
+                showBossPatternEffect(this.x, this.y, this.pattern.name);
+            }
+        }
+        if (this.patternCooldown > 0) this.patternCooldown--;
+
         return false;
     }
 
     draw() {
+        if (this.isDead) return;
         // 적 기본 모양
         ctx.save();
         let baseColor = this.color;
@@ -2112,7 +2378,7 @@ class Enemy {
         // 체력바
         const healthBarWidth = TILE_SIZE - 10;
         const healthBarHeight = 5;
-        const healthPercentage = this.health / this.maxHealth;
+        const healthPercentage = Math.max(0, this.health / this.maxHealth);
         
         ctx.fillStyle = 'red';
         ctx.fillRect(
@@ -2159,6 +2425,42 @@ class Enemy {
             showDamageNumber(this.x, this.y, this.lastDamage.amount, true);
             this.lastDamage = null;
         }
+    }
+
+    // 방어력 일관 적용
+    takeDamage(damage, isCritical = false) {
+        if (this.isDead || this.isInvincible) return false;
+        // 방어력 적용
+        const actualDamage = Math.max(1, Math.floor(damage * (1 - (this.defense / (this.defense + 100)))));
+        this.health = Math.max(0, this.health - actualDamage);
+        this.lastDamage = { amount: actualDamage, isCritical };
+        if (this.health <= 0) {
+            this.die();
+            return true;
+        }
+        return false;
+    }
+
+    die() {
+        if (this.isDead) return;
+        this.isDead = true;
+        // 보상 지급 및 중복 방지
+        gainExperience(this.experienceValue);
+        gameState.gold += this.reward * (gameState.goldMultiplier || 1);
+        gameStats.totalGold += this.reward * (gameState.goldMultiplier || 1);
+        gameStats.enemiesKilled++;
+        let scoreToAdd = this.reward;
+        if (this.lastDamage && this.lastDamage.isCritical) scoreToAdd *= 2;
+        if (this.type === 'BOSS') {
+            scoreToAdd = this.reward * 3;
+            gameStats.bossesKilled++;
+            gameState.bossKilled = true;
+            this.patternCooldown = 99999; // 보스 사망 시 패턴 중단
+            this.skillCooldown = 99999; // 보스 사망 시 스킬 중단
+        }
+        gameState.score += scoreToAdd;
+        playSound('enemy_death');
+        updateStats();
     }
 }
 
@@ -2330,9 +2632,9 @@ function startWave() {
     enemyGroups = [];
     
     // 20% 확률로 특수 이벤트 발생
-    if (Math.random() < 0.2) {
-        triggerSpecialEvent();
-    }
+    // if (Math.random() < 0.2) {
+    //     triggerSpecialEvent();
+    // }
     
     for (let i = 0; i < groupsToSpawn; i++) {
         const group = new EnemyGroup(groupIdCounter++, groupSize);
@@ -3134,24 +3436,32 @@ window.addEventListener('load', () => {
 
 // 데미지 숫자 표시 함수
 function showDamageNumber(x, y, damage, isCritical = false) {
-    const damageText = document.createElement('div');
-    damageText.className = 'damage-number';
-    if (isCritical) damageText.classList.add('critical');
-    
-    // 타워 중심을 기준으로 계산
-    const centerX = x * TILE_SIZE + TILE_SIZE/2;
-    const centerY = y * TILE_SIZE + TILE_SIZE/2;
-    
-    damageText.style.left = `${centerX}px`;
-    damageText.style.top = `${centerY}px`;
-    damageText.textContent = damage;
-    
-    document.querySelector('.game-area').appendChild(damageText);
-    
-    // 애니메이션 종료 후 제거
+    if (lowSpecMode) return;
+    const damageText = EffectPool.get('damage');
+    // 랜덤한 회전과 이동
+    const rotation = (Math.random() - 0.5) * 30;
+    const offsetX = (Math.random() - 0.5) * 20;
+    damageText.style.cssText = `
+        display: block;
+        left: ${x * TILE_SIZE + TILE_SIZE/2 + offsetX}px;
+        top: ${y * TILE_SIZE + TILE_SIZE/2}px;
+        transform: translate(-50%, -50%) rotate(${rotation}deg);
+        z-index: 1200;
+        opacity: 1;
+        pointer-events: none;
+        color: ${isCritical ? '#ef4444' : '#fff'};
+        font-size: ${isCritical ? '24px' : '16px'};
+        font-weight: ${isCritical ? 'bold' : 'normal'};
+        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        animation: ${isCritical ? 'criticalDamageNumber' : 'damageNumber'} 1s ease-out forwards;
+    `;
+    damageText.className = `damage-number${isCritical ? ' critical' : ''}`;
+    damageText.textContent = damage.toLocaleString();
+
+    // 애니메이션 종료 후 풀로 반환
     damageText.addEventListener('animationend', () => {
-        damageText.remove();
-    });
+        EffectPool.release(damageText);
+    }, { once: true });
 }
 
 // 스킬 발동 예고 효과
@@ -3505,17 +3815,21 @@ function showSpecialEffect(x, y, name) {
     }, 2000);
 }
 
-function showBossPatternEffect(x, y, name) {
+function showBossPatternEffect(x, y, patternName) {
     const effect = document.createElement('div');
     effect.className = 'boss-pattern-effect';
-    effect.textContent = name;
-    effect.style.left = `${x * TILE_SIZE}px`;
-    effect.style.top = `${y * TILE_SIZE}px`;
-    document.querySelector('.game-area').appendChild(effect);
-    
-    setTimeout(() => {
-        effect.remove();
-    }, 2000);
+    effect.textContent = patternName;
+    effect.style.position = 'absolute';
+    effect.style.left = `${x * TILE_SIZE + TILE_SIZE/2}px`;
+    effect.style.top = `${y * TILE_SIZE + TILE_SIZE/2}px`;
+    effect.style.transform = 'translate(-50%, -50%)';
+    effect.style.zIndex = 1200;
+    effect.style.pointerEvents = 'none';
+    // 반드시 .game-area에만 추가, 없으면 추가하지 않음
+    const parent = document.querySelector('.game-area');
+    if (!parent) return;
+    parent.appendChild(effect);
+    setTimeout(() => effect.remove(), 1000);
 }
 
 // 맵 선택 함수
@@ -3797,48 +4111,39 @@ document.head.insertAdjacentHTML('beforeend', `
     </style>
 `);
 
-// 보스 패턴 정의
-const BOSS_PATTERNS = {
-    TANK: {
-        name: '방어막',
-        cooldown: 300,
-        effect: (boss) => {
-            boss.isInvincible = true;
-            boss.defense = 50;
-            setTimeout(() => {
-                boss.isInvincible = false;
-                boss.defense = 0;
-            }, 5000);
-        }
-    },
-    SPEED: {
-        name: '돌진',
-        cooldown: 200,
-        effect: (boss) => {
-            const currentIndex = boss.pathIndex;
-            if (currentIndex + 3 < currentMap.path.length) {
-                boss.x = currentMap.path[currentIndex + 3].x;
-                boss.y = currentMap.path[currentIndex + 3].y;
-                boss.pathIndex += 3;
-            }
-        }
-    },
-    SUMMONER: {
-        name: '소환',
-        cooldown: 400,
-        effect: (boss) => {
-            for (let i = 0; i < 3; i++) {
-                const enemy = new Enemy(gameState.wave);
-                enemy.x = boss.x;
-                enemy.y = boss.y;
-                enemy.health = 50;
-                enemy.maxHealth = 50;
-                enemy.speed = 0.03;
-                enemies.push(enemy);
-            }
-        }
-    }
-};
+// 보스 패턴 이펙트 표시 함수
+function showBossPatternEffect(x, y, patternName) {
+    const effect = document.createElement('div');
+    effect.className = 'boss-pattern-effect';
+    effect.style.left = `${x * TILE_SIZE}px`;
+    effect.style.top = `${y * TILE_SIZE}px`;
+    effect.textContent = patternName;
+
+    // game-container가 없으면 .game-area, 그것도 없으면 body에 추가
+    let parent = document.getElementById('game-container')
+        || document.querySelector('.game-area')
+        || document.body;
+    parent.appendChild(effect);
+
+    setTimeout(() => {
+        effect.remove();
+    }, 1000);
+}
+
+// 보스 패턴 경고 표시 함수
+function showBossPatternWarning(x, y, patternName) {
+    const warning = document.createElement('div');
+    warning.className = 'boss-pattern-warning';
+    warning.style.left = `${x * TILE_SIZE}px`;
+    warning.style.top = `${y * TILE_SIZE}px`;
+    warning.textContent = `${patternName} 준비중...`;
+    
+    document.getElementById('game-container').appendChild(warning);
+    
+    setTimeout(() => {
+        warning.remove();
+    }, 2000);
+}
 
 // CSS 스타일 추가
 document.head.insertAdjacentHTML('beforeend', `
@@ -4865,65 +5170,93 @@ document.head.insertAdjacentHTML('beforeend', `
     </style>
 `);
 
-// 적 유형 정의
-const ENEMY_TYPES = {
-    NORMAL: {
-        name: '일반 적',
-        health: 100,
-        speed: 0.02,
-        reward: 10,
-        color: 'red',
-        experienceValue: 10
-    },
-    FAST: {
-        name: '빠른 적',
-        health: 50,
-        speed: 0.04,
-        reward: 15,
-        color: 'yellow',
-        experienceValue: 15
-    },
-    TANK: {
-        name: '탱커',
-        health: 300,
-        speed: 0.01,
-        reward: 20,
-        color: 'purple',
-        experienceValue: 20
-    },
-    HEALER: {
-        name: '치유사',
-        health: 80,
-        speed: 0.015,
-        reward: 25,
-        color: 'green',
-        experienceValue: 25,
-        healAmount: 10,
-        healRange: 2
-    }
-};
-
 // 상태 효과 정의
 const STATUS_EFFECTS = {
     POISON: {
         name: '독',
-        duration: 5,
+        duration: 180,
         damagePerTick: 2,
-        color: 'green'
+        color: '#00ff00',
+        update: (enemy) => {
+            if (enemy.isDead) return true;
+            enemy.takeDamage(STATUS_EFFECTS.POISON.damagePerTick);
+            return false;
+        }
     },
     FROZEN: {
         name: '빙결',
-        duration: 3,
+        duration: 120,
         speedMultiplier: 0.5,
-        color: 'blue'
+        color: '#00ffff',
+        update: (enemy) => {
+            if (enemy.isDead) return true;
+            enemy.speed = enemy.baseSpeed * STATUS_EFFECTS.FROZEN.speedMultiplier;
+            return false;
+        }
     },
     BURNING: {
         name: '화상',
-        duration: 4,
+        duration: 150,
         damagePerTick: 3,
-        color: 'orange'
+        color: '#ff0000',
+        update: (enemy) => {
+            if (enemy.isDead) return true;
+            enemy.takeDamage(STATUS_EFFECTS.BURNING.damagePerTick);
+            return false;
+        }
     }
 };
+
+// 상태 효과 이펙트 표시 함수
+function showStatusEffect(x, y, effectType) {
+    const effect = document.createElement('div');
+    effect.className = 'status-effect';
+    effect.style.left = `${x * TILE_SIZE}px`;
+    effect.style.top = `${y * TILE_SIZE}px`;
+    effect.textContent = STATUS_EFFECTS[effectType].name;
+    effect.style.color = STATUS_EFFECTS[effectType].color;
+    
+    document.getElementById('game-container').appendChild(effect);
+    
+    setTimeout(() => {
+        effect.remove();
+    }, 1000);
+}
+
+// 상태 효과 업데이트 함수
+function updateStatusEffects(enemy) {
+    if (enemy.isDead) return;
+    
+    for (const [effectType, effect] of enemy.statusEffects) {
+        if (!STATUS_EFFECTS[effectType]) continue;
+        
+        effect.remaining--;
+        
+        // 효과 업데이트
+        if (STATUS_EFFECTS[effectType].update) {
+            const shouldRemove = STATUS_EFFECTS[effectType].update(enemy);
+            if (shouldRemove) {
+                enemy.statusEffects.delete(effectType);
+                continue;
+            }
+        }
+        
+        // 효과 종료
+        if (effect.remaining <= 0) {
+            // 효과 제거 시 원래 상태로 복구
+            switch(effectType) {
+                case 'FROZEN':
+                    enemy.speed = enemy.baseSpeed;
+                    break;
+                case 'POISON':
+                case 'BURNING':
+                    enemy.continuousDamage = Math.max(0, enemy.continuousDamage - STATUS_EFFECTS[effectType].damagePerTick);
+                    break;
+            }
+            enemy.statusEffects.delete(effectType);
+        }
+    }
+}
 
 function showHealEffect(x, y) {
     const effect = {
@@ -4959,170 +5292,6 @@ function showHealEffect(x, y) {
 
     animate();
 }
-
-// 적 AI 패턴 상수
-const ENEMY_PATTERNS = {
-    NORMAL: {
-        name: '일반',
-        description: '기본 경로를 따라 이동',
-        update: function(enemy) {
-            if (enemy.pathIndex >= currentMap.path.length - 1) {
-                gameState.lives--;
-                return true;
-            }
-            const target = currentMap.path[enemy.pathIndex + 1];
-            const dx = target.x - enemy.x;
-            const dy = target.y - enemy.y;
-            if (Math.abs(dx) < enemy.speed && Math.abs(dy) < enemy.speed) {
-                enemy.pathIndex++;
-            } else {
-                enemy.x += dx * enemy.speed;
-                enemy.y += dy * enemy.speed;
-            }
-            return false;
-        }
-    },
-    ZIGZAG: {
-        name: '지그재그',
-        description: '경로를 따라가면서 좌우로 살짝 흔들림',
-        update: function(enemy) {
-            if (enemy.pathIndex >= currentMap.path.length - 1) {
-                gameState.lives--;
-                return true;
-            }
-            const prev = currentMap.path[enemy.pathIndex];
-            const target = currentMap.path[enemy.pathIndex + 1];
-            const dx = target.x - prev.x;
-            const dy = target.y - prev.y;
-            // 경로의 법선 벡터(좌우 흔들림)
-            const nx = -dy;
-            const ny = dx;
-            if (enemy.zigzagFrame === undefined) enemy.zigzagFrame = 0;
-            enemy.zigzagFrame++;
-            const offset = Math.sin(enemy.zigzagFrame * 0.2) * 0.2; // 0.2칸 이내로 흔들림
-            // 목표 위치 계산 (경로 + 흔들림)
-            const tx = target.x + nx * offset;
-            const ty = target.y + ny * offset;
-            const ddx = tx - enemy.x;
-            const ddy = ty - enemy.y;
-            if (Math.abs(ddx) < enemy.speed && Math.abs(ddy) < enemy.speed) {
-                enemy.pathIndex++;
-            } else {
-                enemy.x += ddx * enemy.speed;
-                enemy.y += ddy * enemy.speed;
-            }
-            return false;
-        }
-    },
-    SWARM: {
-        name: '무리',
-        description: '경로를 따라가면서 가까운 적과 뭉침',
-        update: function(enemy) {
-            if (enemy.pathIndex >= currentMap.path.length - 1) {
-                gameState.lives--;
-                return true;
-            }
-            // 경로 기본 이동
-            const target = currentMap.path[enemy.pathIndex + 1];
-            let dx = target.x - enemy.x;
-            let dy = target.y - enemy.y;
-            // 가까운 적과의 거리 보정(경로에서 크게 벗어나지 않게 0.1칸 이내로만 영향)
-            let minDist = Infinity;
-            let closest = null;
-            enemies.forEach(other => {
-                if (other !== enemy) {
-                    const dist = Math.sqrt((other.x - enemy.x) ** 2 + (other.y - enemy.y) ** 2);
-                    if (dist < minDist) {
-                        minDist = dist;
-                        closest = other;
-                    }
-                }
-            });
-            if (closest && minDist > 0.1 && minDist < 2) {
-                dx += (closest.x - enemy.x) * 0.05;
-                dy += (closest.y - enemy.y) * 0.05;
-            }
-            if (Math.abs(dx) < enemy.speed && Math.abs(dy) < enemy.speed) {
-                enemy.pathIndex++;
-            } else {
-                enemy.x += dx * enemy.speed;
-                enemy.y += dy * enemy.speed;
-            }
-            return false;
-        }
-    },
-    AMBUSH: {
-        name: '매복',
-        description: '경로에서 잠시 멈췄다가 빠르게 돌진',
-        update: function(enemy) {
-            if (enemy.pathIndex >= currentMap.path.length - 1) {
-                gameState.lives--;
-                return true;
-            }
-            if (!enemy.ambushState) {
-                enemy.ambushState = 'hiding';
-                enemy.ambushTimer = 60;
-                enemy.originalSpeed = enemy.speed;
-            }
-            switch(enemy.ambushState) {
-                case 'hiding':
-                    enemy.ambushTimer--;
-                    if (enemy.ambushTimer <= 0) {
-                        enemy.ambushState = 'charging';
-                        enemy.speed = enemy.originalSpeed * 2;
-                        showAmbushEffect(enemy.x, enemy.y);
-                    }
-                    break;
-                case 'charging':
-                    const target = currentMap.path[enemy.pathIndex + 1];
-                    const dx = target.x - enemy.x;
-                    const dy = target.y - enemy.y;
-                    if (Math.abs(dx) < enemy.speed && Math.abs(dy) < enemy.speed) {
-                        enemy.pathIndex++;
-                        enemy.ambushState = 'hiding';
-                        enemy.speed = enemy.originalSpeed;
-                        enemy.ambushTimer = 60;
-                    } else {
-                        enemy.x += dx * enemy.speed;
-                        enemy.y += dy * enemy.speed;
-                    }
-                    break;
-            }
-            return false;
-        }
-    },
-    // ... existing code ...
-    GROUP_RUSH: {
-        name: '집단 돌진',
-        description: '그룹 신호에 맞춰 동시에 돌진',
-        update: function(enemy) {
-            if (enemy.pathIndex >= currentMap.path.length - 1) {
-                gameState.lives--;
-                return true;
-            }
-            // 그룹 신호: 그룹 전체가 일정 거리 이하로 모이면 돌진
-            const group = enemyGroups.find(g => g.id === enemy.groupId);
-            let rush = false;
-            if (group) {
-                const alive = group.members.filter(e => e.health > 0);
-                // 그룹 내 적이 모두 가까이 모이면 돌진
-                const close = alive.every(e => Math.abs(e.x - enemy.x) < 1 && Math.abs(e.y - enemy.y) < 1);
-                if (close) rush = true;
-            }
-            const target = currentMap.path[enemy.pathIndex + 1];
-            const dx = target.x - enemy.x;
-            const dy = target.y - enemy.y;
-            const speed = rush ? enemy.speed * 2 : enemy.speed;
-            if (Math.abs(dx) < speed && Math.abs(dy) < speed) {
-                enemy.pathIndex++;
-            } else {
-                enemy.x += dx * speed;
-                enemy.y += dy * speed;
-            }
-            return false;
-        }
-    }
-};
 
 // 매복 효과 표시 함수
 function showAmbushEffect(x, y) {
@@ -5161,71 +5330,25 @@ function showAmbushEffect(x, y) {
     animate();
 }
 
-// 적 스킬 정의
-const ENEMY_SKILLS = {
-    SHIELD: {
-        name: '방어막',
-        cooldown: 300, // 5초
-        effect: function(enemy) {
-            enemy.isInvincible = true;
-            showSkillEffect(enemy.x, enemy.y, '방어막');
-            setTimeout(() => {
-                enemy.isInvincible = false;
-            }, 2000); // 2초간 무적
-        }
-    },
-    TELEPORT: {
-        name: '순간이동',
-        cooldown: 400,
-        effect: function(enemy) {
-            if (enemy.pathIndex + 3 < currentMap.path.length - 1) {
-                enemy.pathIndex += 3;
-                const target = currentMap.path[enemy.pathIndex];
-                enemy.x = target.x;
-                enemy.y = target.y;
-                showSkillEffect(enemy.x, enemy.y, '순간이동');
-            }
-        }
-    },
-    HEAL_SELF: {
-        name: '자가회복',
-        cooldown: 350,
-        effect: function(enemy) {
-            const heal = Math.floor(enemy.maxHealth * 0.3);
-            enemy.health = Math.min(enemy.maxHealth, enemy.health + heal);
-            showSkillEffect(enemy.x, enemy.y, '자가회복');
-        }
-    },
-    HEAL_AOE: {
-        name: '광역 힐',
-        cooldown: 500,
-        effect: function(enemy) {
-            enemies.forEach(e => {
-                if (e !== enemy && Math.abs(e.x - enemy.x) < 2 && Math.abs(e.y - enemy.y) < 2) {
-                    e.health = Math.min(e.maxHealth, e.health + Math.floor(e.maxHealth * 0.2));
-                    showSkillEffect(e.x, e.y, '힐');
-                }
-            });
-            showSkillEffect(enemy.x, enemy.y, '광역힐');
-        }
-    }
-};
-
 // 적 스킬 시각 효과
 function showSkillEffect(x, y, name) {
+    const parent = document.querySelector('.game-area');
+    if (!parent) return;
     const effect = document.createElement('div');
     effect.className = 'enemy-skill-effect';
     effect.textContent = name;
     effect.style.position = 'absolute';
     effect.style.left = `${x * TILE_SIZE + TILE_SIZE / 2}px`;
-    effect.style.top = `${y * TILE_SIZE}px`;
-    effect.style.transform = 'translate(-50%, -100%)';
+    effect.style.top = `${y * TILE_SIZE + TILE_SIZE / 2}px`;
+    effect.style.transform = 'translate(-50%, -50%)';
     effect.style.color = '#00eaff';
     effect.style.fontWeight = 'bold';
-    effect.style.fontSize = '14px';
+    effect.style.fontSize = '18px';
     effect.style.pointerEvents = 'none';
-    effect.style.zIndex = 1000;
-    document.querySelector('.game-area').appendChild(effect);
+    effect.style.zIndex = 1200;
+    effect.setAttribute('data-x', x);
+    effect.setAttribute('data-y', y);
+    parent.appendChild(effect);
     setTimeout(() => effect.remove(), 1200);
 }
 
@@ -5255,15 +5378,18 @@ let groupIdCounter = 1;
 // 그룹 버프/효과 적용 함수
 function applyGroupBuffs() {
     enemyGroups.forEach(group => {
-        const alive = group.members.filter(e => e.health > 0);
-        // 모두 살아있으면 속도 20% 증가
+        const alive = group.members.filter(e => e.health > 0 && !e.isDead);
         alive.forEach(e => {
             e.groupSpeedBuff = (alive.length === group.members.length) ? 1.2 : 1.0;
-        });
-        // 1마리만 남으면 방어력 50% 증가
-        alive.forEach(e => {
             e.groupDefenseBuff = (alive.length === 1) ? 1.5 : 1.0;
         });
+        // 그룹 내 모두 죽었으면 버프 해제
+        if (alive.length === 0) {
+            group.members.forEach(e => {
+                e.groupSpeedBuff = 1.0;
+                e.groupDefenseBuff = 1.0;
+            });
+        }
     });
 }
 
@@ -5316,6 +5442,9 @@ function initializeGame() {
     gameState.enemiesDefeated = 0;
     gameState.totalEnemies = 0;
     gameState.waveReward = 0;
+
+    // 이펙트 풀 초기화
+    initializeEffects();
 
     // 맵 선택 드롭다운 초기화
     const mapSelect = document.getElementById('mapSelect');
@@ -5380,162 +5509,41 @@ function initializeGame() {
 // ... existing code ...
 
 document.getElementById('waveStartButton').addEventListener('click', () => {
-    showCountdown();
+    showCountdown(); // initializeGame() 호출 금지
 });
 
-// 특수 이벤트 트리거 함수 추가
-function triggerSpecialEvent() {
-    const eventKeys = Object.keys(SPECIAL_EVENTS);
-    const randomEvent = eventKeys[Math.floor(Math.random() * eventKeys.length)];
-    
-    // 이미 발생한 이벤트인지 확인
-    if (!gameStats.eventsTriggered.includes(randomEvent)) {
-        const event = SPECIAL_EVENTS[randomEvent];
-        event.effect();
-        gameStats.eventsTriggered.push(randomEvent);
-        updateStats();
-    }
-}
-
-// 웨이브 시작 시 특수 이벤트 발생 확률 추가
-function startWave() {
-    if (gameState.waveInProgress) return;
-    
-    gameState.waveInProgress = true;
-    let groupSize = 3 + Math.floor(Math.random() * 3); // 3~5마리 그룹
-    let totalEnemies = 10 + (gameState.wave * 2);
-    let groupsToSpawn = Math.ceil(totalEnemies / groupSize);
-    gameState.enemiesRemaining = totalEnemies;
-    enemyGroups = [];
-    
-    // 20% 확률로 특수 이벤트 발생
-    if (Math.random() < 0.2) {
-        triggerSpecialEvent();
-    }
-    
-    for (let i = 0; i < groupsToSpawn; i++) {
-        const group = new EnemyGroup(groupIdCounter++, groupSize);
-        for (let j = 0; j < groupSize && gameState.enemiesRemaining > 0; j++) {
-            const enemy = new Enemy(gameState.wave);
-            group.add(enemy);
-            enemies.push(enemy);
-            gameState.enemiesRemaining--;
+// 맵 선택 이벤트에서만 initializeGame() 호출
+const mapSelect = document.getElementById('mapSelect');
+if (mapSelect) {
+    mapSelect.addEventListener('change', (e) => {
+        if (!gameState.isStarted) {
+            selectMap(e.target.value);
+            gameState.currentMap = e.target.value;
+            drawMinimap();
+            initializeGame(); // 맵 변경 시에만 초기화
         }
-        enemyGroups.push(group);
-    }
-    
-    // 보스 웨이브는 기존대로
-    if (gameState.wave % gameState.bossWave === 0) {
-        gameState.enemiesRemaining = 1;
-        enemies.push(new Enemy(gameState.wave, true));
-    }
-    
-    showWaveStartEffect();
-    playSound('wave_start');
+    });
 }
 
+// 게임 시작 버튼에서만 initializeGame() 호출
+const startBtn = document.getElementById('startBtn');
+if (startBtn) {
+    // 기존에 이벤트 리스너가 중복 등록되지 않도록 제거
+    startBtn.replaceWith(startBtn.cloneNode(true));
+    const newStartBtn = document.getElementById('startBtn');
+    newStartBtn.addEventListener('click', () => {
+        if (!gameState.isStarted) {
+            gameState.isStarted = true;
+            updateControlVisibility();
+            initializeGame(); // 게임 시작 시 초기화
+        } else {
+            restartGame();
+            gameState.isStarted = true; // 재시작 후에도 isStarted는 true 유지
+            updateControlVisibility();
+        }
+    });
+}
 // ... existing code ...
-
-// 게임 초기화
-document.addEventListener('DOMContentLoaded', function() {
-    // 게임 컨트롤 이벤트
-    const pauseBtn = document.getElementById('pauseBtn');
-    const helpBtn = document.getElementById('helpBtn');
-    const closeHelp = document.getElementById('closeHelp');
-    const difficultySelect = document.getElementById('difficultySelect');
-    const saveBtn = document.getElementById('saveBtn');
-    const loadBtn = document.getElementById('loadBtn');
-    const mapSelect = document.getElementById('mapSelect');
-    const waveStartButton = document.getElementById('waveStartButton');
-    const soundToggleBtn = document.getElementById('soundToggleBtn');
-    const musicToggleBtn = document.getElementById('musicToggleBtn');
-
-    if (pauseBtn) {
-        pauseBtn.addEventListener('click', () => {
-            if (gameState.isStarted) {
-                gameState.isPaused = !gameState.isPaused;
-                pauseBtn.textContent = gameState.isPaused ? '계속하기' : '일시정지';
-            }
-        });
-    }
-
-    if (difficultySelect) {
-        difficultySelect.addEventListener('change', (e) => {
-            if (!gameState.isStarted) {
-                gameState.difficulty = e.target.value;
-                const settings = DIFFICULTY_SETTINGS[gameState.difficulty];
-                gameState.gold = settings.gold;
-                gameState.lives = settings.lives;
-                gameState.maxTowers = settings.maxTowers;
-                updateTowerLimit();
-            }
-        });
-    }
-
-    if (saveBtn) {
-        saveBtn.addEventListener('click', () => {
-            saveGame();
-        });
-    }
-
-    if (loadBtn) {
-        loadBtn.addEventListener('click', () => {
-            loadGame();
-        });
-    }
-
-    if (mapSelect) {
-        mapSelect.addEventListener('change', (e) => {
-            if (!gameState.isStarted) {
-                selectMap(e.target.value);
-                gameState.currentMap = e.target.value;
-                drawMinimap();
-            }
-        });
-    }
-
-    if (waveStartButton) {
-        waveStartButton.addEventListener('click', () => {
-            showCountdown();
-        });
-    }
-
-    if (soundToggleBtn) {
-        soundToggleBtn.addEventListener('click', function() {
-            toggleSound();
-            this.classList.toggle('muted');
-            this.textContent = soundEnabled ? '🔊 효과음' : '🔇 효과음';
-        });
-    }
-
-    if (musicToggleBtn) {
-        musicToggleBtn.addEventListener('click', function() {
-            toggleMusic();
-            this.classList.toggle('muted');
-            this.textContent = musicEnabled ? '🎵 배경음악' : '🎵 배경음악';
-        });
-    }
-
-    // 파워업 메뉴 이벤트
-    const powerupItems = document.querySelectorAll('.powerup-item');
-    if (powerupItems.length > 0) {
-        powerupItems.forEach(item => {
-            item.addEventListener('click', () => {
-                const powerupType = item.dataset.powerup.toUpperCase();
-                const powerup = POWERUPS[powerupType];
-                
-                if (gameState.gold >= powerup.cost) {
-                    gameState.gold -= powerup.cost;
-                    powerup.effect();
-                    playSound('powerup');
-                }
-            });
-        });
-    }
-
-    // 게임 초기화
-    initializeGame();
-});
 
 // 이펙트 풀 관리자
 const EffectPool = {
@@ -5762,24 +5770,6 @@ function updateControlVisibility() {
     document.getElementById('musicToggleBtn').style.display = isStarted ? 'inline-block' : 'none';
 }
 
-// 게임 시작 버튼 클릭 이벤트에 추가
-const startBtn = document.getElementById('startBtn');
-if (startBtn) {
-    startBtn.addEventListener('click', () => {
-        if (!gameState.isStarted) {
-            gameState.isStarted = true;
-            updateControlVisibility();
-            // 기존 게임 시작 로직은 그대로 유지
-        } else {
-            // 재시작 로직
-            // (원래의 restartGame 함수 등 호출)
-            restartGame();
-            gameState.isStarted = true; // 재시작 후에도 isStarted는 true 유지
-            updateControlVisibility();
-        }
-    });
-}
-
 // 페이지 로드 시 초기 상태 설정
 window.addEventListener('DOMContentLoaded', updateControlVisibility);
 
@@ -5815,3 +5805,23 @@ function showTowerRangePreview(x, y, range, type) {
 
     document.querySelector('.game-area').appendChild(rangePreview);
 }
+
+document.head.insertAdjacentHTML('beforeend', `
+    <style>
+        .enemy-skill-effect {
+            position: absolute;
+            color: #00eaff;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 0 2px 8px #000, 0 0 8px #00eaff;
+            z-index: 1200;
+            pointer-events: none;
+            animation: skillEffectFade 1.2s ease-out forwards;
+        }
+        @keyframes skillEffectFade {
+            0% { opacity: 1; transform: scale(1.2) translate(-50%, -50%);}
+            100% { opacity: 0; transform: scale(1) translate(-50%, -80%);}
+        }
+    </style>
+`);
+

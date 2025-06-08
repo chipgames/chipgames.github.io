@@ -625,9 +625,10 @@ body {
     font-weight: normal;
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
     pointer-events: none;
-    z-index: 102;
+    z-index: 1200;
     will-change: transform, opacity;
-    animation: damageNumber 1s ease-out;
+    opacity: 1;
+    overflow: visible;
 }
 
 .damage-number.critical {
@@ -636,7 +637,8 @@ body {
     font-weight: bold;
     text-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
     will-change: transform, opacity;
-    animation: criticalDamageNumber 1s ease-out;
+    opacity: 1;
+    overflow: visible;
 }
 
 .special-effect {
