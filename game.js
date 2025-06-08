@@ -1858,15 +1858,19 @@ const BOSS_PATTERNS = {
         cooldown: 180,
         update: (boss) => {
             if (boss.isDead) return true;
-
+            // 쿨다운 60프레임(1초) 전 예고
+            if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, 'Teleport');
             if (boss.patternCooldown === 0) {
-                const randomIndex = Math.floor(Math.random() * currentMap.path.length);
-                boss.x = currentMap.path[randomIndex].x;
-                boss.y = currentMap.path[randomIndex].y;
+                // 현재 pathIndex에서 3~5칸 앞(랜덤)으로 순간이동
+                const jump = Math.floor(Math.random() * 3) + 3; // 3~5칸
+                let newIndex = Math.min(boss.pathIndex + jump, currentMap.path.length - 1);
+                boss.pathIndex = newIndex;
+                const target = currentMap.path[newIndex];
+                boss.x = target.x;
+                boss.y = target.y;
                 showBossPatternEffect(boss.x, boss.y, 'Teleport');
                 playSound('bossTeleport');
             }
-
             return false;
         }
     },
@@ -1978,6 +1982,17 @@ class Enemy {
             this.experienceValue = Math.floor(this.calculateLeveledExperience(enemyType.experienceValue));
             this.name = `${enemyType.name} Lv.${this.level} (${this.pattern.name})`;
             this.color = enemyType.color;
+            // 일반 적만 타입별 스킬/쿨다운 세팅
+            if (this.type === 'TANK') {
+                this.skill = ENEMY_SKILLS.SHIELD;
+                this.skillCooldown = this.skill.cooldown;
+            } else if (this.type === 'HEALER') {
+                this.skill = ENEMY_SKILLS.HEAL_AOE;
+                this.skillCooldown = this.skill.cooldown;
+            } else {
+                this.skill = null;
+                this.skillCooldown = 0;
+            }
         } else {
             // 보스 타입 랜덤 선택
             const bossTypes = Object.keys(BOSS_TYPES);
@@ -1996,26 +2011,32 @@ class Enemy {
             this.name = `${bossType.name} Lv.${this.level}`;
             this.color = bossType.color;
             this.ability = bossType.ability;
-            // 타입별 패턴/스킬 고정
+            // 타입별 패턴/스킬/쿨다운 고정 (switch문에서만 세팅)
             switch (randomBossType) {
                 case 'TANK':
                     this.pattern = BOSS_PATTERNS.SHIELD;
                     this.skill = ENEMY_SKILLS.SHIELD;
+                    this.patternCooldown = this.pattern.cooldown;
+                    this.skillCooldown = this.skill.cooldown;
                     break;
                 case 'SPEED':
                     this.pattern = BOSS_PATTERNS.TELEPORT;
                     this.skill = ENEMY_SKILLS.TELEPORT;
+                    this.patternCooldown = this.pattern.cooldown;
+                    this.skillCooldown = this.skill.cooldown;
                     break;
                 case 'SUMMONER':
                     this.pattern = BOSS_PATTERNS.HEAL;
                     this.skill = ENEMY_SKILLS.HEAL_AOE;
+                    this.patternCooldown = this.pattern.cooldown;
+                    this.skillCooldown = this.pattern.cooldown + 40; // 쿨다운 다르게
                     break;
                 default:
                     this.pattern = BOSS_PATTERNS.SHIELD;
                     this.skill = ENEMY_SKILLS.SHIELD;
+                    this.patternCooldown = this.pattern.cooldown;
+                    this.skillCooldown = this.skill.cooldown;
             }
-            this.patternCooldown = this.pattern.cooldown;
-            this.skillCooldown = this.skill.cooldown;
         }
 
         // Enemy 생성자 내 (보스/특수 적에 스킬 부여 예시)
@@ -2115,11 +2136,15 @@ class Enemy {
                 // 효과 제거
                 switch(effectType) {
                     case 'FROZEN':
-                        this.speed = this.baseSpeed;
+                        // FROZEN이 여러 번 중첩된 경우를 위해, 남은 FROZEN이 없을 때만 복구
+                        if (![...this.statusEffects.keys()].filter(e => e === 'FROZEN').length <= 1) {
+                            this.speed = this.baseSpeed;
+                        }
                         break;
                     case 'POISON':
                     case 'BURNING':
                         this.continuousDamage -= STATUS_EFFECTS[effectType].damagePerTick;
+                        if (this.continuousDamage < 0) this.continuousDamage = 0;
                         break;
                 }
                 this.statusEffects.delete(effectType);
@@ -2190,7 +2215,7 @@ class Enemy {
         }
         if (this.skill && this.skillCooldown === 0) {
             this.skill.effect(this);
-            this.skillCooldown = this.skill.cooldown;
+            this.skillCooldown = this.skill.cooldown > 0 ? this.skill.cooldown : 1; // 즉시 쿨다운 세팅
         }
 
         // 그룹 버프 적용
@@ -2203,15 +2228,18 @@ class Enemy {
             showSkillWarning(this.x, this.y, this.skill.name);
         }
 
-        // Enemy.update 내 보스 패턴 실행 안전장치
-        if (this.type === 'BOSS' && this.patternCooldown <= 0 && !this.isDead) {
-            if (this.pattern && typeof this.pattern.effect === 'function') {
-                this.pattern.effect(this);
-                this.patternCooldown = this.pattern.cooldown;
-                showBossPatternEffect(this.x, this.y, this.pattern.name);
+        // Enemy.update 내 보스 패턴 실행 안전장치 - 수정된 부분
+        if (this.type === 'BOSS') {
+            if (this.patternCooldown <= 0 && !this.isDead) {
+                if (this.pattern && typeof this.pattern.effect === 'function') {
+                    this.pattern.effect(this);
+                    this.patternCooldown = this.pattern.cooldown > 0 ? this.pattern.cooldown : 1; // 즉시 쿨다운 세팅
+                    showBossPatternEffect(this.x, this.y, this.pattern.name);
+                }
+            } else if (this.patternCooldown > 0) {
+                this.patternCooldown--;
             }
         }
-        if (this.patternCooldown > 0) this.patternCooldown--;
 
         return false;
     }
@@ -2370,7 +2398,7 @@ class Enemy {
         ctx.font = 'bold 10px Arial';
         ctx.textAlign = 'center';
         ctx.fillText(
-            `Lv.${this.level}`,
+            `Lv.${this.level}${this.pattern ? ' [' + this.pattern.name + ']' : ''}`,
             this.x * TILE_SIZE + TILE_SIZE / 2,
             this.y * TILE_SIZE + TILE_SIZE / 2
         );
@@ -2444,6 +2472,16 @@ class Enemy {
     die() {
         if (this.isDead) return;
         this.isDead = true;
+        // 그룹에서 제거
+        if (this.groupId && Array.isArray(enemyGroups)) {
+            const group = enemyGroups.find(g => g.id === this.groupId);
+            if (group) {
+                group.members = group.members.filter(e => e !== this);
+            }
+        }
+        // 버프 해제
+        this.groupSpeedBuff = 1.0;
+        this.groupDefenseBuff = 1.0;
         // 보상 지급 및 중복 방지
         gainExperience(this.experienceValue);
         gameState.gold += this.reward * (gameState.goldMultiplier || 1);
@@ -2455,8 +2493,8 @@ class Enemy {
             scoreToAdd = this.reward * 3;
             gameStats.bossesKilled++;
             gameState.bossKilled = true;
-            this.patternCooldown = 99999; // 보스 사망 시 패턴 중단
-            this.skillCooldown = 99999; // 보스 사망 시 스킬 중단
+            this.patternCooldown = 99999;
+            this.skillCooldown = 99999;
         }
         gameState.score += scoreToAdd;
         playSound('enemy_death');
@@ -3815,21 +3853,39 @@ function showSpecialEffect(x, y, name) {
     }, 2000);
 }
 
+// 보스 패턴 이펙트 표시 함수
 function showBossPatternEffect(x, y, patternName) {
-    const effect = document.createElement('div');
-    effect.className = 'boss-pattern-effect';
+    const parent = document.querySelector('.game-area');
+    if (!parent) return;
+    // 이미 같은 위치+이름에 이펙트가 있으면 새로 만들지 않음
+    let effect = parent.querySelector(`.boss-pattern-effect[data-x='${x}'][data-y='${y}'][data-name='${patternName}']`);
+    if (!effect) {
+        effect = EffectPool.get('special');
+        effect.className = 'boss-pattern-effect';
+        effect.setAttribute('data-x', x);
+        effect.setAttribute('data-y', y);
+        effect.setAttribute('data-name', patternName);
+        parent.appendChild(effect);
+    }
     effect.textContent = patternName;
+    effect.style.display = 'block';
     effect.style.position = 'absolute';
     effect.style.left = `${x * TILE_SIZE + TILE_SIZE/2}px`;
     effect.style.top = `${y * TILE_SIZE + TILE_SIZE/2}px`;
     effect.style.transform = 'translate(-50%, -50%)';
     effect.style.zIndex = 1200;
     effect.style.pointerEvents = 'none';
-    // 반드시 .game-area에만 추가, 없으면 추가하지 않음
-    const parent = document.querySelector('.game-area');
-    if (!parent) return;
-    parent.appendChild(effect);
-    setTimeout(() => effect.remove(), 1000);
+    effect.style.color = '#00eaff';
+    effect.style.fontWeight = 'bold';
+    effect.style.fontSize = '18px';
+    effect.style.textShadow = '0 2px 8px #000, 0 0 8px #00eaff';
+    effect.style.animation = 'skillEffectFade 1.2s ease-out forwards';
+    effect.addEventListener('animationend', () => {
+        EffectPool.release(effect);
+    }, { once: true });
+    setTimeout(() => {
+        EffectPool.release(effect);
+    }, 1200);
 }
 
 // 맵 선택 함수
@@ -4137,9 +4193,13 @@ function showBossPatternWarning(x, y, patternName) {
     warning.style.left = `${x * TILE_SIZE}px`;
     warning.style.top = `${y * TILE_SIZE}px`;
     warning.textContent = `${patternName} 준비중...`;
-    
-    document.getElementById('game-container').appendChild(warning);
-    
+
+    // game-container가 없으면 .game-area, 그것도 없으면 body에 추가
+    let parent = document.getElementById('game-container')
+        || document.querySelector('.game-area')
+        || document.body;
+    parent.appendChild(warning);
+
     setTimeout(() => {
         warning.remove();
     }, 2000);
@@ -5251,6 +5311,7 @@ function updateStatusEffects(enemy) {
                 case 'POISON':
                 case 'BURNING':
                     enemy.continuousDamage = Math.max(0, enemy.continuousDamage - STATUS_EFFECTS[effectType].damagePerTick);
+                    if (enemy.continuousDamage < 0) enemy.continuousDamage = 0;
                     break;
             }
             enemy.statusEffects.delete(effectType);
@@ -5334,9 +5395,18 @@ function showAmbushEffect(x, y) {
 function showSkillEffect(x, y, name) {
     const parent = document.querySelector('.game-area');
     if (!parent) return;
-    const effect = document.createElement('div');
-    effect.className = 'enemy-skill-effect';
+    // 이미 같은 위치+이름에 이펙트가 있으면 새로 만들지 않음
+    let effect = parent.querySelector(`.enemy-skill-effect[data-x='${x}'][data-y='${y}'][data-name='${name}']`);
+    if (!effect) {
+        effect = EffectPool.get('special');
+        effect.className = 'enemy-skill-effect';
+        effect.setAttribute('data-x', x);
+        effect.setAttribute('data-y', y);
+        effect.setAttribute('data-name', name);
+        parent.appendChild(effect);
+    }
     effect.textContent = name;
+    effect.style.display = 'block';
     effect.style.position = 'absolute';
     effect.style.left = `${x * TILE_SIZE + TILE_SIZE / 2}px`;
     effect.style.top = `${y * TILE_SIZE + TILE_SIZE / 2}px`;
@@ -5346,10 +5416,13 @@ function showSkillEffect(x, y, name) {
     effect.style.fontSize = '18px';
     effect.style.pointerEvents = 'none';
     effect.style.zIndex = 1200;
-    effect.setAttribute('data-x', x);
-    effect.setAttribute('data-y', y);
-    parent.appendChild(effect);
-    setTimeout(() => effect.remove(), 1200);
+    effect.style.animation = 'skillEffectFade 1.2s ease-out forwards';
+    effect.addEventListener('animationend', () => {
+        EffectPool.release(effect);
+    }, { once: true });
+    setTimeout(() => {
+        EffectPool.release(effect);
+    }, 1200);
 }
 
 // 적 그룹 클래스
@@ -5824,4 +5897,114 @@ document.head.insertAdjacentHTML('beforeend', `
         }
     </style>
 `);
+
+// 1. BOSS_PATTERNS.HEAL 개선 (조건부 분기/랜덤성/예고)
+BOSS_PATTERNS.HEAL = {
+    name: 'Heal',
+    cooldown: 240,
+    update: (boss) => {
+        if (boss.isDead) return true;
+        // 쿨다운 60프레임(1초) 전 예고
+        if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, 'Heal');
+        // 체력 50% 이하일 때만 힐 사용
+        if (boss.health / boss.maxHealth <= 0.5 && boss.patternCooldown === 0) {
+            const healAmount = Math.floor(boss.maxHealth * 0.4);
+            boss.health = Math.min(boss.maxHealth, boss.health + healAmount);
+            showBossPatternEffect(boss.x, boss.y, '강력한 힐!');
+            playSound('bossHeal');
+        } else if (boss.patternCooldown === 0) {
+            // 50% 초과면 소환 행동(예시)
+            // summonMinions(boss.x, boss.y); // 실제 소환 함수 필요시 구현
+            showBossPatternEffect(boss.x, boss.y, '소환!');
+            playSound('bossSummon');
+        }
+        return false;
+    }
+};
+
+// 2. 상태이상 내성/면역/중첩 제한
+Enemy.prototype.applyStatusEffect = function(effectType, duration) {
+    const effect = STATUS_EFFECTS[effectType];
+    if (!effect) return;
+    // 보스는 FROZEN 완전 면역
+    if (this.type === 'BOSS' && effectType === 'FROZEN') return;
+    // 탱커는 POISON 50%만 적용
+    let actualDuration = duration || effect.duration;
+    if (this.type === 'TANK' && effectType === 'POISON') actualDuration = Math.ceil(actualDuration * 0.5);
+    if (this.type === 'BOSS') actualDuration = Math.ceil(actualDuration * 0.5);
+    // 중첩 제한: 최대 2번까지만 중첩
+    if (this.statusEffects.has(effectType)) {
+        const current = this.statusEffects.get(effectType);
+        if (current.remaining < actualDuration * 2) {
+            current.remaining = Math.max(current.remaining, actualDuration);
+        }
+    } else {
+        this.statusEffects.set(effectType, {
+            duration: actualDuration,
+            remaining: actualDuration
+        });
+        switch(effectType) {
+            case 'FROZEN':
+                this.speed *= effect.speedMultiplier;
+                break;
+            case 'POISON':
+            case 'BURNING':
+                this.continuousDamage += effect.damagePerTick;
+                break;
+        }
+    }
+};
+
+// 3. draw()에서 실시간 상태(쿨다운/상태이상 등) 표시
+Enemy.prototype.draw = function() {
+    if (this.isDead) return;
+    ctx.save();
+    let baseColor = this.color;
+    let statusIcons = [];
+    // ... 기존 상태이상 오라 ...
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(
+        this.x * TILE_SIZE + 5,
+        this.y * TILE_SIZE + 5,
+        TILE_SIZE - 10,
+        TILE_SIZE - 10
+    );
+    // ... 그룹/보스 오라 ...
+    ctx.restore();
+    // 상태이상/스킬/쿨다운 아이콘 표시
+    if (statusIcons.length > 0 || (this.skill && this.skillCooldown > 0)) {
+        ctx.save();
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        let icons = statusIcons.join(' ');
+        if (this.skill && this.skillCooldown > 0) {
+            icons += ' ⏳';
+        }
+        ctx.fillStyle = '#fff';
+        ctx.fillText(
+            icons,
+            this.x * TILE_SIZE + TILE_SIZE / 2,
+            this.y * TILE_SIZE - 18
+        );
+        ctx.restore();
+    }
+    // 레벨/패턴명 표시
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(
+        `Lv.${this.level}${this.pattern ? ' [' + this.pattern.name + ']' : ''}`,
+        this.x * TILE_SIZE + TILE_SIZE / 2,
+        this.y * TILE_SIZE + TILE_SIZE / 2
+    );
+    // 쿨다운/상태이상 실시간 표시
+    ctx.fillStyle = 'yellow';
+    ctx.font = '10px Arial';
+    ctx.fillText(
+        `패턴쿨:${this.patternCooldown} 스킬쿨:${this.skillCooldown} ${[...this.statusEffects.keys()].join(',')}`,
+        this.x * TILE_SIZE + TILE_SIZE / 2,
+        this.y * TILE_SIZE - 30
+    );
+    // ... 체력바/상태이상/이름/크리티컬 ...
+};
 
