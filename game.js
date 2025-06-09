@@ -2599,7 +2599,27 @@ function showWaveStartEffect() {
         <h2>웨이브 ${gameState.wave} 시작!</h2>
         <p>적의 수: ${gameState.enemiesRemaining}</p>
     `;
-    document.body.appendChild(effect);
+    
+    // .game-area에 추가
+    const parent = document.querySelector('.game-area');
+    if (!parent) {
+        console.error('게임 영역을 찾을 수 없습니다.');
+        return;
+    }
+    parent.appendChild(effect);
+
+    // 중앙 배치 스타일
+    effect.style.position = 'absolute';
+    effect.style.left = '50%';
+    effect.style.top = '50%';
+    effect.style.transform = 'translate(-50%, -50%)';
+    effect.style.zIndex = '2000';
+    effect.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    effect.style.padding = '20px';
+    effect.style.borderRadius = '10px';
+    effect.style.color = '#fff';
+    effect.style.textAlign = 'center';
+    effect.style.animation = 'fadeInOut 2s ease-in-out';
     
     setTimeout(() => {
         effect.remove();
