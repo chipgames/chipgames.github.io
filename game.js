@@ -2254,8 +2254,8 @@ class Enemy {
         // Enemy.update 내 보스 패턴 실행 안전장치 - 수정된 부분
         if (this.type === 'BOSS') {
             if (this.patternCooldown <= 0 && !this.isDead) {
-                if (this.pattern && typeof this.pattern.effect === 'function') {
-                    this.pattern.effect(this);
+                if (this.pattern && typeof this.pattern.update === 'function') {
+                    this.pattern.update(this);
                     this.patternCooldown = this.pattern.cooldown > 0 ? this.pattern.cooldown : 1; // 즉시 쿨다운 세팅
                     showBossPatternEffect(this.x, this.y, this.pattern.name);
                 }
