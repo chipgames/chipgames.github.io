@@ -2506,6 +2506,7 @@ function showTowerEffect(x, y) {
 
 // 타워 업그레이드 이펙트
 function showUpgradeEffect(x, y) {
+    if (lowSpecMode) return;
     // 업그레이드 이펙트 생성
     const effect = document.createElement('div');
     effect.className = 'upgrade-effect';
@@ -3764,6 +3765,7 @@ function gainExperience(amount) {
 
 // 레벨업 이펙트
 function showLevelUpEffect(reward) {
+    if (lowSpecMode) return;
     const effect = document.createElement('div');
     effect.className = 'level-up-effect';
     effect.innerHTML = `
@@ -3780,6 +3782,7 @@ function showLevelUpEffect(reward) {
 
 // 특수 이벤트 표시
 function showEventNotification(message) {
+    if (lowSpecMode) return;
     // 이미 표시된 알림이 있는지 확인
     const existingNotification = document.querySelector('.event-notification');
     if (existingNotification) {
@@ -4042,6 +4045,7 @@ function checkTowerCombos() {
 
 // 조합 이펙트 표시 함수
 function showComboEffect(comboName) {
+    if (lowSpecMode) return;
     const effect = document.createElement('div');
     effect.className = 'combo-effect';
     effect.innerHTML = `
@@ -5740,32 +5744,6 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
-
-// 이펙트 생성 함수들에서 저사양 모드 분기 추가
-function showTowerEffect(x, y) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showUpgradeEffect(x, y) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showComboEffect(comboName) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showLevelUpEffect(reward) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showEventNotification(message) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
 
 function updateControlVisibility() {
     const isStarted = gameState.isStarted;
