@@ -1859,7 +1859,7 @@ const BOSS_PATTERNS = {
         update: (boss) => {
             if (boss.isDead) return true;
             // 쿨다운 60프레임(1초) 전 예고
-            if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, '순간이동');
+            // if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, '순간이동');
             if (boss.patternCooldown === 0) {
                 // 현재 pathIndex에서 3~5칸 앞(랜덤)으로 순간이동
                 const jump = Math.floor(Math.random() * 3) + 3; // 3~5칸
@@ -2237,6 +2237,7 @@ class Enemy {
             this.skillCooldown--;
         }
         if (this.skill && this.skillCooldown === 0) {
+            //console.log(`[스킬발동]`, this.x, this.y, this.skill.name, this);
             this.skill.effect(this);
             this.skillCooldown = this.skill.cooldown > 0 ? this.skill.cooldown : 1; // 즉시 쿨다운 세팅
         }
@@ -2772,7 +2773,7 @@ function gameLoop() {
 
     // 적 업데이트 및 그리기
     enemies = enemies.filter(enemy => {
-        //console.log('enemy 객체:', enemy, 'draw:', typeof enemy.draw, 'instanceof Enemy:', enemy instanceof Enemy);
+        //console.log('[Enemy.update]', this.x, this.y, this);
         if (enemy.draw) enemy.draw();
         return !enemy.update();
     });
@@ -4067,25 +4068,6 @@ document.head.insertAdjacentHTML('beforeend', `
         }
     </style>
 `);
-
-// 보스 패턴 경고 표시 함수
-function showBossPatternWarning(x, y, patternName) {
-    const warning = document.createElement('div');
-    warning.className = 'boss-pattern-warning';
-    warning.style.left = `${x * TILE_SIZE}px`;
-    warning.style.top = `${y * TILE_SIZE}px`;
-    warning.textContent = `${patternName} 준비중...`;
-
-    // game-container가 없으면 .game-area, 그것도 없으면 body에 추가
-    let parent = document.getElementById('game-container')
-        || document.querySelector('.game-area')
-        || document.body;
-    parent.appendChild(warning);
-
-    setTimeout(() => {
-        warning.remove();
-    }, 2000);
-}
 
 // CSS 스타일 추가
 document.head.insertAdjacentHTML('beforeend', `
@@ -5796,7 +5778,7 @@ BOSS_PATTERNS.HEAL = {
     update: (boss) => {
         if (boss.isDead) return true;
         // 쿨다운 60프레임(1초) 전 예고
-        if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, '힐');
+        // if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, '힐');
         // 체력 50% 이하일 때만 힐 사용
         if (boss.health / boss.maxHealth <= 0.5 && boss.patternCooldown === 0) {
             const healAmount = Math.floor(boss.maxHealth * 0.4);
