@@ -1832,7 +1832,7 @@ const BOSS_TYPES = {
 // 보스 패턴 정의
 const BOSS_PATTERNS = {
     SHIELD: {
-        name: 'Shield',
+        name: '방어막',
         cooldown: 300,
         duration: 180,
         update: (boss) => {
@@ -1841,7 +1841,7 @@ const BOSS_PATTERNS = {
             if (boss.patternCooldown === 0) {
                 boss.isInvincible = true;
                 boss.defense = 50;
-                showBossPatternEffect(boss.x, boss.y, 'Shield');
+                showBossPatternEffect(boss.x, boss.y, '방어막');
                 playSound('bossShield');
             }
 
@@ -1854,12 +1854,12 @@ const BOSS_PATTERNS = {
         }
     },
     TELEPORT: {
-        name: 'Teleport',
+        name: '순간이동',
         cooldown: 180,
         update: (boss) => {
             if (boss.isDead) return true;
             // 쿨다운 60프레임(1초) 전 예고
-            if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, 'Teleport');
+            if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, '순간이동');
             if (boss.patternCooldown === 0) {
                 // 현재 pathIndex에서 3~5칸 앞(랜덤)으로 순간이동
                 const jump = Math.floor(Math.random() * 3) + 3; // 3~5칸
@@ -1868,14 +1868,14 @@ const BOSS_PATTERNS = {
                 const target = currentMap.path[newIndex];
                 boss.x = target.x;
                 boss.y = target.y;
-                showBossPatternEffect(boss.x, boss.y, 'Teleport');
+                showBossPatternEffect(boss.x, boss.y, '순간이동');
                 playSound('bossTeleport');
             }
             return false;
         }
     },
     HEAL: {
-        name: 'Heal',
+        name: '힐',
         cooldown: 240,
         update: (boss) => {
             if (boss.isDead) return true;
@@ -1883,7 +1883,7 @@ const BOSS_PATTERNS = {
             if (boss.patternCooldown === 0) {
                 const healAmount = Math.floor(boss.maxHealth * 0.3);
                 boss.health = Math.min(boss.maxHealth, boss.health + healAmount);
-                showBossPatternEffect(boss.x, boss.y, 'Heal');
+                showBossPatternEffect(boss.x, boss.y, '힐');
                 playSound('bossHeal');
             }
 
@@ -1928,7 +1928,7 @@ const ENEMY_SKILLS = {
         }
     },
     HEAL_AOE: {
-        name: '광역 힐',
+        name: '힐',
         cooldown: 500,
         effect: function (enemy) {
             enemies.forEach(e => {
@@ -1937,7 +1937,7 @@ const ENEMY_SKILLS = {
                     showSkillEffect(e.x, e.y, '힐');
                 }
             });
-            showSkillEffect(enemy.x, enemy.y, '광역힐');
+            showSkillEffect(enemy.x, enemy.y, '힐');
         }
     }
 };
@@ -2184,7 +2184,7 @@ class Enemy {
                         enemy.health = Math.min(enemy.maxHealth, enemy.health + healAmount);
                         // 이펙트 중복 방지: 이미 같은 위치에 이펙트가 있으면 추가하지 않음
                         if (!document.querySelector(`.enemy-skill-effect[data-x='${enemy.x}'][data-y='${enemy.y}']`)) {
-                            showSkillEffect(enemy.x, enemy.y, 'Heal');
+                            showSkillEffect(enemy.x, enemy.y, '힐');
                         }
                         healedAny = true;
                     }
@@ -2337,7 +2337,7 @@ class Enemy {
             return '🌀';
         });
         if (statusIcons.length) {
-            ctx.font = '18px Arial';
+            ctx.font = '14px Arial';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillText(statusIcons.join(' '), barX, barY + barH + 2);
@@ -2681,31 +2681,40 @@ function showInsufficientGold() {
 // 타워 범위 미리보기
 let rangePreview = null;
 
+
 function showTowerRangePreview(x, y, range, type) {
     if (rangePreview) {
         rangePreview.remove();
     }
-    
+
     rangePreview = document.createElement('div');
     rangePreview.className = 'tower-range-preview';
-    
+
     // 타워 중심을 기준으로 계산
-    const centerX = x * TILE_SIZE + TILE_SIZE/2;
-    const centerY = y * TILE_SIZE + TILE_SIZE/2;
+    const centerX = x * TILE_SIZE + TILE_SIZE / 2;
+    const centerY = y * TILE_SIZE + TILE_SIZE / 2;
     const diameter = range * TILE_SIZE * 2;
-    
-    rangePreview.style.left = `${centerX - diameter/2}px`;
-    rangePreview.style.top = `${centerY - diameter/2}px`;
+
+    // 캔버스의 위치(오프셋) 보정
+    //const canvas = document.getElementById('gameCanvas');
+    const canvasRect = canvas.getBoundingClientRect();
+    const parentRect = canvas.parentElement.getBoundingClientRect();
+    const offsetX = canvasRect.left - parentRect.left;
+    const offsetY = canvasRect.top - parentRect.top;
+
+    rangePreview.style.left = `${offsetX + centerX - diameter / 2}px`;
+    rangePreview.style.top = `${offsetY + centerY - diameter / 2}px`;
     rangePreview.style.width = `${diameter}px`;
     rangePreview.style.height = `${diameter}px`;
-    
+
     // 타워 종류에 따른 색상 설정
     const tower = TOWER_TYPES[type];
     rangePreview.style.backgroundColor = `${tower.color}20`;
     rangePreview.style.borderColor = tower.color;
-    
+
     document.querySelector('.game-area').appendChild(rangePreview);
 }
+
 
 function hideTowerRangePreview() {
     if (rangePreview) {
@@ -3763,13 +3772,13 @@ function showBossPatternEffect(x, y, patternName) {
     effect.style.display = 'block';
     effect.style.position = 'absolute';
     effect.style.left = `${x * TILE_SIZE + TILE_SIZE/2}px`;
-    effect.style.top = `${y * TILE_SIZE + TILE_SIZE/2}px`;
+    effect.style.top = `${y * TILE_SIZE + (TILE_SIZE*2)}px`;
     effect.style.transform = 'translate(-50%, -50%)';
     effect.style.zIndex = 1200;
     effect.style.pointerEvents = 'none';
     effect.style.color = '#00eaff';
     effect.style.fontWeight = 'bold';
-    effect.style.fontSize = '18px';
+    effect.style.fontSize = '14px';
     effect.style.textShadow = '0 2px 8px #000, 0 0 8px #00eaff';
     effect.style.animation = 'skillEffectFade 1.2s ease-out forwards';
     effect.addEventListener('animationend', () => {
@@ -4059,25 +4068,6 @@ document.head.insertAdjacentHTML('beforeend', `
     </style>
 `);
 
-// 보스 패턴 이펙트 표시 함수
-function showBossPatternEffect(x, y, patternName) {
-    const effect = document.createElement('div');
-    effect.className = 'boss-pattern-effect';
-    effect.style.left = `${x * TILE_SIZE}px`;
-    effect.style.top = `${y * TILE_SIZE}px`;
-    effect.textContent = patternName;
-
-    // game-container가 없으면 .game-area, 그것도 없으면 body에 추가
-    let parent = document.getElementById('game-container')
-        || document.querySelector('.game-area')
-        || document.body;
-    parent.appendChild(effect);
-
-    setTimeout(() => {
-        effect.remove();
-    }, 1000);
-}
-
 // 보스 패턴 경고 표시 함수
 function showBossPatternWarning(x, y, patternName) {
     const warning = document.createElement('div');
@@ -4195,7 +4185,7 @@ document.head.insertAdjacentHTML('beforeend', `
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
             overflow: hidden;
-            margin: 10px 0 18px 0;
+            margin: 10px 0 14px 0;
             position: relative;
             border: 1px solid #2196F3;
         }
@@ -5304,11 +5294,13 @@ function showSkillEffect(x, y, name) {
     effect.style.display = 'block';
     effect.style.position = 'absolute';
     effect.style.left = `${x * TILE_SIZE + TILE_SIZE / 2}px`;
-    effect.style.top = `${y * TILE_SIZE + TILE_SIZE / 2}px`;
-    effect.style.transform = 'translate(-50%, -50%)';
+    // HP바 바로 위에 표시
+    //effect.style.top = `${y * TILE_SIZE + 8}px`;
+    effect.style.top = `${y * TILE_SIZE + (TILE_SIZE * 2) }px`;
+    effect.style.transform = 'translate(-50%, -100%)';
     effect.style.color = '#00eaff';
     effect.style.fontWeight = 'bold';
-    effect.style.fontSize = '18px';
+    effect.style.fontSize = '14px';
     effect.style.pointerEvents = 'none';
     effect.style.zIndex = 1200;
     effect.style.animation = 'skillEffectFade 1.2s ease-out forwards';
@@ -5745,38 +5737,38 @@ function updateControlVisibility() {
 // 페이지 로드 시 초기 상태 설정
 window.addEventListener('DOMContentLoaded', updateControlVisibility);
 
-function showTowerRangePreview(x, y, range, type) {
-    if (rangePreview) {
-        rangePreview.remove();
-    }
+//function showTowerRangePreview(x, y, range, type) {
+//    if (rangePreview) {
+//        rangePreview.remove();
+//    }
 
-    rangePreview = document.createElement('div');
-    rangePreview.className = 'tower-range-preview';
+//    rangePreview = document.createElement('div');
+//    rangePreview.className = 'tower-range-preview';
 
-    // 타워 중심을 기준으로 계산
-    const centerX = x * TILE_SIZE + TILE_SIZE/2;
-    const centerY = y * TILE_SIZE + TILE_SIZE/2;
-    const diameter = range * TILE_SIZE * 2;
+//    // 타워 중심을 기준으로 계산
+//    const centerX = x * TILE_SIZE + TILE_SIZE/2;
+//    const centerY = y * TILE_SIZE + TILE_SIZE/2;
+//    const diameter = range * TILE_SIZE * 2;
 
-    // 캔버스의 위치(오프셋) 보정
-    const canvas = document.getElementById('gameCanvas');
-    const canvasRect = canvas.getBoundingClientRect();
-    const parentRect = canvas.parentElement.getBoundingClientRect();
-    const offsetX = canvasRect.left - parentRect.left;
-    const offsetY = canvasRect.top - parentRect.top;
+//    // 캔버스의 위치(오프셋) 보정
+//    const canvas = document.getElementById('gameCanvas');
+//    const canvasRect = canvas.getBoundingClientRect();
+//    const parentRect = canvas.parentElement.getBoundingClientRect();
+//    const offsetX = canvasRect.left - parentRect.left;
+//    const offsetY = canvasRect.top - parentRect.top;
 
-    rangePreview.style.left = `${offsetX + centerX - diameter/2}px`;
-    rangePreview.style.top = `${offsetY + centerY - diameter/2}px`;
-    rangePreview.style.width = `${diameter}px`;
-    rangePreview.style.height = `${diameter}px`;
+//    rangePreview.style.left = `${offsetX + centerX - diameter/2}px`;
+//    rangePreview.style.top = `${offsetY + centerY - diameter/2}px`;
+//    rangePreview.style.width = `${diameter}px`;
+//    rangePreview.style.height = `${diameter}px`;
 
-    // 타워 종류에 따른 색상 설정
-    const tower = TOWER_TYPES[type];
-    rangePreview.style.backgroundColor = `${tower.color}20`;
-    rangePreview.style.borderColor = tower.color;
+//    // 타워 종류에 따른 색상 설정
+//    const tower = TOWER_TYPES[type];
+//    rangePreview.style.backgroundColor = `${tower.color}20`;
+//    rangePreview.style.borderColor = tower.color;
 
-    document.querySelector('.game-area').appendChild(rangePreview);
-}
+//    document.querySelector('.game-area').appendChild(rangePreview);
+//}
 
 document.head.insertAdjacentHTML('beforeend', `
     <style>
@@ -5784,7 +5776,7 @@ document.head.insertAdjacentHTML('beforeend', `
             position: absolute;
             color: #00eaff;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 14px;
             text-shadow: 0 2px 8px #000, 0 0 8px #00eaff;
             z-index: 1200;
             pointer-events: none;
@@ -5799,12 +5791,12 @@ document.head.insertAdjacentHTML('beforeend', `
 
 // 1. BOSS_PATTERNS.HEAL 개선 (조건부 분기/랜덤성/예고)
 BOSS_PATTERNS.HEAL = {
-    name: 'Heal',
+    name: '힐',
     cooldown: 240,
     update: (boss) => {
         if (boss.isDead) return true;
         // 쿨다운 60프레임(1초) 전 예고
-        if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, 'Heal');
+        if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, '힐');
         // 체력 50% 이하일 때만 힐 사용
         if (boss.health / boss.maxHealth <= 0.5 && boss.patternCooldown === 0) {
             const healAmount = Math.floor(boss.maxHealth * 0.4);
