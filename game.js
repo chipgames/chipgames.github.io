@@ -2247,11 +2247,6 @@ class Enemy {
         if (this.groupSpeedBuff) this.speed = this.baseSpeed * this.groupSpeedBuff;
         if (this.groupDefenseBuff) this.defense = 10 * this.groupDefenseBuff; // 예시: 방어력 10 기준
 
-        // 스킬 발동 예고
-        if (this.skill && this.skillCooldown === 30) { // 0.5초 전에 경고
-            showSkillWarning(this.x, this.y, this.skill.name);
-        }
-
         // Enemy.update 내 보스 패턴 실행 안전장치 - 수정된 부분
         if (this.type === 'BOSS') {
             if (this.patternCooldown <= 0 && !this.isDead) {
@@ -2277,14 +2272,23 @@ class Enemy {
         ctx.fillStyle = this.color;
         ctx.fillRect(
             this.x * TILE_SIZE + 6,
-            this.y * TILE_SIZE + 18,
+            this.y * TILE_SIZE + 6, // 18 → 6
+            TILE_SIZE - 12,
+            TILE_SIZE - 12
+        );
+        // 적 본체 테두리 추가
+        ctx.strokeStyle = '#222';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(
+            this.x * TILE_SIZE + 6,
+            this.y * TILE_SIZE + 6,
             TILE_SIZE - 12,
             TILE_SIZE - 12
         );
 
         // 2. HP바 (적 본체 위)
         const barX = this.x * TILE_SIZE + 6;
-        const barY = this.y * TILE_SIZE + 8; // 본체보다 위쪽
+        const barY = this.y * TILE_SIZE - 4; // 8 → -4
         const barW = TILE_SIZE - 12;
         const barH = 8;
         const percent = Math.max(0, this.health / this.maxHealth);
@@ -2315,9 +2319,9 @@ class Enemy {
         ctx.textBaseline = 'bottom';
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 3;
-        ctx.strokeText(`${this.name}${this.pattern?.name ? ' [' + this.pattern.name + ']' : ''}`, barX + barW / 2, barY - 4);
+        ctx.strokeText(`${this.name}${this.pattern?.name ? ' [' + this.pattern.name + ']' : ''}`, barX + barW / 2, barY - 6); // -4 → -6
         ctx.fillStyle = '#fff';
-        ctx.fillText(`${this.name}${this.pattern?.name ? ' [' + this.pattern.name + ']' : ''}`, barX + barW / 2, barY - 4);
+        ctx.fillText(`${this.name}${this.pattern?.name ? ' [' + this.pattern.name + ']' : ''}`, barX + barW / 2, barY - 6);
 
         // 4. 레벨 (적 본체 중앙, 테두리 추가)
         ctx.font = 'bold 12px Arial';
@@ -2325,9 +2329,9 @@ class Enemy {
         ctx.textBaseline = 'middle';
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 3;
-        ctx.strokeText(`Lv.${this.level}`, this.x * TILE_SIZE + TILE_SIZE / 2, this.y * TILE_SIZE + 18 + (TILE_SIZE - 12) / 2);
+        ctx.strokeText(`Lv.${this.level}`, this.x * TILE_SIZE + TILE_SIZE / 2, this.y * TILE_SIZE + 6 + (TILE_SIZE - 12) / 2);
         ctx.fillStyle = '#fff';
-        ctx.fillText(`Lv.${this.level}`, this.x * TILE_SIZE + TILE_SIZE / 2, this.y * TILE_SIZE + 18 + (TILE_SIZE - 12) / 2);
+        ctx.fillText(`Lv.${this.level}`, this.x * TILE_SIZE + TILE_SIZE / 2, this.y * TILE_SIZE + 6 + (TILE_SIZE - 12) / 2);
 
         // 5. 상태이상 아이콘 (HP바 아래)
         const statusIcons = [...this.statusEffects.keys()].map(k => {
@@ -3402,28 +3406,6 @@ function showDamageNumber(x, y, damage, isCritical = false) {
     damageText.addEventListener('animationend', () => {
         EffectPool.release(damageText);
     }, { once: true });
-}
-
-// 스킬 발동 예고 효과
-function showSkillWarning(x, y, skillName) {
-    const warning = document.createElement('div');
-    warning.className = 'skill-warning';
-    warning.textContent = `⚠️ ${skillName}`;
-    warning.style.left = `${x * TILE_SIZE + TILE_SIZE/2}px`;
-    warning.style.top = `${y * TILE_SIZE - 40}px`;
-    document.querySelector('.game-area').appendChild(warning);
-
-    const animation = warning.animate([
-        { transform: 'scale(1)', opacity: 1 },
-        { transform: 'scale(1.2)', opacity: 0.8 },
-        { transform: 'scale(1)', opacity: 1 }
-    ], {
-        duration: 500,
-        iterations: 3,
-        easing: 'ease-in-out'
-    });
-
-    animation.onfinish = () => warning.remove();
 }
 
 // 그룹 시각화 효과
