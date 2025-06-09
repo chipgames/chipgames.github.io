@@ -7,6 +7,22 @@
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="data:,">
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .main-container {
+            flex: 1 0 auto;
+        }
+        footer, .main-footer, .game-footer {
+            flex-shrink: 0;
+        }
         .contact-container {
             max-width: 800px;
             margin: 40px auto;
@@ -79,27 +95,54 @@
     </style>
 </head>
 <body>
-    <div class="contact-container">
-        <h1>문의하기</h1>
+    <!-- 헤더 영역 -->
+    <header class="main-header">
+        <nav class="main-nav">
+            <div class="logo">
+                <h1>타워 디펜스</h1>
+            </div>
+            <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
+            <ul class="nav-links">
+                <li><a href="index.html#game">게임하기</a></li>
+                <li><a href="index.html#guides">가이드</a></li>
+                <li><a href="index.html#" id="descriptionBtn">게임 설명</a></li>
+                <li><a href="index.html#" id="howtoBtn">이용 방법</a></li>
+                <li><a href="index.html#" id="helpBtn">도움말</a></li>
+            </ul>
+        </nav>
+    </header>
 
-        <div class="contact-info">
-            <h2>게임 관련 문의</h2>
-            <p>게임 플레이 중 발생하는 문제나 건의사항이 있으시면 아래 연락처로 문의해 주세요.</p>
-            <p>이메일: <a href="mailto:chipwebgames@gmail.com">chipwebgames@gmail.com</a></p>
-        </div>
-
-        <a href="index.html" class="back-button">게임으로 돌아가기</a>
+    <div class="main-container">
+        <main class="game-area contact-container">
+            <h1 style="color:#4CAF50; text-align:center; margin-bottom:30px; font-size:2em;">문의하기</h1>
+            <p>게임, 광고, 개인정보, 기타 문의사항이 있으시면 아래 이메일로 연락해 주세요.</p>
+            <ul style="margin-bottom:30px;">
+                <li><strong>이메일:</strong> chipwebgames@gmail.com</li>
+            </ul>
+            <a href="index.html" class="back-button">게임으로 돌아가기</a>
+        </main>
     </div>
 
-    <footer class="game-footer">
+    <!-- 푸터 -->
+    <footer class="main-footer">
         <div class="footer-links">
-            <a href="privacy.html">개인정보 처리방침</a>
-            <a href="terms.html">이용약관</a>
+            <a href="privacy.html">개인정보처리방침</a>
             <a href="contact.html">문의하기</a>
         </div>
-        <div class="copyright">
-            © 2025 ChipGames. All rights reserved.
-        </div>
+        <p>&copy; 2025 ChipGames. All rights reserved.</p>
     </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 햄버거 메뉴 토글 (index.html과 동일하게)
+        const navToggle = document.querySelector('.nav-toggle');
+        const navLinks = document.querySelector('.nav-links');
+        if (navToggle && navLinks) {
+            navToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('open');
+            });
+        }
+    });
+    </script>
 </body>
 </html> 
