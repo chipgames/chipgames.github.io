@@ -2559,36 +2559,96 @@ function startWave() {
     if (gameState.waveInProgress) return;
     
     gameState.waveInProgress = true;
-    let groupSize = 3 + Math.floor(Math.random() * 3); // 3~5마리 그룹
-    let totalEnemies = 10 + (gameState.wave * 2);
-    let groupsToSpawn = Math.ceil(totalEnemies / groupSize);
-    gameState.enemiesRemaining = totalEnemies;
-    enemyGroups = [];
     
-    // 20% 확률로 특수 이벤트 발생
-    // if (Math.random() < 0.2) {
-    //     triggerSpecialEvent();
-    // }
-    
-    for (let i = 0; i < groupsToSpawn; i++) {
-        const group = new EnemyGroup(groupIdCounter++, groupSize);
-        for (let j = 0; j < groupSize && gameState.enemiesRemaining > 0; j++) {
-            const enemy = new Enemy(gameState.wave);
-            group.add(enemy);
-            enemies.push(enemy);
-            gameState.enemiesRemaining--;
-        }
-        enemyGroups.push(group);
-    }
-    
-    // 보스 웨이브는 기존대로
+    // 보스 웨이브 처리
     if (gameState.wave % gameState.bossWave === 0) {
         gameState.enemiesRemaining = 1;
-        enemies.push(new Enemy(gameState.wave, true));
+        gameState.totalEnemies = 1;
+        const boss = new Enemy(gameState.wave, true);
+        enemies.push(boss);
+        showWaveStartEffect();
+        playSound('wave_start');
+        return; // 반드시 함수 종료
     }
     
+    // 일반 웨이브 처리
+    let totalEnemies = 10 + (gameState.wave * 2);
+    let groupSize = 3 + Math.floor(Math.random() * 3); // 3~5마리 그룹
+    let groupsToSpawn = Math.ceil(totalEnemies / groupSize);
+    
+    gameState.enemiesRemaining = totalEnemies;
+    gameState.totalEnemies = totalEnemies;
+    gameState.currentGroup = 0;
+    gameState.totalGroups = groupsToSpawn;
+    gameState.groupSize = groupSize;
+    gameState.enemiesInCurrentGroup = 0;
+    gameState.lastSpawnTime = Date.now();
+    gameState.spawnTimer = null;
+    enemyGroups = [];
+    
+    spawnNextEnemy();
     showWaveStartEffect();
     playSound('wave_start');
+}
+
+// 다음 적 생성 함수
+function spawnNextEnemy() {
+    // 웨이브가 진행 중이 아니거나 적이 더 이상 없으면 종료
+    if (!gameState.waveInProgress || gameState.enemiesRemaining <= 0) {
+        //console.log('적 생성 종료:', {
+        //    waveInProgress: gameState.waveInProgress,
+        //    enemiesRemaining: gameState.enemiesRemaining
+        //});
+        if (gameState.spawnTimer) {
+            clearTimeout(gameState.spawnTimer);
+            gameState.spawnTimer = null;
+        }
+        return;
+    }
+    
+    // 새로운 그룹 시작
+    if (gameState.enemiesInCurrentGroup === 0) {
+        const group = new EnemyGroup(groupIdCounter++, gameState.groupSize);
+        enemyGroups.push(group);
+        gameState.currentGroup++;
+        //console.log('새 그룹 시작:', {
+        //    groupId: groupIdCounter - 1,
+        //    currentGroup: gameState.currentGroup,
+        //    totalGroups: gameState.totalGroups
+        //});
+    }
+    
+    // 현재 그룹에 적 추가
+    const enemy = new Enemy(gameState.wave);
+    enemyGroups[gameState.currentGroup - 1].add(enemy);
+    enemies.push(enemy);
+    gameState.enemiesRemaining--;
+    gameState.enemiesInCurrentGroup++;
+    gameState.lastSpawnTime = Date.now();
+    
+    //console.log('적 생성:', {
+    //    enemiesRemaining: gameState.enemiesRemaining,
+    //    enemiesInCurrentGroup: gameState.enemiesInCurrentGroup,
+    //    totalEnemies: gameState.totalEnemies
+    //});
+    
+    // 그룹이 가득 찼으면 다음 그룹 준비
+    if (gameState.enemiesInCurrentGroup >= gameState.groupSize) {
+        gameState.enemiesInCurrentGroup = 0;
+    }
+    
+    // 다음 적 생성 예약
+    if (gameState.enemiesRemaining > 0) {
+        const randomDelay = 300 + Math.random() * 1700; // 0.3초 ~ 2초
+        if (gameState.spawnTimer) {
+            clearTimeout(gameState.spawnTimer);
+        }
+        gameState.spawnTimer = setTimeout(spawnNextEnemy, randomDelay);
+        //console.log('다음 적 생성 예약:', {
+        //    delay: randomDelay,
+        //    enemiesRemaining: gameState.enemiesRemaining
+        //});
+    }
 }
 
 // 웨이브 시작 이펙트
@@ -2643,14 +2703,17 @@ function updateInfoBar() {
     }
 }
 
-// 웨이브 진행 상황 업데이트
+// 웨이브 진행 상황 업데이트 함수 수정
 function updateWaveProgress() {
     const progress = document.getElementById('waveProgress');
     const fill = progress.querySelector('.fill');
     let text = progress.querySelector('.progress-text');
-    const total = gameState.enemiesRemaining + enemies.length;
+    
+    // 전체 적의 수 대비 현재 진행률 계산
+    const total = gameState.totalEnemies;
     const remaining = gameState.enemiesRemaining;
     const percentage = total > 0 ? ((total - remaining) / total) * 100 : 0;
+    
     fill.style.width = `${percentage}%`;
     progress.style.display = gameState.waveInProgress ? 'block' : 'none';
 
@@ -2802,13 +2865,8 @@ function gameLoop() {
         return !enemy.update();
     });
 
-    // 새로운 적 생성
-    if (gameState.waveInProgress && gameState.enemiesRemaining > 0 && 
-        Math.random() < DIFFICULTY_SETTINGS[gameState.difficulty].enemySpawnRate) {
-        enemies.push(new Enemy(gameState.wave));
-        gameState.enemiesRemaining--;
-    }
-
+    // 새로운 적 생성 부분 제거 (이제 spawnNextGroup에서 처리)
+    
     // 웨이브 종료 체크
     checkWaveEnd();
 
@@ -2855,6 +2913,14 @@ function gameLoop() {
 
     // 그룹 연결선 그리기
     drawGroupConnections();
+
+    // 적 생성 타이밍 체크 (2초 이상 지났고, 아직 적이 남아있으면 강제 생성)
+    if (gameState.waveInProgress && 
+        gameState.enemiesRemaining > 0 && 
+        Date.now() - gameState.lastSpawnTime > 2000) {
+        //console.log('강제 적 생성');
+        spawnNextEnemy();
+    }
 
     requestAnimationFrame(gameLoop);
 }
@@ -5365,7 +5431,7 @@ function initializeGame() {
     // 게임 상태 초기화
     gameState.gold = DIFFICULTY_SETTINGS[gameState.difficulty].initialGold;
     gameState.lives = DIFFICULTY_SETTINGS[gameState.difficulty].initialLives;
-    gameState.wave = 0;
+    gameState.wave = 1;
     gameState.score = 0;
     gameState.towers = [];
     gameState.enemies = [];
