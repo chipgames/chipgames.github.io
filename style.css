@@ -620,25 +620,21 @@ body {
 
 .damage-number {
     position: absolute;
-    color: #ffffff;
+    color: #fff;
     font-size: 16px;
     font-weight: normal;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    animation: damageNumber 1s ease-out forwards;
     pointer-events: none;
     z-index: 1200;
-    will-change: transform, opacity;
     opacity: 1;
-    overflow: visible;
 }
 
 .damage-number.critical {
     color: #ef4444;
     font-size: 24px;
     font-weight: bold;
-    text-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
-    will-change: transform, opacity;
-    opacity: 1;
-    overflow: visible;
+    animation: criticalDamageNumber 1s ease-out forwards;
 }
 
 .special-effect {
@@ -707,16 +703,25 @@ body {
 }
 
 @keyframes damageNumber {
-    0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
-    50% { transform: translate(-50%, -100%) scale(1.2) rotate(5deg); opacity: 0.8; }
-    100% { transform: translate(-50%, -150%) scale(1) rotate(0deg); opacity: 0; }
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) translateY(-30px) rotate(10deg);
+    }
 }
 
 @keyframes criticalDamageNumber {
-    0% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
-    25% { transform: translate(-50%, -75%) scale(1.5) rotate(-10deg); opacity: 1; }
-    50% { transform: translate(-50%, -100%) scale(1.2) rotate(10deg); opacity: 0.8; }
-    100% { transform: translate(-50%, -150%) scale(1) rotate(0deg); opacity: 0; }
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) translateY(0) rotate(0deg) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) translateY(-40px) rotate(20deg) scale(1.2);
+    }
 }
 
 @keyframes specialRing {
@@ -1182,4 +1187,114 @@ body {
         padding: 6px 10px 6px 8px;
         font-size: 0.95em;
     }
+}
+
+.tower-build-menu {
+    position: fixed;
+    background: #232526;
+    border: 2px solid #4CAF50;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    min-width: 300px;
+    max-width: 400px;
+    color: #fff;
+}
+
+.tower-build-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #4CAF50;
+}
+
+.tower-build-header h2 {
+    margin: 0 0 8px 0;
+    color: #4CAF50;
+    font-size: 1.4em;
+}
+
+.tower-list {
+    display: grid;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.tower-card {
+    background: #2c2c2c;
+    border: 1px solid #4CAF50;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.tower-card:hover:not(.disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+.tower-card.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.tower-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.tower-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #fff;
+}
+
+.tower-name {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.tower-cost {
+    color: #FFD700;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.tower-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.tower-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.9em;
+}
+
+.tower-stat-label {
+    color: #888;
+    font-size: 0.8em;
+}
+
+.tower-stat-value {
+    color: #4CAF50;
+    font-weight: bold;
+}
+
+.tower-description {
+    font-size: 0.9em;
+    color: #aaa;
+    line-height: 1.4;
 }
