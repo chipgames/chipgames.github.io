@@ -1960,6 +1960,21 @@ class Enemy {
         this.patternCooldown = 0;
         this.healCooldown = 0;
 
+        // 1. 먼저 pattern 보호용 defineProperty 선언
+        let _pattern;
+        Object.defineProperty(this, 'pattern', {
+            get() { return _pattern; },
+            set(v) {
+                if (_pattern !== undefined) {
+                    console.warn('[Enemy] pattern은 생성자 외부에서 변경할 수 없습니다!', this, v, new Error().stack);
+                    return;
+                }
+                _pattern = v;
+            },
+            configurable: false,
+            enumerable: true
+        });
+
         // AI 패턴 및 타입/이름 초기화
         if (!isBoss) {
             // 적 타입 랜덤 선택
@@ -1967,7 +1982,7 @@ class Enemy {
             const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
             const enemyType = ENEMY_TYPES[randomType];
             this.type = randomType;
-            // 패턴 랜덤 선택
+            // 패턴 랜덤 선택 (생성자에서 한 번만!)
             const patterns = Object.keys(ENEMY_PATTERNS);
             const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
             this.pattern = ENEMY_PATTERNS[randomPattern];
@@ -1981,6 +1996,9 @@ class Enemy {
             this.reward = Math.floor(this.calculateLeveledReward(enemyType.reward));
             this.experienceValue = Math.floor(this.calculateLeveledExperience(enemyType.experienceValue));
             this.name = `${enemyType.name} Lv.${this.level} (${this.pattern.name})`;
+
+            
+
             this.color = enemyType.color;
             // 일반 적만 타입별 스킬/쿨다운 세팅
             if (this.type === 'TANK') {
@@ -2011,13 +2029,13 @@ class Enemy {
             this.name = `${bossType.name} Lv.${this.level}`;
             this.color = bossType.color;
             this.ability = bossType.ability;
-            // 타입별 패턴/스킬/쿨다운 고정 (switch문에서만 세팅)
+            // 타입별 패턴/스킬/쿨다운 고정 (생성자에서 한 번만!)
             switch (randomBossType) {
                 case 'TANK':
                     this.pattern = BOSS_PATTERNS.SHIELD;
                     this.skill = ENEMY_SKILLS.SHIELD;
                     this.patternCooldown = this.pattern.cooldown;
-                    this.skillCooldown = this.skill.cooldown;
+                    this.skillCooldown = this.skill.cooldown;                    
                     break;
                 case 'SPEED':
                     this.pattern = BOSS_PATTERNS.TELEPORT;
@@ -2182,6 +2200,8 @@ class Enemy {
             this.die();
             return true;
         }
+        // 이동 전 로그
+        //console.log('[Enemy.update] 이동 전', {x: this.x, y: this.y, pathIndex: this.pathIndex, pattern: this.pattern?.name});
         this.updateStatusEffects();
         // 레벨업 시도
         this.tryLevelUp();
@@ -2202,7 +2222,10 @@ class Enemy {
 
         // AI 패턴 업데이트
         if (this.pattern && this.pattern.update) {
+            const before = {x: this.x, y: this.y, pathIndex: this.pathIndex};
             const shouldRemove = this.pattern.update(this);
+            // 이동 후 로그
+            //console.log(`[Enemy.pattern.update] 패턴: ${this.pattern.name}`, {before, after: {x: this.x, y: this.y, pathIndex: this.pathIndex}});
             if (shouldRemove) return true;
         }
 
@@ -2245,249 +2268,82 @@ class Enemy {
     }
 
     draw() {
+        //console.log('Enemy draw 호출', this);
         if (this.isDead) return;
-        // 적 기본 모양
         ctx.save();
-        let baseColor = this.color;
-        // 상태이상별 색상 오버레이 및 오라
-        let statusIcons = [];
-        if (this.statusEffects.has('POISON')) {
-            baseColor = 'limegreen';
-            ctx.globalAlpha = 0.5;
-            ctx.beginPath();
-            ctx.arc(
-                this.x * TILE_SIZE + TILE_SIZE / 2 + Math.sin(Date.now()/100)*6,
-                this.y * TILE_SIZE + TILE_SIZE / 2 + Math.cos(Date.now()/120)*6,
-                8 + Math.sin(Date.now()/200)*2,
-                0, Math.PI * 2
-            );
-            ctx.fillStyle = 'rgba(0,255,0,0.2)';
-            ctx.fill();
-            ctx.globalAlpha = 1.0;
-            statusIcons.push('🟢');
-        }
-        if (this.statusEffects.has('FROZEN')) {
-            baseColor = 'deepskyblue';
-            ctx.globalAlpha = 0.5;
-            ctx.beginPath();
-            ctx.arc(
-                this.x * TILE_SIZE + TILE_SIZE / 2,
-                this.y * TILE_SIZE + TILE_SIZE / 2,
-                TILE_SIZE/2 + Math.sin(Date.now()/150)*2,
-                0, Math.PI * 2
-            );
-            ctx.fillStyle = 'rgba(0,200,255,0.18)';
-            ctx.fill();
-            ctx.globalAlpha = 1.0;
-            statusIcons.push('❄️');
-        }
-        if (this.statusEffects.has('BURNING')) {
-            baseColor = 'orangered';
-            ctx.globalAlpha = 0.5;
-            ctx.beginPath();
-            ctx.arc(
-                this.x * TILE_SIZE + TILE_SIZE / 2 + Math.sin(Date.now()/80)*4,
-                this.y * TILE_SIZE + TILE_SIZE / 2 - 8 + Math.cos(Date.now()/60)*2,
-                7 + Math.sin(Date.now()/100)*2,
-                0, Math.PI * 2
-            );
-            ctx.fillStyle = 'rgba(255,80,0,0.18)';
-            ctx.fill();
-            ctx.globalAlpha = 1.0;
-            statusIcons.push('🔥');
-        }
-        ctx.fillStyle = baseColor;
+
+        // 1. 적 본체(사각형)
+        ctx.fillStyle = this.color;
         ctx.fillRect(
-            this.x * TILE_SIZE + 5,
-            this.y * TILE_SIZE + 5,
-            TILE_SIZE - 10,
-            TILE_SIZE - 10
-        );
-        // 그룹 버프 오라
-        if (this.groupSpeedBuff && this.groupSpeedBuff > 1.01) {
-            ctx.globalAlpha = 0.3;
-            ctx.beginPath();
-            ctx.arc(
-                this.x * TILE_SIZE + TILE_SIZE / 2,
-                this.y * TILE_SIZE + TILE_SIZE / 2,
-                TILE_SIZE/2 + 10 + Math.sin(Date.now()/100)*2,
-                0, Math.PI * 2
-            );
-            ctx.strokeStyle = '#00ff88';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            ctx.globalAlpha = 1.0;
-        }
-        if (this.groupDefenseBuff && this.groupDefenseBuff > 1.01) {
-            ctx.globalAlpha = 0.3;
-            ctx.beginPath();
-            ctx.arc(
-                this.x * TILE_SIZE + TILE_SIZE / 2,
-                this.y * TILE_SIZE + TILE_SIZE / 2,
-                TILE_SIZE/2 + 14 + Math.sin(Date.now()/120)*2,
-                0, Math.PI * 2
-            );
-            ctx.strokeStyle = '#ffaa00';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            ctx.globalAlpha = 1.0;
-        }
-        // 방어막(무적) 오라
-        if (this.isInvincible) {
-            ctx.save();
-            ctx.globalAlpha = 0.6;
-            ctx.beginPath();
-            ctx.arc(
-                this.x * TILE_SIZE + TILE_SIZE / 2,
-                this.y * TILE_SIZE + TILE_SIZE / 2,
-                TILE_SIZE/2 + 6 + Math.sin(Date.now()/120)*2,
-                0, Math.PI * 2
-            );
-            ctx.strokeStyle = '#00eaff';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            ctx.restore();
-        }
-        // 그룹 색상 테두리
-        if (this.groupColor) {
-            ctx.strokeStyle = this.groupColor;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(
-                this.x * TILE_SIZE + 5,
-                this.y * TILE_SIZE + 5,
-                TILE_SIZE - 10,
-                TILE_SIZE - 10
-            );
-        }
-        // 보스/특수 적 강조 오라
-        if (this.type === 'BOSS') {
-            ctx.globalAlpha = 0.5;
-            ctx.beginPath();
-            ctx.arc(
-                this.x * TILE_SIZE + TILE_SIZE / 2,
-                this.y * TILE_SIZE + TILE_SIZE / 2,
-                TILE_SIZE/2 + 18 + Math.sin(Date.now()/80)*3,
-                0, Math.PI * 2
-            );
-            ctx.strokeStyle = '#ff00ff';
-            ctx.lineWidth = 4;
-            ctx.stroke();
-            ctx.globalAlpha = 1.0;
-        }
-        ctx.restore();
-        // 상태이상/스킬/쿨다운 아이콘 표시
-        if (statusIcons.length > 0 || (this.skill && this.skillCooldown > 0)) {
-            ctx.save();
-            ctx.font = '16px Arial';
-            ctx.textAlign = 'center';
-            let icons = statusIcons.join(' ');
-            if (this.skill && this.skillCooldown > 0) {
-                icons += ' ⏳';
-            }
-            ctx.fillStyle = '#fff';
-            ctx.fillText(
-                icons,
-                this.x * TILE_SIZE + TILE_SIZE / 2,
-                this.y * TILE_SIZE - 18
-            );
-            ctx.restore();
-        }
-
-        // 레벨 표시
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 10px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(
-            `Lv.${this.level}${this.pattern ? ' [' + this.pattern.name + ']' : ''}`,
-            this.x * TILE_SIZE + TILE_SIZE / 2,
-            this.y * TILE_SIZE + TILE_SIZE / 2
+            this.x * TILE_SIZE + 6,
+            this.y * TILE_SIZE + 18,
+            TILE_SIZE - 12,
+            TILE_SIZE - 12
         );
 
-        // HP바 (적 사각형 내부 상단, 굵고 진하게, 테두리+숫자)
-        const barX = this.x * TILE_SIZE + 5;
-        const barY = this.y * TILE_SIZE + 7;
-        const barW = TILE_SIZE - 10;
-        const barH = 7;
+        // 2. HP바 (적 본체 위)
+        const barX = this.x * TILE_SIZE + 6;
+        const barY = this.y * TILE_SIZE + 8; // 본체보다 위쪽
+        const barW = TILE_SIZE - 12;
+        const barH = 8;
         const percent = Math.max(0, this.health / this.maxHealth);
 
-        // 배경(검정)
-        ctx.fillStyle = 'rgba(0,0,0,0.7)';
-        ctx.fillRect(barX-1, barY-1, barW+2, barH+2);
-        // HP바(빨간색)
-        ctx.fillStyle = '#c0392b';
+        // HP바 배경
+        ctx.fillStyle = '#333';
         ctx.fillRect(barX, barY, barW, barH);
-        // HP바(초록색, 현재 체력)
-        ctx.fillStyle = '#27ae60';
+
+        // HP바 실제 체력
+        ctx.fillStyle = percent > 0.6 ? '#4ef04e' : (percent > 0.3 ? '#ffe066' : '#ff4e4e');
         ctx.fillRect(barX, barY, barW * percent, barH);
-        // 테두리(흰색)
+
+        // HP바 테두리
         ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(barX-1, barY-1, barW+2, barH+2);
-        // HP 숫자 표시(중앙)
-        ctx.font = 'bold 10px Arial';
-        ctx.fillStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(barX, barY, barW, barH);
+
+        // HP 숫자 (원하면 주석 해제)
+        // ctx.font = 'bold 11px Arial';
+        // ctx.fillStyle = '#fff';
+        // ctx.textAlign = 'center';
+        // ctx.textBaseline = 'middle';
+        // ctx.fillText(`${Math.ceil(this.health)}/${this.maxHealth}`, barX + barW / 2, barY + barH / 2);
+
+        // 3. 이름/패턴명 (HP바 위, 테두리 추가)
+        ctx.font = 'bold 11px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(`${Math.ceil(this.health)}/${this.maxHealth}`, barX + barW/2, barY + barH - 1);
+        ctx.textBaseline = 'bottom';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 3;
+        ctx.strokeText(`${this.name}${this.pattern?.name ? ' [' + this.pattern.name + ']' : ''}`, barX + barW / 2, barY - 4);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(`${this.name}${this.pattern?.name ? ' [' + this.pattern.name + ']' : ''}`, barX + barW / 2, barY - 4);
+
+        // 4. 레벨 (적 본체 중앙, 테두리 추가)
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 3;
+        ctx.strokeText(`Lv.${this.level}`, this.x * TILE_SIZE + TILE_SIZE / 2, this.y * TILE_SIZE + 18 + (TILE_SIZE - 12) / 2);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(`Lv.${this.level}`, this.x * TILE_SIZE + TILE_SIZE / 2, this.y * TILE_SIZE + 18 + (TILE_SIZE - 12) / 2);
+
+        // 5. 상태이상 아이콘 (HP바 아래)
+        const statusIcons = [...this.statusEffects.keys()].map(k => {
+            if (k === 'FROZEN') return '❄️';
+            if (k === 'POISON') return '☠️';
+            if (k === 'BURNING') return '🔥';
+            if (k === 'SLOWED') return '⏳';
+            return '🌀';
+        });
+        if (statusIcons.length) {
+            ctx.font = '18px Arial';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            ctx.fillText(statusIcons.join(' '), barX, barY + barH + 2);
+        }
 
         ctx.restore();
-
-        // 상태이상/스킬/쿨다운 아이콘 표시
-        if (statusIcons.length > 0 || (this.skill && this.skillCooldown > 0)) {
-            ctx.save();
-            ctx.font = '16px Arial';
-            ctx.textAlign = 'center';
-            let icons = statusIcons.join(' ');
-            if (this.skill && this.skillCooldown > 0) {
-                icons += ' ⏳';
-            }
-            ctx.fillStyle = '#fff';
-            ctx.fillText(
-                icons,
-                this.x * TILE_SIZE + TILE_SIZE / 2,
-                this.y * TILE_SIZE - 18
-            );
-            ctx.restore();
-        }
-
-        // 레벨 표시
-        ctx.fillStyle = 'white';
-        ctx.font = 'bold 10px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(
-            `Lv.${this.level}${this.pattern ? ' [' + this.pattern.name + ']' : ''}`,
-            this.x * TILE_SIZE + TILE_SIZE / 2,
-            this.y * TILE_SIZE + TILE_SIZE / 2
-        );
-
-        // 상태 효과 표시
-        let effectY = this.y * TILE_SIZE - 15;
-        for (const [effectType, effect] of this.statusEffects) {
-            const statusEffect = STATUS_EFFECTS[effectType];
-            ctx.fillStyle = statusEffect.color;
-            ctx.fillRect(
-                this.x * TILE_SIZE + 5,
-                effectY,
-                (TILE_SIZE - 10) * (effect.remaining / effect.duration),
-                3
-            );
-            effectY -= 5;
-        }
-
-        // 이름 표시
-        ctx.fillStyle = 'white';
-        ctx.font = '12px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText(
-            this.name,
-            this.x * TILE_SIZE,
-            this.y * TILE_SIZE - 5
-        );
-
-        // 크리티컬 데미지 표시
-        if (this.lastDamage && this.lastDamage.isCritical) {
-            showDamageNumber(this.x, this.y, this.lastDamage.amount, true);
-            this.lastDamage = null;
-        }
     }
 
     // 방어력 일관 적용
@@ -2907,7 +2763,8 @@ function gameLoop() {
 
     // 적 업데이트 및 그리기
     enemies = enemies.filter(enemy => {
-        enemy.draw();
+        //console.log('enemy 객체:', enemy, 'draw:', typeof enemy.draw, 'instanceof Enemy:', enemy instanceof Enemy);
+        if (enemy.draw) enemy.draw();
         return !enemy.update();
     });
 
@@ -5996,57 +5853,3 @@ Enemy.prototype.applyStatusEffect = function(effectType, duration) {
         }
     }
 };
-
-// 3. draw()에서 실시간 상태(쿨다운/상태이상 등) 표시
-Enemy.prototype.draw = function() {
-    if (this.isDead) return;
-    ctx.save();
-    let baseColor = this.color;
-    let statusIcons = [];
-    // ... 기존 상태이상 오라 ...
-    ctx.fillStyle = baseColor;
-    ctx.fillRect(
-        this.x * TILE_SIZE + 5,
-        this.y * TILE_SIZE + 5,
-        TILE_SIZE - 10,
-        TILE_SIZE - 10
-    );
-    // ... 그룹/보스 오라 ...
-    ctx.restore();
-    // 상태이상/스킬/쿨다운 아이콘 표시
-    if (statusIcons.length > 0 || (this.skill && this.skillCooldown > 0)) {
-        ctx.save();
-        ctx.font = '16px Arial';
-        ctx.textAlign = 'center';
-        let icons = statusIcons.join(' ');
-        if (this.skill && this.skillCooldown > 0) {
-            icons += ' ⏳';
-        }
-        ctx.fillStyle = '#fff';
-        ctx.fillText(
-            icons,
-            this.x * TILE_SIZE + TILE_SIZE / 2,
-            this.y * TILE_SIZE - 18
-        );
-        ctx.restore();
-    }
-    // 레벨/패턴명 표시
-    ctx.fillStyle = 'white';
-    ctx.font = 'bold 10px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(
-        `Lv.${this.level}${this.pattern ? ' [' + this.pattern.name + ']' : ''}`,
-        this.x * TILE_SIZE + TILE_SIZE / 2,
-        this.y * TILE_SIZE + TILE_SIZE / 2
-    );
-    //// 쿨다운/상태이상 실시간 표시
-    //ctx.fillStyle = 'yellow';
-    //ctx.font = '10px Arial';
-    //ctx.fillText(
-    //    `패턴쿨:${this.patternCooldown} 스킬쿨:${this.skillCooldown} ${[...this.statusEffects.keys()].join(',')}`,
-    //    this.x * TILE_SIZE + TILE_SIZE / 2,
-    //    this.y * TILE_SIZE - 30
-    //);
-    // ... 체력바/상태이상/이름/크리티컬 ...
-};
-
