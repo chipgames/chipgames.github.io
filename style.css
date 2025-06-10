@@ -960,6 +960,10 @@ body {
     font-size: 1.0em;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     animation: upgradeText 0.8s ease-out;
+    /* 세로쓰기 방지 */
+    writing-mode: initial !important;
+    white-space: nowrap !important;
+    letter-spacing: 0.02em;
 }
 
 @keyframes upgradeRing {
