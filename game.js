@@ -1315,19 +1315,19 @@ class Tower {
 
         switch(this.type) {
             case 'BASIC':
-                target.health -= damage;
+                target.takeDamage(damage, isCritical, this);
                 break;
             case 'ICE':
-                target.health -= damage;
+                target.takeDamage(damage, isCritical, this);
                 target.applyStatusEffect('FROZEN', this.freezeDuration);
                 break;
             case 'POISON':
-                target.health -= damage;
+                target.takeDamage(damage, isCritical, this);
                 target.poisonDamage = this.poisonDamage;
                 target.poisonDuration = this.poisonDuration;
                 break;
             case 'LASER':
-                target.health -= damage;
+                target.takeDamage(damage, isCritical, this);
                 target.continuousDamage = this.continuousDamage;
                 break;
             case 'SPLASH':
@@ -1343,7 +1343,7 @@ class Tower {
 
     // 스플래시 공격 실행 함수
     executeSplashAttack(mainTarget, damage) {
-        mainTarget.health -= damage;
+        mainTarget.takeDamage(damage, false, this);
         mainTarget.applyStatusEffect('SLOWED', this.slowEffect);
 
         // 범위 내 다른 적들도 데미지
@@ -1355,7 +1355,7 @@ class Tower {
             const distance = Math.sqrt(dx * dx + dy * dy);
             
             if (distance <= this.splashRadius * TILE_SIZE) {
-                enemy.health -= damage * 0.5;
+                enemy.takeDamage(damage * 0.5, false, this);
                 enemy.applyStatusEffect('SLOWED', this.slowEffect);
             }
         });
@@ -1391,12 +1391,15 @@ class Tower {
     }
 
     gainExperience(amount) {
+        //console.log('경험치 획득:', amount, '현재 경험치:', this.experience, '다음 레벨까지:', this.experienceToNextLevel);
         this.experience += amount;
         
         // 타워 레벨업 체크
         while (this.experience >= this.experienceToNextLevel) {
+            //console.log('레벨업! 현재 레벨:', this.level);
             this.experience -= this.experienceToNextLevel;
             this.level++;
+            console.log('[타워 레벨업]', '좌표:', this.x, this.y, '새 레벨:', this.level);
             this.experienceToNextLevel = Math.floor(this.experienceToNextLevel * 1.5);
             
             // 레벨업 시 능력치 상승
@@ -1411,7 +1414,8 @@ class Tower {
             }
             
             // 레벨업 이펙트
-            showUpgradeEffect(this.x, this.y);
+            //console.log('레벨업 이펙트 호출');
+            showLevelUpEffect(this);
             playSound('powerup');
         }
     }
@@ -2254,7 +2258,7 @@ class Enemy {
             this.experienceValue = Math.floor(this.calculateLeveledExperience(this.experienceValue));
             
             // 레벨업 효과 표시
-            showLevelUpEffect(this.x, this.y);
+            //showLevelUpEffect(this.x, this.y);
             return true;
         }
         return false;
@@ -2492,12 +2496,13 @@ class Enemy {
     }
 
     // 방어력 일관 적용
-    takeDamage(damage, isCritical = false) {
+    takeDamage(damage, isCritical = false, attacker = null) {
         if (this.isDead || this.isInvincible) return false;
         // 방어력 적용
         const actualDamage = Math.max(1, Math.floor(damage * (1 - (this.defense / (this.defense + 100)))));
         this.health = Math.max(0, this.health - actualDamage);
         this.lastDamage = { amount: actualDamage, isCritical };
+        if (attacker) this.lastAttacker = attacker;
         if (this.health <= 0) {
             this.die();
             return true;
@@ -2519,7 +2524,9 @@ class Enemy {
         this.groupSpeedBuff = 1.0;
         this.groupDefenseBuff = 1.0;
         // 보상 지급 및 중복 방지
-        gainExperience(this.experienceValue);
+        if (this.lastAttacker && typeof this.lastAttacker.gainExperience === 'function') {
+            this.lastAttacker.gainExperience(this.experienceValue);
+        }
         gameState.gold += this.reward * (gameState.goldMultiplier || 1);
         gameStats.totalGold += this.reward * (gameState.goldMultiplier || 1);
         gameStats.enemiesKilled++;
@@ -3026,9 +3033,21 @@ function gameLoop() {
 
     // 타워 그리기 및 공격
     towers.forEach(tower => {
+        //console.log('타워 draw:', tower, '레벨:', tower.level); // 레벨 디버깅
         tower.draw();
         tower.attack(enemies);
     });
+
+    // 레벨업 이펙트 그리기
+    const levelUpEffects = EffectPool.getPool('levelUp');
+    if (levelUpEffects && Array.isArray(levelUpEffects)) {
+        levelUpEffects.forEach(effect => {
+            if (effect.active) {
+                effect.update();
+                effect.draw();
+            }
+        });
+    }
 
     // 적 업데이트 및 그리기
     enemies = enemies.filter(enemy => {
@@ -3909,7 +3928,7 @@ function gainExperience(amount) {
         // 레벨업 보상
         const levelUpReward = gameState.level * 50;
         gameState.gold += levelUpReward;
-        showLevelUpEffect(levelUpReward);
+        //showLevelUpEffect(levelUpReward);
     }
     
     updateInfoBar();
@@ -5717,10 +5736,26 @@ const EffectPool = {
         if (!this.pools.has(type)) {
             const pool = [];
             for (let i = 0; i < count; i++) {
-                const element = document.createElement('div');
-                element.className = type + '-effect';
-                element.style.display = 'none';
-                pool.push(element);
+                if (type === 'levelUp') {
+                    pool.push({
+                        active: false,
+                        x: 0,
+                        y: 0,
+                        alpha: 1,
+                        scale: 1,
+                        rotation: 0,
+                        type: 'levelUp',
+                        duration: 1000,
+                        startTime: 0,
+                        draw: function() {},
+                        update: function() {}
+                    });
+                } else {
+                    const element = document.createElement('div');
+                    element.className = type + '-effect';
+                    element.style.display = 'none';
+                    pool.push(element);
+                }
             }
             this.pools.set(type, pool);
         }
@@ -5731,22 +5766,50 @@ const EffectPool = {
             this.init(type);
         }
         const pool = this.pools.get(type);
-        const element = pool.find(el => el.style.display === 'none');
-        if (element) {
-            return element;
+        if (type === 'levelUp') {
+            const effect = pool.find(e => !e.active);
+            if (effect) {
+                effect.active = true;
+                return effect;
+            }
+            // 풀이 비어있으면 새로 생성
+            const newEffect = {
+                active: true,
+                x: 0,
+                y: 0,
+                alpha: 1,
+                scale: 1,
+                rotation: 0,
+                type: 'levelUp',
+                duration: 1000,
+                startTime: 0,
+                draw: function() {},
+                update: function() {}
+            };
+            pool.push(newEffect);
+            return newEffect;
+        } else {
+            const element = pool.find(el => el.style.display === 'none');
+            if (element) {
+                return element;
+            }
+            // 풀이 비어있으면 새로 생성
+            const newElement = document.createElement('div');
+            newElement.className = type + '-effect';
+            pool.push(newElement);
+            return newElement;
         }
-        // 풀이 비어있으면 새로 생성
-        const newElement = document.createElement('div');
-        newElement.className = type + '-effect';
-        pool.push(newElement);
-        return newElement;
     },
     
     release(element) {
-        element.style.display = 'none';
-        element.className = element.className.split(' ')[0]; // 클래스 초기화
-        element.textContent = ''; // 내용 초기화
-        element.style.cssText = ''; // 스타일 초기화
+        if (element.type === 'levelUp') {
+            element.active = false;
+        } else {
+            element.style.display = 'none';
+            element.className = element.className.split(' ')[0]; // 클래스 초기화
+            element.textContent = ''; // 내용 초기화
+            element.style.cssText = ''; // 스타일 초기화
+        }
     },
     
     getPool(type) {
@@ -5755,12 +5818,14 @@ const EffectPool = {
 };
 
 function initializeEffects() {
+    console.log('이펙트 초기화 시작');
     // 이펙트 풀 초기화
     EffectPool.init('attack', 20);
     EffectPool.init('damage', 30);
     EffectPool.init('special', 5);
     EffectPool.init('upgrade', 5);
     EffectPool.init('levelUp', 5);  // 레벨업 이펙트 풀 추가
+    console.log('이펙트 초기화 완료');
 }
 
 // 공격 이펙트 표시 (최적화)
@@ -6149,8 +6214,14 @@ function drawWaveMessage() {
 }
 
 function showLevelUpEffect(tower) {
+    if (!tower || typeof tower !== 'object' || tower.x === undefined || tower.y === undefined) {
+        console.error('showLevelUpEffect는 반드시 타워 객체로 호출해야 합니다!', tower);
+        return;
+    }
+    console.log('showLevelUpEffect 호출됨:', tower);
     // 이펙트 풀에서 이펙트 가져오기
     const effect = EffectPool.get('levelUp');
+    console.log('이펙트 가져옴:', effect);
     if (!effect) return;
 
     // 이펙트 초기화

@@ -957,7 +957,7 @@ body {
     transform: translateX(-50%);
     color: #fbbf24;
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 1.0em;
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     animation: upgradeText 0.8s ease-out;
 }
