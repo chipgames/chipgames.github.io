@@ -5668,15 +5668,31 @@ function showDamageNumber(x, y, damage, isCritical = false) {
     
     const damageText = EffectPool.get('damage');
     
-    // 랜덤한 회전과 이동
-    const rotation = (Math.random() - 0.5) * 30;
+    // 데미지 크기에 따른 스타일 변화
+    const damageSize = Math.min(Math.max(damage / 100, 1), 2); // 1~2 사이의 크기
+    const fontSize = Math.floor(16 * damageSize);
+    
+    // 랜덤한 X 이동
     const offsetX = (Math.random() - 0.5) * 20;
+    
+    // 크리티컬 여부에 따른 색상과 효과
+    const color = isCritical ? '#ff4444' : '#ffffff';
+    const textShadow = isCritical 
+        ? '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000' 
+        : '0 0 5px #000000, 0 0 10px #000000';
     
     damageText.style.cssText = `
         display: block;
         left: ${x * TILE_SIZE + TILE_SIZE/2 + offsetX}px;
         top: ${y * TILE_SIZE + TILE_SIZE/2}px;
-        transform: translate(-50%, -50%) rotate(${rotation}deg);
+        transform: translate(-50%, -50%);
+        font-size: ${fontSize}px;
+        color: ${color};
+        text-shadow: ${textShadow};
+        font-weight: ${isCritical ? 'bold' : 'normal'};
+        animation: damageNumberJump 1.2s cubic-bezier(0.4,1.5,0.5,1) forwards;
+        z-index: 1000;
+        pointer-events: none;
     `;
     
     damageText.className = `damage-number ${isCritical ? 'critical' : ''}`;
@@ -5687,6 +5703,38 @@ function showDamageNumber(x, y, damage, isCritical = false) {
         EffectPool.release(damageText);
     }, { once: true });
 }
+
+// 데미지 숫자 점프 애니메이션 스타일 추가
+document.head.insertAdjacentHTML('beforeend', `
+    <style>
+        .damage-number {
+            position: absolute;
+            will-change: transform, opacity;
+        }
+        .damage-number.critical {
+            color: #ff4444;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+        }
+        @keyframes damageNumberJump {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            30% {
+                opacity: 1;
+                transform: translate(-50%, -120%) scale(1.5);
+            }
+            60% {
+                opacity: 0.9;
+                transform: translate(-50%, 0%) scale(0.9);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, 40%) scale(0.7);
+            }
+        }
+    </style>
+`);
 
 // 특수능력 이펙트 표시 (최적화)
 function showSpecialEffect(x, y, name) {
@@ -5767,39 +5815,6 @@ function updateControlVisibility() {
 
 // 페이지 로드 시 초기 상태 설정
 window.addEventListener('DOMContentLoaded', updateControlVisibility);
-
-//function showTowerRangePreview(x, y, range, type) {
-//    if (rangePreview) {
-//        rangePreview.remove();
-//    }
-
-//    rangePreview = document.createElement('div');
-//    rangePreview.className = 'tower-range-preview';
-
-//    // 타워 중심을 기준으로 계산
-//    const centerX = x * TILE_SIZE + TILE_SIZE/2;
-//    const centerY = y * TILE_SIZE + TILE_SIZE/2;
-//    const diameter = range * TILE_SIZE * 2;
-
-//    // 캔버스의 위치(오프셋) 보정
-//    const canvas = document.getElementById('gameCanvas');
-//    const canvasRect = canvas.getBoundingClientRect();
-//    const parentRect = canvas.parentElement.getBoundingClientRect();
-//    const offsetX = canvasRect.left - parentRect.left;
-//    const offsetY = canvasRect.top - parentRect.top;
-
-//    rangePreview.style.left = `${offsetX + centerX - diameter/2}px`;
-//    rangePreview.style.top = `${offsetY + centerY - diameter/2}px`;
-//    rangePreview.style.width = `${diameter}px`;
-//    rangePreview.style.height = `${diameter}px`;
-
-//    // 타워 종류에 따른 색상 설정
-//    const tower = TOWER_TYPES[type];
-//    rangePreview.style.backgroundColor = `${tower.color}20`;
-//    rangePreview.style.borderColor = tower.color;
-
-//    document.querySelector('.game-area').appendChild(rangePreview);
-//}
 
 document.head.insertAdjacentHTML('beforeend', `
     <style>
