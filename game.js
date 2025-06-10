@@ -3640,7 +3640,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     
     sellButton.addEventListener('click', () => {
         const sellValue = tower.getSellValue();
-        gold += sellValue;
+        gameState.gold += sellValue;
         showRewardPopup(sellValue);
         towers = towers.filter(t => t !== tower);
         updateInfoBar();
