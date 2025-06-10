@@ -1400,7 +1400,7 @@ class Tower {
             //console.log('레벨업! 현재 레벨:', this.level);
             this.experience -= this.experienceToNextLevel;
             this.level++;
-            console.log('[타워 레벨업]', '좌표:', this.x, this.y, '새 레벨:', this.level);
+            //console.log('[타워 레벨업]', '좌표:', this.x, this.y, '새 레벨:', this.level);
             this.experienceToNextLevel = Math.floor(this.experienceToNextLevel * 1.5);
             
             // 레벨업 시 능력치 상승
@@ -4187,8 +4187,8 @@ function checkTowerCombos() {
             // 조합 이펙트 표시 (이미 표시되지 않은 경우에만)
             if (!shownCombos.includes(comboKey)) {
                 towers.forEach(tower => {
-                    if (!tower.activeCombos) tower.activeCombos = [];
-                    tower.activeCombos.push(comboKey);
+                    if (!tower.activeCombos) tower.activeCombos = new Set();
+                    tower.activeCombos.add(comboKey);
                 });
                 showComboEffect(combo.name);
                 shownCombos.push(comboKey);
@@ -5705,13 +5705,13 @@ if (startBtn) {
     const newStartBtn = document.getElementById('startBtn');
     
     newStartBtn.addEventListener('click', () => {
-        console.log('게임 시작 버튼 클릭됨'); // 디버깅용 로그
-        console.log('현재 gameState.isStarted:', gameState.isStarted); // 현재 상태 확인
+        //console.log('게임 시작 버튼 클릭됨'); // 디버깅용 로그
+        //console.log('현재 gameState.isStarted:', gameState.isStarted); // 현재 상태 확인
         
         if (!gameState.isStarted) {
             // 게임 시작
             gameState.isStarted = true;
-            console.log('게임 시작됨, gameState.isStarted:', gameState.isStarted); // 상태 변경 확인
+            //console.log('게임 시작됨, gameState.isStarted:', gameState.isStarted); // 상태 변경 확인
             
             newStartBtn.textContent = '재시작';
             document.getElementById('tutorial').style.display = 'none';
@@ -5733,7 +5733,7 @@ if (startBtn) {
             // 게임 재시작
             restartGame();
             gameState.isStarted = true;
-            console.log('게임 재시작됨, gameState.isStarted:', gameState.isStarted); // 상태 변경 확인
+            //console.log('게임 재시작됨, gameState.isStarted:', gameState.isStarted); // 상태 변경 확인
             updateControlVisibility();
         }
     });
@@ -5830,14 +5830,14 @@ const EffectPool = {
 };
 
 function initializeEffects() {
-    console.log('이펙트 초기화 시작');
+    //console.log('이펙트 초기화 시작');
     // 이펙트 풀 초기화
     EffectPool.init('attack', 20);
     EffectPool.init('damage', 30);
     EffectPool.init('special', 5);
     EffectPool.init('upgrade', 5);
     EffectPool.init('levelUp', 5);  // 레벨업 이펙트 풀 추가
-    console.log('이펙트 초기화 완료');
+    //console.log('이펙트 초기화 완료');
 }
 
 // 공격 이펙트 표시 (최적화)
@@ -6230,10 +6230,10 @@ function showLevelUpEffect(tower) {
         console.error('showLevelUpEffect는 반드시 타워 객체로 호출해야 합니다!', tower);
         return;
     }
-    console.log('showLevelUpEffect 호출됨:', tower);
+    //console.log('showLevelUpEffect 호출됨:', tower);
     // 이펙트 풀에서 이펙트 가져오기
     const effect = EffectPool.get('levelUp');
-    console.log('이펙트 가져옴:', effect);
+    //console.log('이펙트 가져옴:', effect);
     if (!effect) return;
 
     // 이펙트 초기화
