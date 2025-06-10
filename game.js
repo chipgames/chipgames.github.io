@@ -1265,7 +1265,8 @@ class Tower {
     // 업그레이드 비용 계산 함수
     getUpgradeCost(upgradeType) {
         const baseCost = 100;
-        const level = this[`${upgradeType}Level`];
+        let level = this[`${upgradeType}Level`];
+        if (typeof level !== 'number' || isNaN(level)) level = 1;
         return Math.floor(baseCost * Math.pow(1.5, level));
     }
 
