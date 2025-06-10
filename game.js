@@ -5691,8 +5691,7 @@ if (mapSelect) {
         if (!gameState.isStarted) {
             selectMap(e.target.value);
             gameState.currentMap = e.target.value;
-            drawMinimap();
-            initializeGame(); // 맵 변경 시에만 초기화
+            drawMinimap(); // 미리보기 항상 갱신
         }
     });
 }
