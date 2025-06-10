@@ -1855,14 +1855,12 @@ const BOSS_PATTERNS = {
     },
     TELEPORT: {
         name: '순간이동',
-        cooldown: 180,
+        cooldown: 300, // 5초
         update: (boss) => {
             if (boss.isDead) return true;
-            // 쿨다운 60프레임(1초) 전 예고
-            // if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, '순간이동');
             if (boss.patternCooldown === 0) {
-                // 현재 pathIndex에서 3~5칸 앞(랜덤)으로 순간이동
-                const jump = Math.floor(Math.random() * 3) + 3; // 3~5칸
+                // 현재 pathIndex에서 2~3칸 앞(랜덤)으로 순간이동
+                const jump = Math.floor(Math.random() * 2) + 2; // 2~3칸
                 let newIndex = Math.min(boss.pathIndex + jump, currentMap.path.length - 1);
                 boss.pathIndex = newIndex;
                 const target = currentMap.path[newIndex];
@@ -2483,28 +2481,32 @@ function showPlaceablePositions() {
 
 // 타워 설치/업그레이드 이펙트
 function showTowerEffect(x, y) {
-    const effect = document.createElement('div');
-    effect.className = 'tower-effect';
+    if (lowSpecMode) return;
+    const effect = EffectPool.get('tower');
     
-    // 타워 중심을 기준으로 계산
     const centerX = x * TILE_SIZE + TILE_SIZE/2;
     const centerY = y * TILE_SIZE + TILE_SIZE/2;
     
-    effect.style.left = `${centerX - TILE_SIZE/2}px`;
-    effect.style.top = `${centerY - TILE_SIZE/2}px`;
-    effect.style.width = `${TILE_SIZE}px`;
-    effect.style.height = `${TILE_SIZE}px`;
+    effect.style.cssText = `
+        display: block;
+        left: ${centerX - TILE_SIZE/2}px;
+        top: ${centerY - TILE_SIZE/2}px;
+        width: ${TILE_SIZE}px;
+        height: ${TILE_SIZE}px;
+    `;
     
-    document.querySelector('.game-area').appendChild(effect);
+    // 사운드 재생
+    playSound('tower_build');
     
-    // 애니메이션 종료 후 제거
+    // 애니메이션 종료 후 풀로 반환
     effect.addEventListener('animationend', () => {
-        effect.remove();
-    });
+        EffectPool.release(effect);
+    }, { once: true });
 }
 
 // 타워 업그레이드 이펙트
 function showUpgradeEffect(x, y) {
+    if (lowSpecMode) return;
     // 업그레이드 이펙트 생성
     const effect = document.createElement('div');
     effect.className = 'upgrade-effect';
@@ -2537,20 +2539,38 @@ function showUpgradeEffect(x, y) {
 }
 
 // 게임 시작 버튼 이벤트 수정
-document.getElementById('startBtn').addEventListener('click', () => {
-    if (!gameState.isStarted) {
-        gameState.isStarted = true;
-        document.getElementById('startBtn').textContent = '재시작';
-        document.getElementById('tutorial').style.display = 'none';
-        document.getElementById('waveStartButton').style.display = 'block';
+document.addEventListener('DOMContentLoaded', () => {
+    const startBtn = document.getElementById('startBtn');
+    if (startBtn) {
+        // 기존 이벤트 리스너 제거
+        const newStartBtn = startBtn.cloneNode(true);
+        startBtn.parentNode.replaceChild(newStartBtn, startBtn);
         
-        // 게임 시작 시 배경음악 재생
-        if (musicEnabled) {
-            sounds.bgm.loop = true;
-            sounds.bgm.play().catch(error => console.log('BGM 재생 실패:', error));
-        }
-    } else {
-        restartGame();
+        newStartBtn.addEventListener('click', () => {
+            console.log('게임 시작 버튼 클릭됨'); // 디버깅용 로그
+            if (!gameState.isStarted) {
+                // 게임 시작
+                gameState.isStarted = true;
+                newStartBtn.textContent = '재시작';
+                document.getElementById('tutorial').style.display = 'none';
+                document.getElementById('waveStartButton').style.display = 'block';
+                
+                // 게임 초기화
+                initializeGame();
+                updateControlVisibility();
+                
+                // 게임 시작 시 배경음악 재생
+                if (musicEnabled) {
+                    sounds.bgm.loop = true;
+                    sounds.bgm.play().catch(error => console.log('BGM 재생 실패:', error));
+                }
+            } else {
+                // 게임 재시작
+                restartGame();
+                gameState.isStarted = true;
+                updateControlVisibility();
+            }
+        });
     }
 });
 
@@ -2848,7 +2868,7 @@ function gameLoop() {
     }
 
     // 타워 설치 가능한 위치 표시
-    if (!gameState.waveInProgress) {
+    if (!gameState.waveInProgress && gameState.isStarted) {
         showPlaceablePositions();
     }
 
@@ -3217,6 +3237,27 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
     const towerMenu = document.createElement('div');
     towerMenu.className = 'tower-build-menu';
 
+    // 메뉴 위치 계산 (화면 밖으로 나가지 않도록)
+    const menuWidth = 300;
+    const menuHeight = 400;
+    const padding = 20;
+    
+    let left = clientX;
+    let top = clientY;
+    
+    // 오른쪽으로 넘치면 왼쪽에 표시
+    if (left + menuWidth > window.innerWidth) {
+        left = window.innerWidth - menuWidth - padding;
+    }
+    
+    // 아래로 넘치면 위에 표시
+    if (top + menuHeight > window.innerHeight) {
+        top = window.innerHeight - menuHeight - padding;
+    }
+    
+    towerMenu.style.left = `${left}px`;
+    towerMenu.style.top = `${top}px`;
+
     const header = document.createElement('div');
     header.className = 'tower-build-header';
     header.innerHTML = `
@@ -3463,36 +3504,6 @@ window.addEventListener('load', () => {
         loadingScreen.style.display = 'none';
     }
 });
-
-// 데미지 숫자 표시 함수
-function showDamageNumber(x, y, damage, isCritical = false) {
-    if (lowSpecMode) return;
-    const damageText = EffectPool.get('damage');
-    // 랜덤한 회전과 이동
-    const rotation = (Math.random() - 0.5) * 30;
-    const offsetX = (Math.random() - 0.5) * 20;
-    damageText.style.cssText = `
-        display: block;
-        left: ${x * TILE_SIZE + TILE_SIZE/2 + offsetX}px;
-        top: ${y * TILE_SIZE + TILE_SIZE/2}px;
-        transform: translate(-50%, -50%) rotate(${rotation}deg);
-        z-index: 1200;
-        opacity: 1;
-        pointer-events: none;
-        color: ${isCritical ? '#ef4444' : '#fff'};
-        font-size: ${isCritical ? '24px' : '16px'};
-        font-weight: ${isCritical ? 'bold' : 'normal'};
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        animation: ${isCritical ? 'criticalDamageNumber' : 'damageNumber'} 1s ease-out forwards;
-    `;
-    damageText.className = `damage-number${isCritical ? ' critical' : ''}`;
-    damageText.textContent = damage.toLocaleString();
-
-    // 애니메이션 종료 후 풀로 반환
-    damageText.addEventListener('animationend', () => {
-        EffectPool.release(damageText);
-    }, { once: true });
-}
 
 // 그룹 시각화 효과
 function drawGroupConnections() {
@@ -3754,6 +3765,7 @@ function gainExperience(amount) {
 
 // 레벨업 이펙트
 function showLevelUpEffect(reward) {
+    if (lowSpecMode) return;
     const effect = document.createElement('div');
     effect.className = 'level-up-effect';
     effect.innerHTML = `
@@ -3770,6 +3782,7 @@ function showLevelUpEffect(reward) {
 
 // 특수 이벤트 표시
 function showEventNotification(message) {
+    if (lowSpecMode) return;
     // 이미 표시된 알림이 있는지 확인
     const existingNotification = document.querySelector('.event-notification');
     if (existingNotification) {
@@ -3805,23 +3818,6 @@ document.head.insertAdjacentHTML('beforeend', `
         }
     </style>
 `);
-
-// 특수 효과 표시 함수
-function showSpecialEffect(x, y, name) {
-    const effect = document.createElement('div');
-    effect.className = 'special-effect';
-    effect.innerHTML = `
-        <div class="special-name">${name}</div>
-        <div class="special-animation"></div>
-    `;
-    effect.style.left = `${x * TILE_SIZE}px`;
-    effect.style.top = `${y * TILE_SIZE}px`;
-    document.querySelector('.game-area').appendChild(effect);
-    
-    setTimeout(() => {
-        effect.remove();
-    }, 2000);
-}
 
 // 보스 패턴 이펙트 표시 함수
 function showBossPatternEffect(x, y, patternName) {
@@ -4049,6 +4045,7 @@ function checkTowerCombos() {
 
 // 조합 이펙트 표시 함수
 function showComboEffect(comboName) {
+    if (lowSpecMode) return;
     const effect = document.createElement('div');
     effect.className = 'combo-effect';
     effect.innerHTML = `
@@ -5429,33 +5426,28 @@ window.addEventListener('load', () => {
 // 게임 초기화 함수
 function initializeGame() {
     // 게임 상태 초기화
-    gameState.gold = DIFFICULTY_SETTINGS[gameState.difficulty].initialGold;
-    gameState.lives = DIFFICULTY_SETTINGS[gameState.difficulty].initialLives;
-    gameState.wave = 1;
-    gameState.score = 0;
-    gameState.towers = [];
-    gameState.enemies = [];
-    gameState.projectiles = [];
-    gameState.effects = [];
-    gameState.isPaused = false;
-    gameState.isGameOver = false;
-    gameState.isWaveInProgress = false;
-    gameState.towerLimit = DIFFICULTY_SETTINGS[gameState.difficulty].maxTowers;
-    gameState.towersPlaced = 0;
-    gameState.selectedTower = null;
-    gameState.hoveredTile = null;
-    gameState.lastFrameTime = performance.now();
-    gameState.waveStartTime = 0;
-    gameState.waveDuration = 0;
-    gameState.waveProgress = 0;
-    gameState.enemiesSpawned = 0;
-    gameState.enemiesDefeated = 0;
-    gameState.totalEnemies = 0;
-    gameState.waveReward = 0;
+    const wasStarted = gameState.isStarted; // 현재 시작 상태 저장
+    Object.assign(gameState, {
+        gold: DIFFICULTY_SETTINGS[gameState.difficulty].initialGold,
+        lives: DIFFICULTY_SETTINGS[gameState.difficulty].initialLives,
+        wave: 1,
+        isGameOver: false,
+        waveInProgress: false,
+        enemiesRemaining: 0,
+        isPaused: false,
+        isStarted: wasStarted, // 이전 시작 상태 유지
+        score: 0,
+        bossKilled: false,
+        goldMultiplier: 1,
+        towerCount: 0,
+        experience: 0,
+        level: 1,
+        experienceToNextLevel: 100
+    });
 
     // 이펙트 풀 초기화
     initializeEffects();
-
+    
     // 맵 선택 드롭다운 초기화
     const mapSelect = document.getElementById('mapSelect');
     if (mapSelect) {
@@ -5541,14 +5533,28 @@ if (startBtn) {
     // 기존에 이벤트 리스너가 중복 등록되지 않도록 제거
     startBtn.replaceWith(startBtn.cloneNode(true));
     const newStartBtn = document.getElementById('startBtn');
+    
     newStartBtn.addEventListener('click', () => {
         if (!gameState.isStarted) {
+            // 게임 시작
             gameState.isStarted = true;
+            newStartBtn.textContent = '재시작';
+            document.getElementById('tutorial').style.display = 'none';
+            document.getElementById('waveStartButton').style.display = 'block';
+            
+            // 게임 초기화
+            initializeGame();
             updateControlVisibility();
-            initializeGame(); // 게임 시작 시 초기화
+            
+            // 게임 시작 시 배경음악 재생
+            if (musicEnabled) {
+                sounds.bgm.loop = true;
+                sounds.bgm.play().catch(error => console.log('BGM 재생 실패:', error));
+            }
         } else {
+            // 게임 재시작
             restartGame();
-            gameState.isStarted = true; // 재시작 후에도 isStarted는 true 유지
+            gameState.isStarted = true;
             updateControlVisibility();
         }
     });
@@ -5557,66 +5563,72 @@ if (startBtn) {
 
 // 이펙트 풀 관리자
 const EffectPool = {
-    pools: {},
+    pools: new Map(),
     
-    // 풀 초기화
     init(type, count = 10) {
-        if (!this.pools[type]) {
-            this.pools[type] = [];
+        if (!this.pools.has(type)) {
+            const pool = [];
             for (let i = 0; i < count; i++) {
                 const element = document.createElement('div');
-                element.className = `${type}-effect`;
+                element.className = type + '-effect';
                 element.style.display = 'none';
-                document.querySelector('.game-area').appendChild(element);
-                this.pools[type].push(element);
+                pool.push(element);
             }
+            this.pools.set(type, pool);
         }
     },
     
-    // 이펙트 가져오기
     get(type) {
-        if (!this.pools[type]) {
+        if (!this.pools.has(type)) {
             this.init(type);
         }
-        
-        const pool = this.pools[type];
+        const pool = this.pools.get(type);
         const element = pool.find(el => el.style.display === 'none');
-        
         if (element) {
             return element;
         }
-        
-        // 풀에 여유가 없으면 새로 생성
+        // 풀이 비어있으면 새로 생성
         const newElement = document.createElement('div');
-        newElement.className = `${type}-effect`;
-        document.querySelector('.game-area').appendChild(newElement);
+        newElement.className = type + '-effect';
         pool.push(newElement);
         return newElement;
     },
     
-    // 이펙트 반환
     release(element) {
         element.style.display = 'none';
-        element.className = element.className.split(' ')[0]; // 기본 클래스만 유지
-        element.style = '';
-        element.innerHTML = '';
-        // DOM에서 완전히 제거
-        if (element.parentNode) {
-            element.parentNode.removeChild(element);
-        }
+        element.className = element.className.split(' ')[0]; // 클래스 초기화
+        element.textContent = ''; // 내용 초기화
+        element.style.cssText = ''; // 스타일 초기화
+    },
+    
+    getPool(type) {
+        return this.pools.get(type) || [];
     }
 };
 
-// 이펙트 초기화
 function initializeEffects() {
+    const gameArea = document.querySelector('.game-area');
+    
+    // 이펙트 풀 초기화
     EffectPool.init('attack', 20);
     EffectPool.init('damage', 30);
     EffectPool.init('special', 5);
     EffectPool.init('upgrade', 5);
+    
+    // 각 이펙트 타입별로 요소들을 게임 영역에 추가
+    ['attack', 'damage', 'special', 'upgrade'].forEach(type => {
+        const elements = EffectPool.getPool(type);
+        elements.forEach(element => {
+            if (!gameArea.contains(element)) {
+                gameArea.appendChild(element);
+            }
+        });
+    });
 }
 
 // 공격 이펙트 표시 (최적화)
 function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
+    if (lowSpecMode) return;
     const effect = EffectPool.get('attack');
     
     // 시작점과 목표점의 중심 좌표 계산
@@ -5652,17 +5664,35 @@ function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
 
 // 데미지 숫자 표시 (최적화)
 function showDamageNumber(x, y, damage, isCritical = false) {
+    if (lowSpecMode) return;
+    
     const damageText = EffectPool.get('damage');
     
-    // 랜덤한 회전과 이동
-    const rotation = (Math.random() - 0.5) * 30;
+    // 데미지 크기에 따른 스타일 변화
+    const damageSize = Math.min(Math.max(damage / 100, 1), 2); // 1~2 사이의 크기
+    const fontSize = Math.floor(16 * damageSize);
+    
+    // 랜덤한 X 이동
     const offsetX = (Math.random() - 0.5) * 20;
+    
+    // 크리티컬 여부에 따른 색상과 효과
+    const color = isCritical ? '#ff4444' : '#ffffff';
+    const textShadow = isCritical 
+        ? '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000' 
+        : '0 0 5px #000000, 0 0 10px #000000';
     
     damageText.style.cssText = `
         display: block;
         left: ${x * TILE_SIZE + TILE_SIZE/2 + offsetX}px;
         top: ${y * TILE_SIZE + TILE_SIZE/2}px;
-        transform: translate(-50%, -50%) rotate(${rotation}deg);
+        transform: translate(-50%, -50%);
+        font-size: ${fontSize}px;
+        color: ${color};
+        text-shadow: ${textShadow};
+        font-weight: ${isCritical ? 'bold' : 'normal'};
+        animation: damageNumberJump 1.2s cubic-bezier(0.4,1.5,0.5,1) forwards;
+        z-index: 1000;
+        pointer-events: none;
     `;
     
     damageText.className = `damage-number ${isCritical ? 'critical' : ''}`;
@@ -5674,8 +5704,41 @@ function showDamageNumber(x, y, damage, isCritical = false) {
     }, { once: true });
 }
 
+// 데미지 숫자 점프 애니메이션 스타일 추가
+document.head.insertAdjacentHTML('beforeend', `
+    <style>
+        .damage-number {
+            position: absolute;
+            will-change: transform, opacity;
+        }
+        .damage-number.critical {
+            color: #ff4444;
+            text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+        }
+        @keyframes damageNumberJump {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            30% {
+                opacity: 1;
+                transform: translate(-50%, -120%) scale(1.5);
+            }
+            60% {
+                opacity: 0.9;
+                transform: translate(-50%, 0%) scale(0.9);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, 40%) scale(0.7);
+            }
+        }
+    </style>
+`);
+
 // 특수능력 이펙트 표시 (최적화)
 function showSpecialEffect(x, y, name) {
+    if (lowSpecMode) return;
     const effect = EffectPool.get('special');
     
     const centerX = x * TILE_SIZE + TILE_SIZE/2;
@@ -5730,40 +5793,6 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// 이펙트 생성 함수들에서 저사양 모드 분기 추가
-function showTowerEffect(x, y) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showUpgradeEffect(x, y) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showDamageNumber(x, y, damage, isCritical = false) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showSpecialEffect(x, y, name) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showComboEffect(comboName) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showLevelUpEffect(reward) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-function showEventNotification(message) {
-    if (lowSpecMode) return;
-    // ... 기존 코드 ...
-}
-
 function updateControlVisibility() {
     const isStarted = gameState.isStarted;
     // 게임 시작 버튼은 항상 노출, 텍스트만 변경
@@ -5786,39 +5815,6 @@ function updateControlVisibility() {
 
 // 페이지 로드 시 초기 상태 설정
 window.addEventListener('DOMContentLoaded', updateControlVisibility);
-
-//function showTowerRangePreview(x, y, range, type) {
-//    if (rangePreview) {
-//        rangePreview.remove();
-//    }
-
-//    rangePreview = document.createElement('div');
-//    rangePreview.className = 'tower-range-preview';
-
-//    // 타워 중심을 기준으로 계산
-//    const centerX = x * TILE_SIZE + TILE_SIZE/2;
-//    const centerY = y * TILE_SIZE + TILE_SIZE/2;
-//    const diameter = range * TILE_SIZE * 2;
-
-//    // 캔버스의 위치(오프셋) 보정
-//    const canvas = document.getElementById('gameCanvas');
-//    const canvasRect = canvas.getBoundingClientRect();
-//    const parentRect = canvas.parentElement.getBoundingClientRect();
-//    const offsetX = canvasRect.left - parentRect.left;
-//    const offsetY = canvasRect.top - parentRect.top;
-
-//    rangePreview.style.left = `${offsetX + centerX - diameter/2}px`;
-//    rangePreview.style.top = `${offsetY + centerY - diameter/2}px`;
-//    rangePreview.style.width = `${diameter}px`;
-//    rangePreview.style.height = `${diameter}px`;
-
-//    // 타워 종류에 따른 색상 설정
-//    const tower = TOWER_TYPES[type];
-//    rangePreview.style.backgroundColor = `${tower.color}20`;
-//    rangePreview.style.borderColor = tower.color;
-
-//    document.querySelector('.game-area').appendChild(rangePreview);
-//}
 
 document.head.insertAdjacentHTML('beforeend', `
     <style>
