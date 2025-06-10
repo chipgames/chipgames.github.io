@@ -5878,39 +5878,39 @@ function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
 // 데미지 숫자 표시 (최적화)
 function showDamageNumber(x, y, damage, isCritical = false) {
     if (lowSpecMode) return;
-    
+
     const damageText = EffectPool.get('damage');
-    
+    // 반드시 .game-area에 추가
+    const parent = document.querySelector('.game-area');
+    if (parent && damageText.parentNode !== parent) {
+        if (damageText.parentNode) damageText.parentNode.removeChild(damageText);
+        parent.appendChild(damageText);
+    }
     // 데미지 크기에 따른 스타일 변화
     const damageSize = Math.min(Math.max(damage / 100, 1), 2); // 1~2 사이의 크기
     const fontSize = Math.floor(16 * damageSize);
-    
     // 랜덤한 X 이동
     const offsetX = (Math.random() - 0.5) * 20;
-    
     // 크리티컬 여부에 따른 색상과 효과
     const color = isCritical ? '#ff4444' : '#ffffff';
     const textShadow = isCritical 
         ? '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000' 
         : '0 0 5px #000000, 0 0 10px #000000';
-    
     damageText.style.cssText = `
         display: block;
         left: ${x * TILE_SIZE + TILE_SIZE/2 + offsetX}px;
-        top: ${y * TILE_SIZE + TILE_SIZE/2}px;
+        top: ${y * TILE_SIZE + TILE_SIZE*2}px;
         transform: translate(-50%, -50%);
         font-size: ${fontSize}px;
         color: ${color};
         text-shadow: ${textShadow};
         font-weight: ${isCritical ? 'bold' : 'normal'};
-        animation: damageNumberJump 1.2s cubic-bezier(0.4,1.5,0.5,1) forwards;
+        animation: damageNumberFloat 1.2s cubic-bezier(0.4,1.5,0.5,1) forwards;
         z-index: 1000;
         pointer-events: none;
     `;
-    
     damageText.className = `damage-number ${isCritical ? 'critical' : ''}`;
     damageText.textContent = damage.toLocaleString();
-    
     // 애니메이션 종료 후 풀로 반환
     damageText.addEventListener('animationend', () => {
         EffectPool.release(damageText);

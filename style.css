@@ -624,7 +624,7 @@ body {
     font-size: 16px;
     font-weight: normal;
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    animation: damageNumber 1s ease-out forwards;
+    animation: damageNumberFloat 1.2s cubic-bezier(0.4,1.5,0.5,1) forwards;
     pointer-events: none;
     z-index: 1200;
     opacity: 1;
@@ -702,14 +702,18 @@ body {
     100% { transform: scaleX(1); opacity: 0; }
 }
 
-@keyframes damageNumber {
+@keyframes damageNumberFloat {
     0% {
         opacity: 1;
-        transform: translate(-50%, -50%) translateY(0) rotate(0deg);
+        transform: translate(-50%, 0) scale(1);
+    }
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -30px) scale(1);
     }
     100% {
         opacity: 0;
-        transform: translate(-50%, -50%) translateY(-30px) rotate(10deg);
+        transform: translate(-50%, -40px) scale(0.95);
     }
 }
 
