@@ -1298,3 +1298,46 @@ body {
     color: #aaa;
     line-height: 1.4;
 }
+
+.tower-info {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid #fff;
+    border-radius: 4px;
+    padding: 8px;
+    color: #fff;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1000;
+    min-width: 120px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.tower-name {
+    font-weight: bold;
+    margin-bottom: 4px;
+    color: #ffd700;
+    font-size: 14px;
+}
+
+.tower-level {
+    color: #fff;
+    margin-bottom: 4px;
+    font-size: 12px;
+}
+
+.tower-stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 8px;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tower-stats div {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
