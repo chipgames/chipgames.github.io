@@ -2991,7 +2991,7 @@ function checkWaveEnd() {
 function gameLoop() {
     // 게임이 시작되지 않았거나 일시정지 상태일 때는 프리뷰 화면만 표시
     if (!gameState.isStarted || gameState.isPaused) {
-        console.log('게임이 시작되지 않음, gameState.isStarted:', gameState.isStarted); // 디버깅용 로그
+        //console.log('게임이 시작되지 않음, gameState.isStarted:', gameState.isStarted); // 디버깅용 로그
         requestAnimationFrame(gameLoop);
         return;
     }
@@ -3913,23 +3913,6 @@ function gainExperience(amount) {
     }
     
     updateInfoBar();
-}
-
-// 레벨업 이펙트
-function showLevelUpEffect(reward) {
-    if (lowSpecMode) return;
-    const effect = document.createElement('div');
-    effect.className = 'level-up-effect';
-    effect.innerHTML = `
-        <h3>레벨 업!</h3>
-        <p>현재 레벨: ${gameState.level}</p>
-        <p>보상: +${reward} 골드</p>
-    `;
-    document.body.appendChild(effect);
-    
-    setTimeout(() => {
-        effect.remove();
-    }, 3000);
 }
 
 // 특수 이벤트 표시
@@ -5772,23 +5755,12 @@ const EffectPool = {
 };
 
 function initializeEffects() {
-    const gameArea = document.querySelector('.game-area');
-    
     // 이펙트 풀 초기화
     EffectPool.init('attack', 20);
     EffectPool.init('damage', 30);
     EffectPool.init('special', 5);
     EffectPool.init('upgrade', 5);
-    
-    // 각 이펙트 타입별로 요소들을 게임 영역에 추가
-    ['attack', 'damage', 'special', 'upgrade'].forEach(type => {
-        const elements = EffectPool.getPool(type);
-        elements.forEach(element => {
-            if (!gameArea.contains(element)) {
-                gameArea.appendChild(element);
-            }
-        });
-    });
+    EffectPool.init('levelUp', 5);  // 레벨업 이펙트 풀 추가
 }
 
 // 공격 이펙트 표시 (최적화)
@@ -6174,4 +6146,81 @@ function drawWaveMessage() {
     );
 
     ctx.restore();
+}
+
+function showLevelUpEffect(tower) {
+    // 이펙트 풀에서 이펙트 가져오기
+    const effect = EffectPool.get('levelUp');
+    if (!effect) return;
+
+    // 이펙트 초기화
+    effect.x = tower.x * TILE_SIZE + TILE_SIZE/2;  // 타워의 실제 화면 좌표로 변환
+    effect.y = tower.y * TILE_SIZE + TILE_SIZE/2;  // 타워의 실제 화면 좌표로 변환
+    effect.alpha = 1;
+    effect.scale = 0.5;
+    effect.rotation = 0;
+    effect.active = true;
+    effect.type = 'levelUp';
+    effect.duration = 1000; // 1초 동안 지속
+    effect.startTime = Date.now();
+
+    // 이펙트 그리기 함수
+    effect.draw = function() {
+        if (!this.active) return;
+
+        const elapsed = Date.now() - this.startTime;
+        const progress = elapsed / this.duration;
+
+        // 알파값 감소 (1 -> 0)
+        this.alpha = 1 - progress;
+        
+        // 크기 증가 (0.5 -> 2)
+        this.scale = 0.5 + (progress * 1.5);
+        
+        // 회전 (0 -> 360도)
+        this.rotation = progress * 360;
+
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation * Math.PI / 180);
+        ctx.scale(this.scale, this.scale);
+        ctx.globalAlpha = this.alpha;
+
+        // 레벨업 이펙트 그리기
+        ctx.beginPath();
+        ctx.arc(0, 0, 20, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.5)'; // 반투명 금색
+        ctx.fill();
+
+        // 별 모양 그리기
+        ctx.beginPath();
+        for (let i = 0; i < 5; i++) {
+            const angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
+            const x = Math.cos(angle) * 15;
+            const y = Math.sin(angle) * 15;
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        }
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.8)'; // 더 진한 금색
+        ctx.fill();
+
+        ctx.restore();
+    };
+
+    // 이펙트 업데이트 함수
+    effect.update = function() {
+        if (!this.active) return false;
+        
+        const elapsed = Date.now() - this.startTime;
+        if (elapsed >= this.duration) {
+            this.active = false;
+            EffectPool.release(this);
+            return false;
+        }
+        return true;
+    };
 }
