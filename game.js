@@ -2365,6 +2365,17 @@ class Enemy {
             return true;
         }
 
+        // 기본 이동 로직 추가
+        const target = currentMap.path[this.pathIndex + 1];
+        const dx = target.x - this.x;
+        const dy = target.y - this.y;
+        if (Math.abs(dx) < this.speed && Math.abs(dy) < this.speed) {
+            this.pathIndex++;
+        } else {
+            this.x += dx * this.speed;
+            this.y += dy * this.speed;
+        }
+
         // AI 패턴 업데이트
         if (this.pattern && this.pattern.update) {
             const before = {x: this.x, y: this.y, pathIndex: this.pathIndex};
