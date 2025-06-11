@@ -2082,6 +2082,7 @@ const ENEMY_SKILLS = {
                 enemy.x = target.x;
                 enemy.y = target.y;
                 showSkillEffect(enemy.x, enemy.y, '순간이동');
+                enemy.teleportEffectTime = 40; // 0.7초간 이펙트
             }
         }
     },
@@ -2092,6 +2093,7 @@ const ENEMY_SKILLS = {
             const heal = Math.floor(enemy.maxHealth * 0.3);
             enemy.health = Math.min(enemy.maxHealth, enemy.health + heal);
             showSkillEffect(enemy.x, enemy.y, '자가회복');
+            enemy.healEffectTime = 60; // 1초간 이펙트
         }
     },
     HEAL_AOE: {
@@ -2102,9 +2104,11 @@ const ENEMY_SKILLS = {
                 if (e !== enemy && Math.abs(e.x - enemy.x) < 2 && Math.abs(e.y - enemy.y) < 2) {
                     e.health = Math.min(e.maxHealth, e.health + Math.floor(e.maxHealth * 0.2));
                     showSkillEffect(e.x, e.y, '힐');
+                    e.healEffectTime = 60; // 1초간 이펙트
                 }
             });
             showSkillEffect(enemy.x, enemy.y, '힐');
+            enemy.healEffectTime = 60; // 1초간 이펙트
         }
     }
 };
@@ -2346,6 +2350,10 @@ class Enemy {
 
     update() {
         if (this.isDead) return true;
+
+        if (this.shieldEffectTime > 0) this.shieldEffectTime--;
+        if (this.healEffectTime > 0) this.healEffectTime--;
+        if (this.teleportEffectTime > 0) this.teleportEffectTime--;
 
         if (this.shieldEffectTime > 0) {
             this.shieldEffectTime--;
