@@ -5902,10 +5902,11 @@ function showDamageNumber(x, y, damage, isCritical = false) {
     // 애니메이션 상태
     let startTime = null;
     const duration = 1500; // 1.5초
-    const initialVelocity = -3; // 초기 상승 속도
+    const initialVelocity = -3.5; // 초기 상승 속도
     const gravity = 0.15; // 중력
     let currentY = startY;
     let currentVelocity = initialVelocity;
+    const maxFallDistance = TILE_SIZE * 1.5; // 최대 낙하 거리 (타일 2개 높이)
 
     // 애니메이션 함수
     function animate(currentTime) {
@@ -5917,8 +5918,15 @@ function showDamageNumber(x, y, damage, isCritical = false) {
         currentVelocity += gravity;
         currentY += currentVelocity;
 
+        // 최대 낙하 높이 제한
+        const maxY = startY + maxFallDistance;
+        if (currentY > maxY) {
+            currentY = maxY;
+            currentVelocity = 0;
+        }
+
         // scale 변화 (1.0 ~ 1.5)
-        const scale = 1 + Math.sin(progress * Math.PI) * 0.5;
+        const scale = 0.3 + Math.sin(progress * Math.PI * 2) * 1;
         const opacity = 1 - progress;
 
         // 위치와 스타일 업데이트
