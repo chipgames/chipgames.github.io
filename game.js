@@ -2457,16 +2457,34 @@ class Enemy {
         // 방어막 이펙트 (shieldEffectTime > 0일 때)
         if (this.shieldEffectTime > 0) {
             ctx.save();
-            ctx.strokeStyle = 'rgba(0,200,255,0.7)';
-            ctx.lineWidth = 4;
+            const centerX = this.x * TILE_SIZE + TILE_SIZE / 2;
+            const centerY = this.y * TILE_SIZE + TILE_SIZE / 2;
+            const baseRadius = (TILE_SIZE - 12) / 2 + 6;
+            const t = this.shieldEffectTime;
+
+            // 바깥쪽 연한 원
+            ctx.globalAlpha = 0.18;
             ctx.beginPath();
-            ctx.arc(
-                this.x * TILE_SIZE + TILE_SIZE / 2,
-                this.y * TILE_SIZE + TILE_SIZE / 2,
-                (TILE_SIZE - 12) / 2 + 6,
-                0, Math.PI * 2
-            );
+            ctx.arc(centerX, centerY, baseRadius + 8 + Math.sin(t / 8) * 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#aef6ff';
+            ctx.fill();
+
+            // 중간 원
+            ctx.globalAlpha = 0.28;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius + 2 + Math.sin(t / 6) * 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#5fd6ff';
+            ctx.fill();
+
+            // 안쪽 진한 원
+            ctx.globalAlpha = 0.45;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius - 2, 0, Math.PI * 2);
+            ctx.strokeStyle = '#00cfff';
+            ctx.lineWidth = 3;
             ctx.stroke();
+
+            ctx.globalAlpha = 1.0;
             ctx.restore();
         }
 
