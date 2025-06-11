@@ -2462,74 +2462,6 @@ class Enemy {
             TILE_SIZE - 12
         );
 
-        // === 스킬별 이펙트 ===
-        const centerX = this.x * TILE_SIZE + TILE_SIZE / 2;
-        const centerY = this.y * TILE_SIZE + TILE_SIZE / 2;
-        const baseRadius = (TILE_SIZE - 12) / 2 + 6;
-        // 1. 방어막 (푸른 원 + 🛡️ + 파란 빛)
-        if (this.shieldEffectTime > 0) {
-            const t = this.shieldEffectTime;
-            ctx.save();
-            ctx.globalAlpha = 0.18;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, baseRadius + 8 + Math.sin(t / 8) * 2, 0, Math.PI * 2);
-            ctx.fillStyle = '#aef6ff';
-            ctx.fill();
-            ctx.globalAlpha = 0.35;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
-            ctx.fillStyle = '#5fd6ff';
-            ctx.fill();
-            ctx.globalAlpha = 1.0;
-            ctx.font = '24px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('🛡️', centerX, centerY);
-            ctx.restore();
-        }
-        // 2. 힐/자가회복 (초록 원 + ✚ + 초록 빛)
-        if (this.healEffectTime > 0) {
-            const t = this.healEffectTime;
-            ctx.save();
-            ctx.globalAlpha = 0.18;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, baseRadius + 8 + Math.sin(t / 8) * 2, 0, Math.PI * 2);
-            ctx.fillStyle = '#b6ffb6';
-            ctx.fill();
-            ctx.globalAlpha = 0.35;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
-            ctx.fillStyle = '#4ef04e';
-            ctx.fill();
-            ctx.globalAlpha = 1.0;
-            ctx.font = '24px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('✚', centerX, centerY);
-            ctx.restore();
-        }
-        // 3. 순간이동 (밝은 파랑 원 + ✨ + 섬광)
-        if (this.teleportEffectTime > 0) {
-            const t = this.teleportEffectTime;
-            ctx.save();
-            ctx.globalAlpha = 0.22;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, baseRadius + 12 + Math.sin(t / 5) * 3, 0, Math.PI * 2);
-            ctx.fillStyle = '#e0f7ff';
-            ctx.fill();
-            ctx.globalAlpha = 0.38;
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
-            ctx.fillStyle = '#b3e6ff';
-            ctx.fill();
-            ctx.globalAlpha = 1.0;
-            ctx.font = '24px Arial';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('✨', centerX, centerY);
-            ctx.restore();
-        }
-
         // 2. HP바 (적 본체 위)
         const barX = this.x * TILE_SIZE + 6;
         const barY = this.y * TILE_SIZE - 4; // 8 → -4
@@ -2585,6 +2517,7 @@ class Enemy {
             if (k === 'SLOWED') return '⏳';
             return '🌀';
         });
+
         if (statusIcons.length) {
             ctx.font = '14px Arial';
             ctx.textAlign = 'left';
@@ -2592,8 +2525,78 @@ class Enemy {
             ctx.fillText(statusIcons.join(' '), barX, barY + barH + 2);
         }
 
+
+        // === 스킬별 이펙트 ===
+        const centerX = this.x * TILE_SIZE + TILE_SIZE / 2;
+        const centerY = this.y * TILE_SIZE + TILE_SIZE / 2;
+        const baseRadius = (TILE_SIZE - 12) / 2 + 6;
+        // 1. 방어막 (푸른 원 + 🛡️ + 파란 빛)
+        if (this.shieldEffectTime > 0) {
+            const t = this.shieldEffectTime;
+            ctx.save();
+            ctx.globalAlpha = 0.18;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius + 8 + Math.sin(t / 8) * 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#aef6ff';
+            ctx.fill();
+            ctx.globalAlpha = 0.35;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#5fd6ff';
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🛡️', centerX, centerY);
             ctx.restore();
         }
+
+        // 2. 힐/자가회복 (초록 원 + ✚ + 초록 빛)
+        if (this.healEffectTime > 0) {
+            const t = this.healEffectTime;
+            ctx.save();
+            ctx.globalAlpha = 0.18;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius + 8 + Math.sin(t / 8) * 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#b6ffb6';
+            ctx.fill();
+            ctx.globalAlpha = 0.35;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#4ef04e';
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('✚', centerX, centerY);
+            ctx.restore();
+        }
+        // 3. 순간이동 (밝은 파랑 원 + ✨ + 섬광)
+        if (this.teleportEffectTime > 0) {
+            const t = this.teleportEffectTime;
+            ctx.save();
+            ctx.globalAlpha = 0.22;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius + 12 + Math.sin(t / 5) * 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#e0f7ff';
+            ctx.fill();
+            ctx.globalAlpha = 0.38;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#b3e6ff';
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('✨', centerX, centerY);
+            ctx.restore();
+        }
+
+            ctx.restore();
+    }
 
     // 방어력 일관 적용
     takeDamage(damage, isCritical = false, attacker = null) {
