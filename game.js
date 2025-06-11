@@ -2089,7 +2089,6 @@ const ENEMY_SKILLS = {
     }
 };
 
-
 // 이제 class Enemy를 전역에 선언
 class Enemy {
     constructor(wave, isBoss = false) {
@@ -2202,22 +2201,6 @@ class Enemy {
                     this.patternCooldown = this.pattern.cooldown;
                     this.skillCooldown = this.skill.cooldown;
             }
-        }
-
-        // Enemy 생성자 내 (보스/특수 적에 스킬 부여 예시)
-        // 예시: 탱커는 방어막, 보스는 순간이동, 힐러는 광역힐
-        if (this.type === 'TANK') {
-            this.skill = ENEMY_SKILLS.SHIELD;
-            this.skillCooldown = this.skill.cooldown;
-        } else if (this.type === 'BOSS') {
-            this.skill = ENEMY_SKILLS.TELEPORT;
-            this.skillCooldown = this.skill.cooldown;
-        } else if (this.type === 'HEALER') {
-            this.skill = ENEMY_SKILLS.HEAL_AOE;
-            this.skillCooldown = this.skill.cooldown;
-        } else {
-            this.skill = null;
-            this.skillCooldown = 0;
         }
     }
 
