@@ -1170,6 +1170,7 @@ class Tower {
         // 버프 효과 추적을 위한 Set
         this.activeBuffs = new Set();
         this.activeCombos = new Set();
+        this.shieldEffectTime = 0;
     }
 
     // 특수 효과 초기화 함수 추가
@@ -2064,10 +2065,11 @@ const ENEMY_SKILLS = {
         cooldown: 300, // 5초
         effect: function (enemy) {
             enemy.isInvincible = true;
-            showSkillEffect(enemy.x, enemy.y, '방어막');
+            enemy.shieldEffectTime = 120; // 2초(60fps 기준)
+            showSpecialEffect(enemy.x, enemy.y, '방어막');
             setTimeout(() => {
                 if (!enemy.isDead) enemy.isInvincible = false;
-            }, 2000); // 2초간 무적
+            }, 2000);
         }
     },
     TELEPORT: {
@@ -2080,6 +2082,7 @@ const ENEMY_SKILLS = {
                 enemy.x = target.x;
                 enemy.y = target.y;
                 showSkillEffect(enemy.x, enemy.y, '순간이동');
+                enemy.teleportEffectTime = 40; // 0.7초간 이펙트
             }
         }
     },
@@ -2090,6 +2093,7 @@ const ENEMY_SKILLS = {
             const heal = Math.floor(enemy.maxHealth * 0.3);
             enemy.health = Math.min(enemy.maxHealth, enemy.health + heal);
             showSkillEffect(enemy.x, enemy.y, '자가회복');
+            enemy.healEffectTime = 60; // 1초간 이펙트
         }
     },
     HEAL_AOE: {
@@ -2100,9 +2104,11 @@ const ENEMY_SKILLS = {
                 if (e !== enemy && Math.abs(e.x - enemy.x) < 2 && Math.abs(e.y - enemy.y) < 2) {
                     e.health = Math.min(e.maxHealth, e.health + Math.floor(e.maxHealth * 0.2));
                     showSkillEffect(e.x, e.y, '힐');
+                    e.healEffectTime = 60; // 1초간 이펙트
                 }
             });
             showSkillEffect(enemy.x, enemy.y, '힐');
+            enemy.healEffectTime = 60; // 1초간 이펙트
         }
     }
 };
@@ -2344,10 +2350,20 @@ class Enemy {
 
     update() {
         if (this.isDead) return true;
+
+        if (this.shieldEffectTime > 0) this.shieldEffectTime--;
+        if (this.healEffectTime > 0) this.healEffectTime--;
+        if (this.teleportEffectTime > 0) this.teleportEffectTime--;
+
+        if (this.shieldEffectTime > 0) {
+            this.shieldEffectTime--;
+        }
+
         if (this.health <= 0 && !this.isDead) {
             this.die();
             return true;
         }
+
         // 이동 전 로그
         //console.log('[Enemy.update] 이동 전', {x: this.x, y: this.y, pathIndex: this.pathIndex, pattern: this.pattern?.name});
         this.updateStatusEffects();
@@ -2398,6 +2414,7 @@ class Enemy {
         if (this.skill && this.skillCooldown === 0) {
             //console.log(`[스킬발동]`, this.x, this.y, this.skill.name, this);
             this.skill.effect(this);
+            showSpecialEffect(this.x, this.y, this.skill.name);
             this.skillCooldown = this.skill.cooldown > 0 ? this.skill.cooldown : 1; // 즉시 쿨다운 세팅
         }
 
@@ -2484,8 +2501,8 @@ class Enemy {
 
         // 4. 레벨 (적 본체 중앙, 테두리 추가)
         ctx.font = 'bold 12px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 3;
         ctx.strokeText(`Lv.${this.level}`, this.x * TILE_SIZE + TILE_SIZE / 2, this.y * TILE_SIZE + 6 + (TILE_SIZE - 12) / 2);
@@ -2500,6 +2517,7 @@ class Enemy {
             if (k === 'SLOWED') return '⏳';
             return '🌀';
         });
+
         if (statusIcons.length) {
             ctx.font = '14px Arial';
             ctx.textAlign = 'left';
@@ -2507,7 +2525,77 @@ class Enemy {
             ctx.fillText(statusIcons.join(' '), barX, barY + barH + 2);
         }
 
-        ctx.restore();
+
+        // === 스킬별 이펙트 ===
+        const centerX = this.x * TILE_SIZE + TILE_SIZE / 2;
+        const centerY = this.y * TILE_SIZE + TILE_SIZE / 2;
+        const baseRadius = (TILE_SIZE - 12) / 2 + 6;
+        // 1. 방어막 (푸른 원 + 🛡️ + 파란 빛)
+        if (this.shieldEffectTime > 0) {
+            const t = this.shieldEffectTime;
+            ctx.save();
+            ctx.globalAlpha = 0.18;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius + 8 + Math.sin(t / 8) * 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#aef6ff';
+            ctx.fill();
+            ctx.globalAlpha = 0.35;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#5fd6ff';
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('🛡️', centerX, centerY);
+            ctx.restore();
+        }
+
+        // 2. 힐/자가회복 (초록 원 + ✚ + 초록 빛)
+        if (this.healEffectTime > 0) {
+            const t = this.healEffectTime;
+            ctx.save();
+            ctx.globalAlpha = 0.18;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius + 8 + Math.sin(t / 8) * 2, 0, Math.PI * 2);
+            ctx.fillStyle = '#b6ffb6';
+            ctx.fill();
+            ctx.globalAlpha = 0.35;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#4ef04e';
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('✚', centerX, centerY);
+            ctx.restore();
+        }
+        // 3. 순간이동 (밝은 파랑 원 + ✨ + 섬광)
+        if (this.teleportEffectTime > 0) {
+            const t = this.teleportEffectTime;
+            ctx.save();
+            ctx.globalAlpha = 0.22;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius + 12 + Math.sin(t / 5) * 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#e0f7ff';
+            ctx.fill();
+            ctx.globalAlpha = 0.38;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, baseRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#b3e6ff';
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+            ctx.font = '24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('✨', centerX, centerY);
+            ctx.restore();
+        }
+
+            ctx.restore();
     }
 
     // 방어력 일관 적용
@@ -3733,7 +3821,7 @@ function drawGroupConnections() {
                 const start = members[i];
                 const end = members[i + 1];
                 
-                ctx.beginPath();
+            ctx.beginPath();
                 ctx.moveTo(
                     start.x * TILE_SIZE + TILE_SIZE/2,
                     start.y * TILE_SIZE + TILE_SIZE/2
@@ -4084,16 +4172,16 @@ function selectMap(mapKey) {
     ctx.fillStyle = '#4CAF50';
     ctx.beginPath();
     ctx.arc(currentMap.path[0].x * TILE_SIZE + TILE_SIZE/2, currentMap.path[0].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
-    ctx.fill();
+            ctx.fill();
     ctx.fillStyle = '#e74c3c';
-    ctx.beginPath();
+            ctx.beginPath();
     ctx.arc(currentMap.path[currentMap.path.length-1].x * TILE_SIZE + TILE_SIZE/2, currentMap.path[currentMap.path.length-1].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
-    ctx.fill();
+            ctx.fill();
     
     // 맵 이름 표시
     ctx.fillStyle = 'white';
     ctx.font = 'bold 24px Arial';
-    ctx.textAlign = 'center';
+            ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
     ctx.fillText(currentMap.name, canvas.width/2, 10);
     
@@ -5449,8 +5537,8 @@ function showHealEffect(x, y) {
         ctx.save();
         ctx.globalAlpha = effect.alpha * (1 - effect.currentFrame / effect.duration);
         ctx.fillStyle = '#00ff00';
-        ctx.beginPath();
-        ctx.arc(
+            ctx.beginPath();
+            ctx.arc(
             effect.x,
             effect.y,
             effect.radius + (effect.maxRadius - effect.radius) * (effect.currentFrame / effect.duration),
@@ -5458,7 +5546,7 @@ function showHealEffect(x, y) {
             Math.PI * 2
         );
         ctx.fill();
-        ctx.restore();
+            ctx.restore();
 
         effect.currentFrame++;
         requestAnimationFrame(animate);
@@ -5482,20 +5570,20 @@ function showAmbushEffect(x, y) {
     const animate = () => {
         if (effect.currentFrame >= effect.duration) return;
 
-        ctx.save();
+            ctx.save();
         ctx.globalAlpha = effect.alpha * (1 - effect.currentFrame / effect.duration);
         ctx.strokeStyle = '#ff0000';
         ctx.lineWidth = 3;
-        ctx.beginPath();
+            ctx.beginPath();
         ctx.arc(
             effect.x,
             effect.y,
             effect.radius + (effect.maxRadius - effect.radius) * (effect.currentFrame / effect.duration),
             0,
             Math.PI * 2
-        );
-        ctx.stroke();
-        ctx.restore();
+            );
+            ctx.stroke();
+            ctx.restore();
 
         effect.currentFrame++;
         requestAnimationFrame(animate);
@@ -5680,11 +5768,11 @@ function initializeGame() {
     ctx.fillStyle = '#4CAF50';
     ctx.beginPath();
     ctx.arc(defaultMap.path[0].x * TILE_SIZE + TILE_SIZE/2, defaultMap.path[0].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
-    ctx.fill();
+            ctx.fill();
     ctx.fillStyle = '#e74c3c';
-    ctx.beginPath();
+            ctx.beginPath();
     ctx.arc(defaultMap.path[defaultMap.path.length-1].x * TILE_SIZE + TILE_SIZE/2, defaultMap.path[defaultMap.path.length-1].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
-    ctx.fill();
+            ctx.fill();
     
     // 맵 이름 표시
     ctx.fillStyle = 'white';
@@ -6030,28 +6118,21 @@ document.head.insertAdjacentHTML('beforeend', `
 function showSpecialEffect(x, y, name) {
     if (lowSpecMode) return;
     const effect = EffectPool.get('special');
-    
+    const parent = document.querySelector('.game-area');
+    if (parent && !effect.parentNode) {
+        parent.appendChild(effect);
+    }
     const centerX = x * TILE_SIZE + TILE_SIZE/2;
-    const centerY = y * TILE_SIZE + TILE_SIZE/2;
-    
+    const centerY = y * TILE_SIZE + TILE_SIZE * 3.2; // 본체 중심에 오도록 조정
     effect.style.cssText = `
         display: block;
         left: ${centerX}px;
         top: ${centerY}px;
     `;
-    
     effect.innerHTML = `
-        <div class="special-ring"></div>
-        <div class="special-particles">
-            ${Array(12).fill().map(() => '<div class="particle"></div>').join('')}
-        </div>
         <div class="special-text">${name}</div>
     `;
-    
-    // 사운드 재생
     playSound('special');
-    
-    // 애니메이션 종료 후 풀로 반환
     effect.addEventListener('animationend', () => {
         EffectPool.release(effect);
     }, { once: true });
@@ -6117,6 +6198,19 @@ document.head.insertAdjacentHTML('beforeend', `
             z-index: 1200;
             pointer-events: none;
             animation: skillEffectFade 1.2s ease-out forwards;
+        }
+        .special-text {
+            writing-mode: horizontal-tb !important;
+            white-space: nowrap !important;
+            text-align: center;
+            font-size: 16px;
+            color: #6cf;
+            text-shadow: 0 2px 8px #000, 0 0 8px #6cf;
+            font-weight: bold;
+            letter-spacing: 2px;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
         }
         @keyframes skillEffectFade {
             0% { opacity: 1; transform: scale(1.2) translate(-50%, -50%);}
@@ -6281,8 +6375,8 @@ function drawWaveMessage() {
     // 웨이브 시작 텍스트
     ctx.font = 'bold 24px Arial';
     ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`; // 골드 색상
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
     ctx.fillText(
         `웨이브 ${gameState.currentWaveMessage.wave} 시작!`,
         canvas.width/2,
@@ -6306,8 +6400,8 @@ function drawWaveMessage() {
         canvas.height/2 + 40
     );
 
-    ctx.restore();
-}
+            ctx.restore();
+        }
 
 function showLevelUpEffect(tower) {
     if (!tower || typeof tower !== 'object' || tower.x === undefined || tower.y === undefined) {
