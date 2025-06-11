@@ -2026,14 +2026,28 @@ const BOSS_PATTERNS = {
         cooldown: 240,
         update: (boss) => {
             if (boss.isDead) return true;
-
-            if (boss.patternCooldown === 0) {
-                const healAmount = Math.floor(boss.maxHealth * 0.3);
+            // 쿨다운 60프레임(1초) 전 예고
+            // if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, '힐');
+            // 체력 50% 이하일 때만 힐 사용
+            if (boss.health / boss.maxHealth <= 0.5 && boss.patternCooldown === 0) {
+                const healAmount = Math.floor(boss.maxHealth * 0.4);
                 boss.health = Math.min(boss.maxHealth, boss.health + healAmount);
-                showBossPatternEffect(boss.x, boss.y, '힐');
+                showBossPatternEffect(boss.x, boss.y, '강력한 힐!');
                 playSound('bossHeal');
+            } else if (boss.patternCooldown === 0) {
+                // 50% 초과면 소환 행동
+                // 소환: 일반 적 2~3마리 생성
+                const summonCount = Math.floor(Math.random() * 2) + 2; // 2~3마리
+                for (let i = 0; i < summonCount; i++) {
+                    const enemy = new Enemy(gameState.wave, false);
+                    // 소환 위치를 보스 위치로 지정
+                    enemy.x = boss.x;
+                    enemy.y = boss.y;
+                    enemies.push(enemy);
+                }
+                showBossPatternEffect(boss.x, boss.y, '소환!');
+                playSound('bossSummon');
             }
-
             return false;
         }
     }
@@ -6116,8 +6130,16 @@ BOSS_PATTERNS.HEAL = {
             showBossPatternEffect(boss.x, boss.y, '강력한 힐!');
             playSound('bossHeal');
         } else if (boss.patternCooldown === 0) {
-            // 50% 초과면 소환 행동(예시)
-            // summonMinions(boss.x, boss.y); // 실제 소환 함수 필요시 구현
+            // 50% 초과면 소환 행동
+            // 소환: 일반 적 2~3마리 생성
+            const summonCount = Math.floor(Math.random() * 2) + 2; // 2~3마리
+            for (let i = 0; i < summonCount; i++) {
+                const enemy = new Enemy(gameState.wave, false);
+                // 소환 위치를 보스 위치로 지정
+                enemy.x = boss.x;
+                enemy.y = boss.y;
+                enemies.push(enemy);
+            }
             showBossPatternEffect(boss.x, boss.y, '소환!');
             playSound('bossSummon');
         }
