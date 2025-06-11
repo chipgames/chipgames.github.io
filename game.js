@@ -1307,39 +1307,37 @@ class Tower {
     executeAttack(target) {
         const isCritical = Math.random() < CRITICAL_CHANCE;
         const damage = isCritical ? this.damage * CRITICAL_MULTIPLIER : this.damage;
-        
-        target.lastDamage = { amount: damage, isCritical };
-        playSound('tower_attack');
-
-        // 공격 이펙트 표시
-        showAttackEffect(this.x, this.y, target.x, target.y, isCritical);
 
         switch(this.type) {
             case 'BASIC':
                 target.takeDamage(damage, isCritical, this);
+                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
             case 'ICE':
                 target.takeDamage(damage, isCritical, this);
                 target.applyStatusEffect('FROZEN', this.freezeDuration);
+                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
             case 'POISON':
                 target.takeDamage(damage, isCritical, this);
                 target.poisonDamage = this.poisonDamage;
                 target.poisonDuration = this.poisonDuration;
+                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
             case 'LASER':
                 target.takeDamage(damage, isCritical, this);
                 target.continuousDamage = this.continuousDamage;
+                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
             case 'SPLASH':
                 this.executeSplashAttack(target, damage);
+                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
             case 'SUPPORT':
                 this.executeSupportBuff();
+                // showDamageNumber 호출하지 않음
                 break;
         }
-
-        showDamageNumber(target.x, target.y, damage, isCritical);
     }
 
     // 스플래시 공격 실행 함수
@@ -1366,18 +1364,19 @@ class Tower {
     executeSupportBuff() {
         towers.forEach(tower => {
             if (tower === this) return;
-            
             const dx = tower.x - this.x;
             const dy = tower.y - this.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            
+            // 지원 범위 내에 있으면 버프 적용
             if (distance <= this.buffRange) {
                 if (!this.buffedTowers.has(tower)) {
-                    tower.damage *= this.buffMultiplier;
+                    // 항상 baseDamage 기준으로만 버프 적용
+                    tower.damage = tower.baseDamage * this.buffMultiplier;
                     this.buffedTowers.add(tower);
                 }
             } else if (this.buffedTowers.has(tower)) {
-                tower.damage /= this.buffMultiplier;
+                // 지원 범위에서 벗어나면 baseDamage로 복구
+                tower.damage = tower.baseDamage;
                 this.buffedTowers.delete(tower);
             }
         });
@@ -5945,7 +5944,7 @@ function showDamageNumber(x, y, damage, isCritical = false) {
             pointer-events: none;
         `;
 
-        damageText.textContent = damage.toLocaleString();
+        damageText.textContent = Math.round(damage).toLocaleString();
 
         // 애니메이션 계속
         if (progress < 1) {
