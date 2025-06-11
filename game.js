@@ -1170,6 +1170,7 @@ class Tower {
         // 버프 효과 추적을 위한 Set
         this.activeBuffs = new Set();
         this.activeCombos = new Set();
+        this.shieldEffectTime = 0;
     }
 
     // 특수 효과 초기화 함수 추가
@@ -2064,10 +2065,11 @@ const ENEMY_SKILLS = {
         cooldown: 300, // 5초
         effect: function (enemy) {
             enemy.isInvincible = true;
-            showSkillEffect(enemy.x, enemy.y, '방어막');
+            enemy.shieldEffectTime = 120; // 2초(60fps 기준)
+            showSpecialEffect(enemy.x, enemy.y, '방어막');
             setTimeout(() => {
                 if (!enemy.isDead) enemy.isInvincible = false;
-            }, 2000); // 2초간 무적
+            }, 2000);
         }
     },
     TELEPORT: {
@@ -2344,10 +2346,16 @@ class Enemy {
 
     update() {
         if (this.isDead) return true;
+
+        if (this.shieldEffectTime > 0) {
+            this.shieldEffectTime--;
+        }
+
         if (this.health <= 0 && !this.isDead) {
             this.die();
             return true;
         }
+
         // 이동 전 로그
         //console.log('[Enemy.update] 이동 전', {x: this.x, y: this.y, pathIndex: this.pathIndex, pattern: this.pattern?.name});
         this.updateStatusEffects();
@@ -2398,6 +2406,7 @@ class Enemy {
         if (this.skill && this.skillCooldown === 0) {
             //console.log(`[스킬발동]`, this.x, this.y, this.skill.name, this);
             this.skill.effect(this);
+            showSpecialEffect(this.x, this.y, this.skill.name);
             this.skillCooldown = this.skill.cooldown > 0 ? this.skill.cooldown : 1; // 즉시 쿨다운 세팅
         }
 
@@ -2444,6 +2453,22 @@ class Enemy {
             TILE_SIZE - 12,
             TILE_SIZE - 12
         );
+
+        // 방어막 이펙트 (shieldEffectTime > 0일 때)
+        if (this.shieldEffectTime > 0) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(0,200,255,0.7)';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(
+                this.x * TILE_SIZE + TILE_SIZE / 2,
+                this.y * TILE_SIZE + TILE_SIZE / 2,
+                (TILE_SIZE - 12) / 2 + 6,
+                0, Math.PI * 2
+            );
+            ctx.stroke();
+            ctx.restore();
+        }
 
         // 2. HP바 (적 본체 위)
         const barX = this.x * TILE_SIZE + 6;
@@ -5449,8 +5474,8 @@ function showHealEffect(x, y) {
         ctx.save();
         ctx.globalAlpha = effect.alpha * (1 - effect.currentFrame / effect.duration);
         ctx.fillStyle = '#00ff00';
-        ctx.beginPath();
-        ctx.arc(
+            ctx.beginPath();
+            ctx.arc(
             effect.x,
             effect.y,
             effect.radius + (effect.maxRadius - effect.radius) * (effect.currentFrame / effect.duration),
@@ -5493,9 +5518,9 @@ function showAmbushEffect(x, y) {
             effect.radius + (effect.maxRadius - effect.radius) * (effect.currentFrame / effect.duration),
             0,
             Math.PI * 2
-        );
-        ctx.stroke();
-        ctx.restore();
+            );
+            ctx.stroke();
+            ctx.restore();
 
         effect.currentFrame++;
         requestAnimationFrame(animate);
@@ -6306,8 +6331,8 @@ function drawWaveMessage() {
         canvas.height/2 + 40
     );
 
-    ctx.restore();
-}
+        ctx.restore();
+    }
 
 function showLevelUpEffect(tower) {
     if (!tower || typeof tower !== 'object' || tower.x === undefined || tower.y === undefined) {
