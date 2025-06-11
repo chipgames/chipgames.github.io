@@ -2742,10 +2742,17 @@ function startWave() {
     
     // 보스 웨이브 처리
     if (gameState.wave % gameState.bossWave === 0) {
-        gameState.enemiesRemaining = 1;
-        gameState.totalEnemies = 1;
+        // 보스 1기
         const boss = new Enemy(gameState.wave, true);
         enemies.push(boss);
+        // 일반 적 5기
+        const normalCount = 5;
+        for (let i = 0; i < normalCount; i++) {
+            const enemy = new Enemy(gameState.wave, false);
+            enemies.push(enemy);
+        }
+        gameState.enemiesRemaining = 1 + normalCount;
+        gameState.totalEnemies = 1 + normalCount;
         showWaveStartEffect();
         playSound('wave_start');
         return; // 반드시 함수 종료
