@@ -3562,20 +3562,21 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     const upgradeNames = ['공격력', '사거리', '공격속도'];
     
     upgradeTypes.forEach((type, index) => {
-        const cost = tower.getUpgradeCost(type);
-        const canUpgrade = tower.canUpgrade(type);
-        
+        const isSupport = tower.type === 'SUPPORT';
+        // 지원 타워는 range만 활성화
+        const canUpgrade = isSupport ? (type === 'range' && tower.canUpgrade(type)) : tower.canUpgrade(type);
+
         const option = document.createElement('div');
         option.className = `upgrade-option ${canUpgrade ? '' : 'disabled'}`;
-        
+
         const currentValue = type === 'speed' ? 
             (60 / tower.maxCooldown).toFixed(1) : 
             tower[type];
-        
+
         const nextValue = type === 'speed' ? 
             (60 / Math.max(10, tower.maxCooldown * 0.9)).toFixed(1) : 
             Math.floor(tower[type] * 1.2);
-        
+
         option.innerHTML = `
             <div class="upgrade-info">
                 <span class="upgrade-icon">${upgradeIcons[index]}</span>
@@ -3590,10 +3591,10 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
             </div>
             <div class="upgrade-cost ${canUpgrade ? '' : 'insufficient'}">
                 <span class="cost-icon">💰</span>
-                <span class="cost-value">${cost}</span>
+                <span class="cost-value">${tower.getUpgradeCost(type)}</span>
             </div>
         `;
-        
+
         if (canUpgrade) {
             option.addEventListener('click', () => {
                 tower.upgrade(type);
@@ -3602,7 +3603,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
                 menu.remove();
             });
         }
-        
+
         menu.appendChild(option);
     });
     
