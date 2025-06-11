@@ -3637,7 +3637,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
         <div class="tower-stats">
             <div class="stat">
                 <span class="stat-icon">⚔️</span>
-                <span class="stat-value">${tower.damage}</span>
+                <span class="stat-value">${Math.floor(tower.damage)}</span>
             </div>
             <div class="stat">
                 <span class="stat-icon">🎯</span>
