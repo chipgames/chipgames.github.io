@@ -1751,7 +1751,7 @@ const ENEMY_TYPES = {
     NORMAL: {
         name: '일반 적',
         health: 100,
-        speed: 0.02,
+        speed: 0.013,  // 0.02 -> 0.015로 감소
         reward: 10,
         color: 'red',
         experienceValue: 10
@@ -1759,7 +1759,7 @@ const ENEMY_TYPES = {
     FAST: {
         name: '빠른 적',
         health: 50,
-        speed: 0.04,
+        speed: 0.023,  // 0.04 -> 0.025로 감소
         reward: 15,
         color: 'yellow',
         experienceValue: 15
@@ -1767,7 +1767,7 @@ const ENEMY_TYPES = {
     TANK: {
         name: '탱커',
         health: 300,
-        speed: 0.01,
+        speed: 0.007,  // 유지
         reward: 20,
         color: 'purple',
         experienceValue: 20
@@ -1775,7 +1775,7 @@ const ENEMY_TYPES = {
     HEALER: {
         name: '치유사',
         health: 80,
-        speed: 0.015,
+        speed: 0.01,  // 0.015 -> 0.012로 감소
         reward: 25,
         color: 'green',
         experienceValue: 25,
