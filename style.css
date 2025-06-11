@@ -620,21 +620,12 @@ body {
 
 .damage-number {
     position: absolute;
-    color: #fff;
-    font-size: 16px;
-    font-weight: normal;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    animation: damageNumber 1s ease-out forwards;
-    pointer-events: none;
-    z-index: 1200;
-    opacity: 1;
+    will-change: transform, opacity;
 }
 
 .damage-number.critical {
-    color: #ef4444;
-    font-size: 24px;
-    font-weight: bold;
-    animation: criticalDamageNumber 1s ease-out forwards;
+    color: #ff4444;
+    text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
 }
 
 .special-effect {
@@ -700,28 +691,6 @@ body {
     0% { transform: scaleX(0); opacity: 1; }
     50% { transform: scaleX(1); opacity: 1; }
     100% { transform: scaleX(1); opacity: 0; }
-}
-
-@keyframes damageNumber {
-    0% {
-        opacity: 1;
-        transform: translate(-50%, -50%) translateY(0) rotate(0deg);
-    }
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -50%) translateY(-30px) rotate(10deg);
-    }
-}
-
-@keyframes criticalDamageNumber {
-    0% {
-        opacity: 1;
-        transform: translate(-50%, -50%) translateY(0) rotate(0deg) scale(1);
-    }
-    100% {
-        opacity: 0;
-        transform: translate(-50%, -50%) translateY(-40px) rotate(20deg) scale(1.2);
-    }
 }
 
 @keyframes specialRing {

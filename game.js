@@ -5878,43 +5878,85 @@ function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
 // 데미지 숫자 표시 (최적화)
 function showDamageNumber(x, y, damage, isCritical = false) {
     if (lowSpecMode) return;
-    
+
     const damageText = EffectPool.get('damage');
-    
+    const parent = document.querySelector('.game-area');
+    if (parent && damageText.parentNode !== parent) {
+        if (damageText.parentNode) damageText.parentNode.removeChild(damageText);
+        parent.appendChild(damageText);
+    }
+
     // 데미지 크기에 따른 스타일 변화
-    const damageSize = Math.min(Math.max(damage / 100, 1), 2); // 1~2 사이의 크기
+    const damageSize = Math.min(Math.max(damage / 100, 1), 2);
     const fontSize = Math.floor(16 * damageSize);
-    
-    // 랜덤한 X 이동
-    const offsetX = (Math.random() - 0.5) * 20;
-    
-    // 크리티컬 여부에 따른 색상과 효과
     const color = isCritical ? '#ff4444' : '#ffffff';
     const textShadow = isCritical 
         ? '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000' 
         : '0 0 5px #000000, 0 0 10px #000000';
-    
-    damageText.style.cssText = `
-        display: block;
-        left: ${x * TILE_SIZE + TILE_SIZE/2 + offsetX}px;
-        top: ${y * TILE_SIZE + TILE_SIZE/2}px;
-        transform: translate(-50%, -50%);
-        font-size: ${fontSize}px;
-        color: ${color};
-        text-shadow: ${textShadow};
-        font-weight: ${isCritical ? 'bold' : 'normal'};
-        animation: damageNumberJump 1.2s cubic-bezier(0.4,1.5,0.5,1) forwards;
-        z-index: 1000;
-        pointer-events: none;
-    `;
-    
-    damageText.className = `damage-number ${isCritical ? 'critical' : ''}`;
-    damageText.textContent = damage.toLocaleString();
-    
-    // 애니메이션 종료 후 풀로 반환
-    damageText.addEventListener('animationend', () => {
-        EffectPool.release(damageText);
-    }, { once: true });
+
+    // 초기 위치 설정
+    const startX = x * TILE_SIZE + TILE_SIZE/2;
+    const startY = y * TILE_SIZE + TILE_SIZE*2;
+    const offsetX = (Math.random() - 0.5) * 16;
+
+    // 애니메이션 상태
+    let startTime = null;
+    const duration = 1500; // 1.5초
+    const initialVelocity = -3.5; // 초기 상승 속도
+    const gravity = 0.15; // 중력
+    let currentY = startY;
+    let currentVelocity = initialVelocity;
+    const maxFallDistance = TILE_SIZE * 1.5; // 최대 낙하 거리 (타일 2개 높이)
+
+    // 애니메이션 함수
+    function animate(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // 물리 기반 움직임 계산
+        currentVelocity += gravity;
+        currentY += currentVelocity;
+
+        // 최대 낙하 높이 제한
+        const maxY = startY + maxFallDistance;
+        if (currentY > maxY) {
+            currentY = maxY;
+            currentVelocity = 0;
+        }
+
+        // scale 변화 (1.0 ~ 1.5)
+        const scale = 0.3 + Math.sin(progress * Math.PI * 2) * 1;
+        const opacity = 1 - progress;
+
+        // 위치와 스타일 업데이트
+        damageText.style.cssText = `
+            display: block;
+            position: absolute;
+            left: ${startX + offsetX}px;
+            top: ${currentY}px;
+            transform: translate(-50%, -50%) scale(${scale});
+            font-size: ${fontSize}px;
+            color: ${color};
+            text-shadow: ${textShadow};
+            font-weight: ${isCritical ? '900' : 'bold'};
+            opacity: ${opacity};
+            z-index: 1000;
+            pointer-events: none;
+        `;
+
+        damageText.textContent = damage.toLocaleString();
+
+        // 애니메이션 계속
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            EffectPool.release(damageText);
+        }
+    }
+
+    // 애니메이션 시작
+    requestAnimationFrame(animate);
 }
 
 // 데미지 숫자 점프 애니메이션 스타일 추가
@@ -5923,27 +5965,44 @@ document.head.insertAdjacentHTML('beforeend', `
         .damage-number {
             position: absolute;
             will-change: transform, opacity;
+            font-weight: bold;
+            text-shadow: 0 0 8px #fff, 0 0 4px #000;
         }
         .damage-number.critical {
             color: #ff4444;
             text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+            font-weight: 900;
         }
-        @keyframes damageNumberJump {
+        @keyframes damageNumberParabola {
             0% {
                 opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
+                transform: translate(-50%, 0) scale(1);
+                text-shadow: 0 0 10px #fff, 0 0 5px #000;
             }
-            30% {
+            25% {
                 opacity: 1;
-                transform: translate(-50%, -120%) scale(1.5);
+                transform: translate(-50%, -60%) scale(1.18);
+                text-shadow: 0 0 14px #fff, 0 0 8px #000;
             }
-            60% {
-                opacity: 0.9;
-                transform: translate(-50%, 0%) scale(0.9);
+            50% {
+                opacity: 0.95;
+                transform: translate(-50%, -90%) scale(1.25);
+                text-shadow: 0 0 16px #fff, 0 0 10px #000;
+            }
+            70% {
+                opacity: 0.7;
+                transform: translate(-50%, -40%) scale(1.08);
+                text-shadow: 0 0 10px #fff, 0 0 5px #000;
+            }
+            85% {
+                opacity: 0.4;
+                transform: translate(-50%, 10%) scale(0.95);
+                text-shadow: 0 0 6px #fff, 0 0 2px #000;
             }
             100% {
                 opacity: 0;
-                transform: translate(-50%, 40%) scale(0.7);
+                transform: translate(-50%, 40%) scale(0.8);
+                text-shadow: 0 0 2px #fff, 0 0 1px #000;
             }
         }
     </style>
