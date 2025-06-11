@@ -1404,9 +1404,12 @@ class Tower {
             
             // 레벨업 시 능력치 상승
             this.damage = Math.floor(this.damage * 1.5);
+            this.baseDamage = Math.floor(this.baseDamage * 1.5); // baseDamage도 함께 증가
             this.range += 0.5;
+            this.baseRange += 0.5; // baseRange도 함께 증가
             if (this.splashRadius) this.splashRadius += 0.5;
             this.maxCooldown = Math.max(10, this.maxCooldown * 0.8);
+            this.baseCooldown = Math.max(10, this.baseCooldown * 0.8); // baseCooldown도 함께 감소
             
             // 특수 능력 강화
             if (this.type === 'LASER') {
@@ -5886,7 +5889,7 @@ function showDamageNumber(x, y, damage, isCritical = false) {
     }
 
     // 데미지 크기에 따른 스타일 변화
-    const damageSize = Math.min(Math.max(damage / 100, 1), 2);
+    const damageSize = Math.min(Math.max(damage / 100, 1.2), 2);
     const fontSize = Math.floor(16 * damageSize);
     const color = isCritical ? '#ff4444' : '#ffffff';
     const textShadow = isCritical 
@@ -5900,9 +5903,9 @@ function showDamageNumber(x, y, damage, isCritical = false) {
 
     // 애니메이션 상태
     let startTime = null;
-    const duration = 1500; // 1.5초
+    const duration = 1100; // 1.5초
     const initialVelocity = -3.5; // 초기 상승 속도
-    const gravity = 0.15; // 중력
+    const gravity = 0.2; // 중력
     let currentY = startY;
     let currentVelocity = initialVelocity;
     const maxFallDistance = TILE_SIZE * 1.5; // 최대 낙하 거리 (타일 2개 높이)
@@ -5924,8 +5927,8 @@ function showDamageNumber(x, y, damage, isCritical = false) {
             currentVelocity = 0;
         }
 
-        // scale 변화 (1.0 ~ 1.5)
-        const scale = 0.3 + Math.sin(progress * Math.PI * 2) * 1;
+        // scale 변화 (0.3 ~ 1.3)
+        const scale = 0.5 + Math.sin(progress * Math.PI * 2) * 1;
         const opacity = 1 - progress;
 
         // 위치와 스타일 업데이트
