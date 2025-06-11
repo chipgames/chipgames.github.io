@@ -5901,9 +5901,11 @@ function showDamageNumber(x, y, damage, isCritical = false) {
 
     // 애니메이션 상태
     let startTime = null;
-    const duration = 500; // 1.3초
-    const maxHeight = -30; // 최대 상승 높이 (더 낮게)
-    const gravity = 1.7; // 중력 효과
+    const duration = 1500; // 1.5초
+    const initialVelocity = -3; // 초기 상승 속도
+    const gravity = 0.15; // 중력
+    let currentY = startY;
+    let currentVelocity = initialVelocity;
 
     // 애니메이션 함수
     function animate(currentTime) {
@@ -5911,9 +5913,11 @@ function showDamageNumber(x, y, damage, isCritical = false) {
         const elapsed = currentTime - startTime;
         const progress = Math.min(elapsed / duration, 1);
 
-        // 포물선 운동 계산
-        const height = maxHeight * Math.sin(progress * Math.PI);
-        // scale 변화를 더 크게 (1.0 ~ 1.5)
+        // 물리 기반 움직임 계산
+        currentVelocity += gravity;
+        currentY += currentVelocity;
+
+        // scale 변화 (1.0 ~ 1.5)
         const scale = 1 + Math.sin(progress * Math.PI) * 0.5;
         const opacity = 1 - progress;
 
@@ -5922,7 +5926,7 @@ function showDamageNumber(x, y, damage, isCritical = false) {
             display: block;
             position: absolute;
             left: ${startX + offsetX}px;
-            top: ${startY + height}px;
+            top: ${currentY}px;
             transform: translate(-50%, -50%) scale(${scale});
             font-size: ${fontSize}px;
             color: ${color};
