@@ -1309,30 +1309,35 @@ class Tower {
         const damage = isCritical ? this.damage * CRITICAL_MULTIPLIER : this.damage;
 
         switch(this.type) {
-            case 'BASIC':
-                target.takeDamage(damage, isCritical, this);
-                showDamageNumber(target.x, target.y, damage, isCritical);
+            case 'BASIC': {
+                const actualDamage = target.takeDamage(damage, isCritical, this);
+                if (actualDamage > 0) showDamageNumber(target.x, target.y, actualDamage, isCritical);
                 break;
-            case 'ICE':
-                target.takeDamage(damage, isCritical, this);
+            }
+            case 'ICE': {
+                const actualDamage = target.takeDamage(damage, isCritical, this);
+                if (actualDamage > 0) showDamageNumber(target.x, target.y, actualDamage, isCritical);
                 target.applyStatusEffect('FROZEN', this.freezeDuration);
-                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
-            case 'POISON':
-                target.takeDamage(damage, isCritical, this);
+            }
+            case 'POISON': {
+                const actualDamage = target.takeDamage(damage, isCritical, this);
+                if (actualDamage > 0) showDamageNumber(target.x, target.y, actualDamage, isCritical);
                 target.poisonDamage = this.poisonDamage;
                 target.poisonDuration = this.poisonDuration;
-                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
-            case 'LASER':
-                target.takeDamage(damage, isCritical, this);
+            }
+            case 'LASER': {
+                const actualDamage = target.takeDamage(damage, isCritical, this);
+                if (actualDamage > 0) showDamageNumber(target.x, target.y, actualDamage, isCritical);
                 target.continuousDamage = this.continuousDamage;
-                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
-            case 'SPLASH':
-                this.executeSplashAttack(target, damage);
-                showDamageNumber(target.x, target.y, damage, isCritical);
+            }
+            case 'SPLASH': {
+                const actualDamage = this.executeSplashAttack(target, damage);
+                if (actualDamage > 0) showDamageNumber(target.x, target.y, actualDamage, isCritical);
                 break;
+            }
             case 'SUPPORT':
                 this.executeSupportBuff();
                 // showDamageNumber 호출하지 않음
@@ -1342,22 +1347,21 @@ class Tower {
 
     // 스플래시 공격 실행 함수
     executeSplashAttack(mainTarget, damage) {
-        mainTarget.takeDamage(damage, false, this);
+        const actualDamage = mainTarget.takeDamage(damage, false, this);
         mainTarget.applyStatusEffect('SLOWED', this.slowEffect);
 
         // 범위 내 다른 적들도 데미지
         enemies.forEach(enemy => {
             if (enemy === mainTarget) return;
-            
             const dx = (enemy.x - mainTarget.x) * TILE_SIZE;
             const dy = (enemy.y - mainTarget.y) * TILE_SIZE;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            
             if (distance <= this.splashRadius * TILE_SIZE) {
                 enemy.takeDamage(damage * 0.5, false, this);
                 enemy.applyStatusEffect('SLOWED', this.slowEffect);
             }
         });
+        return actualDamage;
     }
 
     // 지원 버프 실행 함수
@@ -2508,7 +2512,7 @@ class Enemy {
 
     // 방어력 일관 적용
     takeDamage(damage, isCritical = false, attacker = null) {
-        if (this.isDead || this.isInvincible) return false;
+        if (this.isDead || this.isInvincible) return 0;
         // 방어력 적용
         const actualDamage = Math.max(1, Math.floor(damage * (1 - (this.defense / (this.defense + 100)))));
         this.health = Math.max(0, this.health - actualDamage);
@@ -2516,9 +2520,8 @@ class Enemy {
         if (attacker) this.lastAttacker = attacker;
         if (this.health <= 0) {
             this.die();
-            return true;
         }
-        return false;
+        return actualDamage;
     }
 
     die() {
