@@ -7,7 +7,7 @@ const TILE_SIZE = 40;
 const CRITICAL_CHANCE = 0.2; // 20%
 const CRITICAL_MULTIPLIER = 2;
 const ENEMY_LEVEL_SETTINGS = {
-    maxLevel: 10,
+    maxLevel: 999,
     healthMultiplier: 1.2, // 레벨당 체력 증가율
     speedMultiplier: 1.05, // 레벨당 속도 증가율
     rewardMultiplier: 1.15, // 레벨당 보상 증가율
@@ -3966,6 +3966,7 @@ function loadGame() {
         
         // 게임 상태 복원
         Object.assign(gameState, data.gameState);
+        gameState.currentMap = data.currentMap;
         selectMap(data.currentMap);
         
         // 타워 복원
@@ -5716,7 +5717,6 @@ function initializeGame() {
         experience: 0,
         level: 1,
         experienceToNextLevel: 100,
-        currentMap: 'STRAIGHT', // 현재 맵 정보 추가
         currentWaveMessage: null, // 웨이브 메시지 관련 변수 추가
         waveMessageStartTime: 0   // 웨이브 메시지 시작 시간
     });
