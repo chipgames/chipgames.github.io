@@ -5901,9 +5901,9 @@ function showDamageNumber(x, y, damage, isCritical = false) {
 
     // 애니메이션 상태
     let startTime = null;
-    const duration = 1300; // 1.3초
-    const maxHeight = -60; // 최대 상승 높이 (더 낮게)
-    const gravity = 0.7; // 중력 효과
+    const duration = 500; // 1.3초
+    const maxHeight = -30; // 최대 상승 높이 (더 낮게)
+    const gravity = 1.7; // 중력 효과
 
     // 애니메이션 함수
     function animate(currentTime) {
