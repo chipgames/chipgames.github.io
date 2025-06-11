@@ -1307,39 +1307,37 @@ class Tower {
     executeAttack(target) {
         const isCritical = Math.random() < CRITICAL_CHANCE;
         const damage = isCritical ? this.damage * CRITICAL_MULTIPLIER : this.damage;
-        
-        target.lastDamage = { amount: damage, isCritical };
-        playSound('tower_attack');
-
-        // 공격 이펙트 표시
-        showAttackEffect(this.x, this.y, target.x, target.y, isCritical);
 
         switch(this.type) {
             case 'BASIC':
                 target.takeDamage(damage, isCritical, this);
+                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
             case 'ICE':
                 target.takeDamage(damage, isCritical, this);
                 target.applyStatusEffect('FROZEN', this.freezeDuration);
+                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
             case 'POISON':
                 target.takeDamage(damage, isCritical, this);
                 target.poisonDamage = this.poisonDamage;
                 target.poisonDuration = this.poisonDuration;
+                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
             case 'LASER':
                 target.takeDamage(damage, isCritical, this);
                 target.continuousDamage = this.continuousDamage;
+                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
             case 'SPLASH':
                 this.executeSplashAttack(target, damage);
+                showDamageNumber(target.x, target.y, damage, isCritical);
                 break;
             case 'SUPPORT':
                 this.executeSupportBuff();
+                // showDamageNumber 호출하지 않음
                 break;
         }
-
-        showDamageNumber(target.x, target.y, damage, isCritical);
     }
 
     // 스플래시 공격 실행 함수
@@ -1366,18 +1364,19 @@ class Tower {
     executeSupportBuff() {
         towers.forEach(tower => {
             if (tower === this) return;
-            
             const dx = tower.x - this.x;
             const dy = tower.y - this.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
-            
+            // 지원 범위 내에 있으면 버프 적용
             if (distance <= this.buffRange) {
                 if (!this.buffedTowers.has(tower)) {
-                    tower.damage *= this.buffMultiplier;
+                    // 항상 baseDamage 기준으로만 버프 적용
+                    tower.damage = tower.baseDamage * this.buffMultiplier;
                     this.buffedTowers.add(tower);
                 }
             } else if (this.buffedTowers.has(tower)) {
-                tower.damage /= this.buffMultiplier;
+                // 지원 범위에서 벗어나면 baseDamage로 복구
+                tower.damage = tower.baseDamage;
                 this.buffedTowers.delete(tower);
             }
         });
@@ -1405,9 +1404,12 @@ class Tower {
             
             // 레벨업 시 능력치 상승
             this.damage = Math.floor(this.damage * 1.5);
+            this.baseDamage = Math.floor(this.baseDamage * 1.5); // baseDamage도 함께 증가
             this.range += 0.5;
+            this.baseRange += 0.5; // baseRange도 함께 증가
             if (this.splashRadius) this.splashRadius += 0.5;
             this.maxCooldown = Math.max(10, this.maxCooldown * 0.8);
+            this.baseCooldown = Math.max(10, this.baseCooldown * 0.8); // baseCooldown도 함께 감소
             
             // 특수 능력 강화
             if (this.type === 'LASER') {
@@ -1751,7 +1753,7 @@ const ENEMY_TYPES = {
     NORMAL: {
         name: '일반 적',
         health: 100,
-        speed: 0.02,
+        speed: 0.013,  // 0.02 -> 0.015로 감소
         reward: 10,
         color: 'red',
         experienceValue: 10
@@ -1759,7 +1761,7 @@ const ENEMY_TYPES = {
     FAST: {
         name: '빠른 적',
         health: 50,
-        speed: 0.04,
+        speed: 0.023,  // 0.04 -> 0.025로 감소
         reward: 15,
         color: 'yellow',
         experienceValue: 15
@@ -1767,7 +1769,7 @@ const ENEMY_TYPES = {
     TANK: {
         name: '탱커',
         health: 300,
-        speed: 0.01,
+        speed: 0.007,  // 유지
         reward: 20,
         color: 'purple',
         experienceValue: 20
@@ -1775,7 +1777,7 @@ const ENEMY_TYPES = {
     HEALER: {
         name: '치유사',
         health: 80,
-        speed: 0.015,
+        speed: 0.01,  // 0.015 -> 0.012로 감소
         reward: 25,
         color: 'green',
         experienceValue: 25,
@@ -2024,14 +2026,28 @@ const BOSS_PATTERNS = {
         cooldown: 240,
         update: (boss) => {
             if (boss.isDead) return true;
-
-            if (boss.patternCooldown === 0) {
-                const healAmount = Math.floor(boss.maxHealth * 0.3);
+            // 쿨다운 60프레임(1초) 전 예고
+            // if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, '힐');
+            // 체력 50% 이하일 때만 힐 사용
+            if (boss.health / boss.maxHealth <= 0.5 && boss.patternCooldown === 0) {
+                const healAmount = Math.floor(boss.maxHealth * 0.4);
                 boss.health = Math.min(boss.maxHealth, boss.health + healAmount);
-                showBossPatternEffect(boss.x, boss.y, '힐');
+                showBossPatternEffect(boss.x, boss.y, '강력한 힐!');
                 playSound('bossHeal');
+            } else if (boss.patternCooldown === 0) {
+                // 50% 초과면 소환 행동
+                // 소환: 일반 적 2~3마리 생성
+                const summonCount = Math.floor(Math.random() * 2) + 2; // 2~3마리
+                for (let i = 0; i < summonCount; i++) {
+                    const enemy = new Enemy(gameState.wave, false);
+                    // 소환 위치를 보스 위치로 지정
+                    enemy.x = boss.x;
+                    enemy.y = boss.y;
+                    enemies.push(enemy);
+                }
+                showBossPatternEffect(boss.x, boss.y, '소환!');
+                playSound('bossSummon');
             }
-
             return false;
         }
     }
@@ -2086,7 +2102,6 @@ const ENEMY_SKILLS = {
         }
     }
 };
-
 
 // 이제 class Enemy를 전역에 선언
 class Enemy {
@@ -2200,22 +2215,6 @@ class Enemy {
                     this.patternCooldown = this.pattern.cooldown;
                     this.skillCooldown = this.skill.cooldown;
             }
-        }
-
-        // Enemy 생성자 내 (보스/특수 적에 스킬 부여 예시)
-        // 예시: 탱커는 방어막, 보스는 순간이동, 힐러는 광역힐
-        if (this.type === 'TANK') {
-            this.skill = ENEMY_SKILLS.SHIELD;
-            this.skillCooldown = this.skill.cooldown;
-        } else if (this.type === 'BOSS') {
-            this.skill = ENEMY_SKILLS.TELEPORT;
-            this.skillCooldown = this.skill.cooldown;
-        } else if (this.type === 'HEALER') {
-            this.skill = ENEMY_SKILLS.HEAL_AOE;
-            this.skillCooldown = this.skill.cooldown;
-        } else {
-            this.skill = null;
-            this.skillCooldown = 0;
         }
     }
 
@@ -2743,10 +2742,17 @@ function startWave() {
     
     // 보스 웨이브 처리
     if (gameState.wave % gameState.bossWave === 0) {
-        gameState.enemiesRemaining = 1;
-        gameState.totalEnemies = 1;
+        // 보스 1기
         const boss = new Enemy(gameState.wave, true);
         enemies.push(boss);
+        // 일반 적 5기
+        const normalCount = 5;
+        for (let i = 0; i < normalCount; i++) {
+            const enemy = new Enemy(gameState.wave, false);
+            enemies.push(enemy);
+        }
+        gameState.enemiesRemaining = 1 + normalCount;
+        gameState.totalEnemies = 1 + normalCount;
         showWaveStartEffect();
         playSound('wave_start');
         return; // 반드시 함수 종료
@@ -3560,20 +3566,29 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     const upgradeNames = ['공격력', '사거리', '공격속도'];
     
     upgradeTypes.forEach((type, index) => {
-        const cost = tower.getUpgradeCost(type);
-        const canUpgrade = tower.canUpgrade(type);
-        
+        const isSupport = tower.type === 'SUPPORT';
+        // 지원 타워는 range만 활성화
+        const canUpgrade = isSupport ? (type === 'range' && tower.canUpgrade(type)) : tower.canUpgrade(type);
+
         const option = document.createElement('div');
         option.className = `upgrade-option ${canUpgrade ? '' : 'disabled'}`;
-        
-        const currentValue = type === 'speed' ? 
-            (60 / tower.maxCooldown).toFixed(1) : 
-            tower[type];
-        
-        const nextValue = type === 'speed' ? 
-            (60 / Math.max(10, tower.maxCooldown * 0.9)).toFixed(1) : 
-            Math.floor(tower[type] * 1.2);
-        
+
+        // 값 표시 형식 분기
+        let currentValue, nextValue;
+        if (type === 'damage') {
+            currentValue = Math.floor(tower[type]);
+            nextValue = Math.floor(tower[type] * 1.2);
+        } else if (type === 'range') {
+            currentValue = tower[type].toFixed(1);
+            nextValue = (tower[type] * 1.2).toFixed(1);
+        } else if (type === 'speed') {
+            currentValue = (60 / tower.maxCooldown).toFixed(1);
+            nextValue = (60 / Math.max(10, tower.maxCooldown * 0.9)).toFixed(1);
+        } else {
+            currentValue = tower[type];
+            nextValue = tower[type];
+        }
+
         option.innerHTML = `
             <div class="upgrade-info">
                 <span class="upgrade-icon">${upgradeIcons[index]}</span>
@@ -3588,10 +3603,10 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
             </div>
             <div class="upgrade-cost ${canUpgrade ? '' : 'insufficient'}">
                 <span class="cost-icon">💰</span>
-                <span class="cost-value">${cost}</span>
+                <span class="cost-value">${tower.getUpgradeCost(type)}</span>
             </div>
         `;
-        
+
         if (canUpgrade) {
             option.addEventListener('click', () => {
                 tower.upgrade(type);
@@ -3600,7 +3615,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
                 menu.remove();
             });
         }
-        
+
         menu.appendChild(option);
     });
     
@@ -5887,7 +5902,7 @@ function showDamageNumber(x, y, damage, isCritical = false) {
     }
 
     // 데미지 크기에 따른 스타일 변화
-    const damageSize = Math.min(Math.max(damage / 100, 1), 2);
+    const damageSize = Math.min(Math.max(damage / 100, 1.2), 2);
     const fontSize = Math.floor(16 * damageSize);
     const color = isCritical ? '#ff4444' : '#ffffff';
     const textShadow = isCritical 
@@ -5901,9 +5916,9 @@ function showDamageNumber(x, y, damage, isCritical = false) {
 
     // 애니메이션 상태
     let startTime = null;
-    const duration = 1500; // 1.5초
+    const duration = 1100; // 1.5초
     const initialVelocity = -3.5; // 초기 상승 속도
-    const gravity = 0.15; // 중력
+    const gravity = 0.2; // 중력
     let currentY = startY;
     let currentVelocity = initialVelocity;
     const maxFallDistance = TILE_SIZE * 1.5; // 최대 낙하 거리 (타일 2개 높이)
@@ -5925,8 +5940,8 @@ function showDamageNumber(x, y, damage, isCritical = false) {
             currentVelocity = 0;
         }
 
-        // scale 변화 (1.0 ~ 1.5)
-        const scale = 0.3 + Math.sin(progress * Math.PI * 2) * 1;
+        // scale 변화 (0.3 ~ 1.3)
+        const scale = 0.5 + Math.sin(progress * Math.PI * 2) * 1;
         const opacity = 1 - progress;
 
         // 위치와 스타일 업데이트
@@ -5945,7 +5960,7 @@ function showDamageNumber(x, y, damage, isCritical = false) {
             pointer-events: none;
         `;
 
-        damageText.textContent = damage.toLocaleString();
+        damageText.textContent = Math.round(damage).toLocaleString();
 
         // 애니메이션 계속
         if (progress < 1) {
@@ -6122,8 +6137,16 @@ BOSS_PATTERNS.HEAL = {
             showBossPatternEffect(boss.x, boss.y, '강력한 힐!');
             playSound('bossHeal');
         } else if (boss.patternCooldown === 0) {
-            // 50% 초과면 소환 행동(예시)
-            // summonMinions(boss.x, boss.y); // 실제 소환 함수 필요시 구현
+            // 50% 초과면 소환 행동
+            // 소환: 일반 적 2~3마리 생성
+            const summonCount = Math.floor(Math.random() * 2) + 2; // 2~3마리
+            for (let i = 0; i < summonCount; i++) {
+                const enemy = new Enemy(gameState.wave, false);
+                // 소환 위치를 보스 위치로 지정
+                enemy.x = boss.x;
+                enemy.y = boss.y;
+                enemies.push(enemy);
+            }
             showBossPatternEffect(boss.x, boss.y, '소환!');
             playSound('bossSummon');
         }
