@@ -3569,13 +3569,21 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
         const option = document.createElement('div');
         option.className = `upgrade-option ${canUpgrade ? '' : 'disabled'}`;
 
-        const currentValue = type === 'speed' ? 
-            (60 / tower.maxCooldown).toFixed(1) : 
-            tower[type];
-
-        const nextValue = type === 'speed' ? 
-            (60 / Math.max(10, tower.maxCooldown * 0.9)).toFixed(1) : 
-            Math.floor(tower[type] * 1.2);
+        // 값 표시 형식 분기
+        let currentValue, nextValue;
+        if (type === 'damage') {
+            currentValue = Math.floor(tower[type]);
+            nextValue = Math.floor(tower[type] * 1.2);
+        } else if (type === 'range') {
+            currentValue = tower[type].toFixed(1);
+            nextValue = (tower[type] * 1.2).toFixed(1);
+        } else if (type === 'speed') {
+            currentValue = (60 / tower.maxCooldown).toFixed(1);
+            nextValue = (60 / Math.max(10, tower.maxCooldown * 0.9)).toFixed(1);
+        } else {
+            currentValue = tower[type];
+            nextValue = tower[type];
+        }
 
         option.innerHTML = `
             <div class="upgrade-info">
