@@ -6118,28 +6118,21 @@ document.head.insertAdjacentHTML('beforeend', `
 function showSpecialEffect(x, y, name) {
     if (lowSpecMode) return;
     const effect = EffectPool.get('special');
-    
+    const parent = document.querySelector('.game-area');
+    if (parent && !effect.parentNode) {
+        parent.appendChild(effect);
+    }
     const centerX = x * TILE_SIZE + TILE_SIZE/2;
-    const centerY = y * TILE_SIZE + TILE_SIZE/2;
-    
+    const centerY = y * TILE_SIZE + TILE_SIZE * 3.2; // 본체 중심에 오도록 조정
     effect.style.cssText = `
         display: block;
         left: ${centerX}px;
         top: ${centerY}px;
     `;
-    
     effect.innerHTML = `
-        <div class="special-ring"></div>
-        <div class="special-particles">
-            ${Array(12).fill().map(() => '<div class="particle"></div>').join('')}
-        </div>
         <div class="special-text">${name}</div>
     `;
-    
-    // 사운드 재생
     playSound('special');
-    
-    // 애니메이션 종료 후 풀로 반환
     effect.addEventListener('animationend', () => {
         EffectPool.release(effect);
     }, { once: true });
@@ -6205,6 +6198,19 @@ document.head.insertAdjacentHTML('beforeend', `
             z-index: 1200;
             pointer-events: none;
             animation: skillEffectFade 1.2s ease-out forwards;
+        }
+        .special-text {
+            writing-mode: horizontal-tb !important;
+            white-space: nowrap !important;
+            text-align: center;
+            font-size: 16px;
+            color: #6cf;
+            text-shadow: 0 2px 8px #000, 0 0 8px #6cf;
+            font-weight: bold;
+            letter-spacing: 2px;
+            line-height: 1;
+            margin: 0;
+            padding: 0;
         }
         @keyframes skillEffectFade {
             0% { opacity: 1; transform: scale(1.2) translate(-50%, -50%);}
