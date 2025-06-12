@@ -3772,6 +3772,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
         
         // UI 업데이트
         updateInfoBar();
+        updateTowerLimit(); // 타워 개수 UI 즉시 갱신
         showRewardPopup(sellValue);
         menu.remove();
     });
