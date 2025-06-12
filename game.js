@@ -3916,9 +3916,15 @@ function calculateWaveReward() {
 function saveGame() {
     try {
         const saveData = {
+            version: 3, // 버전 증가
             gameState: {
                 ...gameState,
-                isPaused: true
+                lastSpawnTime: gameState.lastSpawnTime,
+                totalEnemies: gameState.totalEnemies,
+                currentGroup: gameState.currentGroup,
+                totalGroups: gameState.totalGroups,
+                groupSize: gameState.groupSize,
+                enemiesInCurrentGroup: gameState.enemiesInCurrentGroup,
             },
             gameStats: { ...gameStats },
             towers: towers.map(tower => ({
@@ -3933,7 +3939,16 @@ function saveGame() {
                 speedLevel: tower.speedLevel,
                 bulletLevel: tower.bulletLevel,
                 specialLevel: tower.specialLevel || 0,
-                cooldown: tower.cooldown || 0
+                cooldown: tower.cooldown || 0,
+                activeBuffs: Array.from(tower.activeBuffs || []),
+                activeCombos: Array.from(tower.activeCombos || []),
+                shieldEffectTime: tower.shieldEffectTime || 0,
+                baseDamage: tower.baseDamage,
+                baseRange: tower.baseRange,
+                baseCooldown: tower.baseCooldown,
+                range: tower.range,
+                damage: tower.damage,
+                maxCooldown: tower.maxCooldown
             })),
             enemies: enemies.map(enemy => ({
                 x: enemy.x,
@@ -3943,13 +3958,25 @@ function saveGame() {
                 maxHealth: enemy.maxHealth,
                 statusEffects: Array.from(enemy.statusEffects.entries()),
                 pathIndex: enemy.pathIndex,
-                isBoss: enemy.isBoss || false
+                isBoss: enemy.isBoss || false,
+                zigzagFrame: enemy.zigzagFrame || 0,
+                groupId: enemy.groupId || null
             })),
+            enemyGroups: enemyGroups.map(group => ({
+                id: group.id,
+                size: group.size,
+                type: group.type || null
+            })),
+            groupIdCounter: groupIdCounter,
             achievements: Object.fromEntries(
                 Object.entries(ACHIEVEMENTS).map(([key, achievement]) => [key, achievement.unlocked])
             ),
             currentMap: gameState.currentMap,
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            // 환경설정
+            soundEnabled: soundEnabled,
+            musicEnabled: musicEnabled,
+            lowSpecMode: typeof lowSpecMode !== 'undefined' ? lowSpecMode : false
         };
 
         // 저장 데이터 검증
@@ -3993,70 +4020,73 @@ function loadGame() {
         }
 
         const data = JSON.parse(saveData);
-        
+        // 저장 데이터 버전 확인
+        if (!data.version || data.version < 3) {
+            showSaveLoadNotification('저장 데이터 버전이 호환되지 않습니다.', true);
+            return;
+        }
         // 저장 데이터 검증
         if (!validateSaveData(data)) {
             throw new Error('저장된 데이터가 손상되었습니다.');
         }
-        
         // 저장 시간 확인 (24시간 제한)
         const saveTime = new Date(data.timestamp);
         const currentTime = new Date();
         const hoursDiff = (currentTime - saveTime) / (1000 * 60 * 60);
-        
         if (hoursDiff > 24) {
             showSaveLoadNotification('저장된 게임이 만료되었습니다.', true);
             return;
         }
-        
         // 게임 상태 복원
         Object.assign(gameState, data.gameState);
-        if (data.gameStats) Object.assign(gameStats, data.gameStats); // 게임 통계 복원
+        if (data.gameStats) Object.assign(gameStats, data.gameStats);
         gameState.currentMap = data.currentMap;
-        selectMap(data.currentMap);
-        
-        // 타워 복원
-        towers = data.towers.map(towerData => {
-            const tower = new Tower(towerData.x, towerData.y, towerData.type);
-            tower.experience = towerData.experience;
-            tower.experienceToNextLevel = towerData.experienceToNextLevel;
-            tower.level = towerData.level;
-            tower.rangeLevel = towerData.rangeLevel || 0;
-            tower.damageLevel = towerData.damageLevel || 0;
-            tower.speedLevel = towerData.speedLevel || 0;
-            tower.bulletLevel = towerData.bulletLevel || 0;
-            tower.specialLevel = towerData.specialLevel || 0;
-            tower.cooldown = towerData.cooldown || 0;
-            // 레벨에 따른 능력치 재계산(기존 루프 제거)
-            // 필요시 추가 특수 상태 복원
-            return tower;
+        // selectMap(data.currentMap); // gameState 값이 덮어써지지 않도록 제거
+        // 맵 UI만 갱신
+        if (typeof drawMinimap === 'function') {
+            drawMinimap();
+        }
+        // 웨이브/스폰 관련 필드 복원
+        gameState.lastSpawnTime = data.gameState.lastSpawnTime;
+        gameState.totalEnemies = data.gameState.totalEnemies;
+        gameState.currentGroup = data.gameState.currentGroup;
+        gameState.totalGroups = data.gameState.totalGroups;
+        gameState.groupSize = data.gameState.groupSize;
+        gameState.enemiesInCurrentGroup = data.gameState.enemiesInCurrentGroup;
+        // 타워 복원 (팩토리 함수 사용)
+        towers = data.towers.map(towerFromData);
+        // 적 복원 (팩토리 함수 사용)
+        enemies = (data.enemies || []).map(enemyFromData);
+        // 적 그룹 복원
+        enemyGroups = (data.enemyGroups || []).map(groupData => {
+            const group = new EnemyGroup(groupData.id, groupData.size, groupData.type);
+            return group;
         });
-        
-        // 적 복원
-        enemies = (data.enemies || []).map(enemyData => {
-            const enemy = new Enemy(gameState.wave, enemyData.isBoss);
-            enemy.x = enemyData.x;
-            enemy.y = enemyData.y;
-            enemy.type = enemyData.type;
-            enemy.health = enemyData.health;
-            enemy.maxHealth = enemyData.maxHealth;
-            enemy.statusEffects = new Map(enemyData.statusEffects);
-            enemy.pathIndex = enemyData.pathIndex;
-            // 필요시 추가 상태 복원
-            return enemy;
-        });
-        
+        groupIdCounter = data.groupIdCounter || 1;
         // 업적 복원
         Object.entries(data.achievements).forEach(([key, unlocked]) => {
             if (ACHIEVEMENTS[key]) {
                 ACHIEVEMENTS[key].unlocked = unlocked;
             }
         });
-        
+        // 환경설정 복원
+        soundEnabled = data.soundEnabled;
+        musicEnabled = data.musicEnabled;
+        if (typeof applyLowSpecMode === 'function') {
+            applyLowSpecMode(data.lowSpecMode);
+        }
+        // UI/통계 등 갱신
         updateTowerLimit();
-        updateInfoBar(); // UI 정보 갱신
-        updateStats();   // 통계 UI 갱신
+        updateInfoBar();
+        updateStats();
         showSaveLoadNotification('게임을 불러왔습니다.');
+        // 웨이브 진행 중이었다면 적 스폰 재개
+        if (gameState.waveInProgress) {
+            spawnNextEnemy();
+            updateWaveProgress();
+        }
+        // 불러오기 후 일시정지 해제
+        gameState.isPaused = false;
     } catch (error) {
         console.error('게임 불러오기 실패:', error);
         showSaveLoadNotification(`불러오기 실패: ${error.message}`, true);
@@ -4065,48 +4095,40 @@ function loadGame() {
 
 // 저장 데이터 검증
 function validateSaveData(saveData) {
-    const requiredFields = ['gameState', 'gameStats', 'towers', 'enemies', 'achievements', 'currentMap', 'timestamp'];
-    
-    // 필수 필드 확인
+    // 웨이브/스폰, 환경설정, 그룹 등 필드도 검증
+    const requiredFields = ['version', 'gameState', 'gameStats', 'towers', 'enemies', 'enemyGroups', 'groupIdCounter', 'achievements', 'currentMap', 'timestamp', 'soundEnabled', 'musicEnabled', 'lowSpecMode'];
     for (const field of requiredFields) {
         if (!(field in saveData)) {
             return false;
         }
     }
-    
-    // 게임 상태 검증
-    const gameStateFields = ['gold', 'lives', 'wave', 'isGameOver', 'waveInProgress', 'enemiesRemaining', 'isPaused', 'isStarted', 'score', 'difficulty'];
-    for (const field of gameStateFields) {
-        if (!(field in saveData.gameState)) {
-            return false;
-        }
-    }
-    
-    // 타워 데이터 검증
-    if (!Array.isArray(saveData.towers)) {
-        return false;
-    }
-    
+    if (!Array.isArray(saveData.towers)) return false;
     for (const tower of saveData.towers) {
-        const towerFields = ['x', 'y', 'type', 'level', 'experience', 'experienceToNextLevel', 'rangeLevel', 'damageLevel', 'speedLevel', 'bulletLevel', 'specialLevel'];
+        const towerFields = ['x', 'y', 'type', 'level', 'experience', 'experienceToNextLevel', 'rangeLevel', 'damageLevel', 'speedLevel', 'bulletLevel', 'specialLevel', 'activeBuffs', 'activeCombos', 'shieldEffectTime'];
         for (const field of towerFields) {
             if (!(field in tower)) {
                 return false;
             }
         }
     }
-    
-    // 적 정보 필드도 검증
     if (!Array.isArray(saveData.enemies)) return false;
     for (const enemy of saveData.enemies) {
-        const enemyFields = ['x', 'y', 'type', 'health', 'maxHealth', 'statusEffects', 'pathIndex', 'isBoss'];
+        const enemyFields = ['x', 'y', 'type', 'health', 'maxHealth', 'statusEffects', 'pathIndex', 'isBoss', 'zigzagFrame', 'groupId'];
         for (const field of enemyFields) {
             if (!(field in enemy)) {
                 return false;
             }
         }
     }
-    
+    if (!Array.isArray(saveData.enemyGroups)) return false;
+    for (const group of saveData.enemyGroups) {
+        const groupFields = ['id', 'size', 'type'];
+        for (const field of groupFields) {
+            if (!(field in group)) {
+                return false;
+            }
+        }
+    }
     return true;
 }
 
@@ -4576,7 +4598,7 @@ document.head.insertAdjacentHTML('beforeend', `
         /* 웨이브 진행 바 스타일 */
         .wave-progress {
             width: 100%;
-            height: 16px;
+            height: 10px;
             background: linear-gradient(90deg, #232526 0%, #414345 100%);
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(33, 150, 243, 0.15);
@@ -6560,4 +6582,27 @@ function showLevelUpEffect(tower) {
         }
         return true;
     };
+}
+
+// Enemy 복원 팩토리 함수
+function enemyFromData(data) {
+    const enemy = Object.create(Enemy.prototype);
+    Object.assign(enemy, data);
+    enemy.statusEffects = new Map(data.statusEffects);
+    return enemy;
+}
+// Tower 복원 팩토리 함수
+function towerFromData(data) {
+    const tower = Object.create(Tower.prototype);
+    Object.assign(tower, data);
+    tower.activeBuffs = new Set(data.activeBuffs);
+    tower.activeCombos = new Set(data.activeCombos);
+    // 기본값 보정
+    if (!isFinite(tower.baseDamage)) tower.baseDamage = TOWER_TYPES[tower.type]?.damage || 1;
+    if (!isFinite(tower.baseRange)) tower.baseRange = TOWER_TYPES[tower.type]?.range || 1;
+    if (!isFinite(tower.baseCooldown)) tower.baseCooldown = TOWER_TYPES[tower.type]?.cooldown || 60;
+    if (!isFinite(tower.range)) tower.range = tower.baseRange;
+    if (!isFinite(tower.damage)) tower.damage = tower.baseDamage;
+    if (!isFinite(tower.maxCooldown)) tower.maxCooldown = tower.baseCooldown;
+    return tower;
 }
