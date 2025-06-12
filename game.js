@@ -1695,13 +1695,15 @@ class Tower {
 
     // 판매 가격 계산
     getSellValue() {
+        const baseValue = TOWER_TYPES[this.type].cost || 100; // 기본 타워 가치
         const totalUpgradeCost = 
             this.getUpgradeCost('range') +
             this.getUpgradeCost('damage') +
             this.getUpgradeCost('speed') +
-            this.getUpgradeCost('bullet');
-        return Math.floor(totalUpgradeCost * 0.7);
-        }
+            this.getUpgradeCost('bullet') +
+            (this.level >= 3 ? this.getUpgradeCost('special') : 0);
+        return Math.floor((baseValue + totalUpgradeCost) * 0.7);
+    }
 
     // 타워 범위 미리보기
     showTowerRangePreview(x, y, range, type) {
@@ -3757,10 +3759,20 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     
     sellButton.addEventListener('click', () => {
         const sellValue = tower.getSellValue();
-        gameState.gold += sellValue;
-        showRewardPopup(sellValue);
+        
+        // 버프 효과 제거
+        if (tower.type === 'SUPPORT') {
+            tower.removeBuffs();
+        }
+        
+        // 타워 제거 및 상태 업데이트
         towers = towers.filter(t => t !== tower);
+        gameState.towerCount--;
+        gameState.gold += sellValue;
+        
+        // UI 업데이트
         updateInfoBar();
+        showRewardPopup(sellValue);
         menu.remove();
     });
     
