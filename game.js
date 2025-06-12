@@ -1289,18 +1289,12 @@ class Tower {
 
     // 타겟 찾기 함수
     findTarget(enemies) {
-        return enemies
+        if (!enemies || !Array.isArray(enemies)) return null;
+        return enemies.filter(enemy => enemy && enemy.x !== undefined && enemy.y !== undefined)  // enemy가 유효한지 확인
             .filter(enemy => {
-                const dx = (enemy.x - this.x) * TILE_SIZE;
-                const dy = (enemy.y - this.y) * TILE_SIZE;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                return distance <= this.range * TILE_SIZE;
-            })
-            .sort((a, b) => {
-                // 가장 가까운 적 우선
-                const distA = Math.sqrt(Math.pow(a.x - this.x, 2) + Math.pow(a.y - this.y, 2));
-                const distB = Math.sqrt(Math.pow(b.x - this.x, 2) + Math.pow(b.y - this.y, 2));
-                return distA - distB;
+                const dx = enemy.x - this.x;
+                const dy = enemy.y - this.y;
+                return Math.sqrt(dx * dx + dy * dy) <= this.range;
             })[0];
     }
 
@@ -3960,7 +3954,19 @@ function saveGame() {
                 pathIndex: enemy.pathIndex,
                 isBoss: enemy.isBoss || false,
                 zigzagFrame: enemy.zigzagFrame || 0,
-                groupId: enemy.groupId || null
+                groupId: enemy.groupId || null,
+                // 추가 상태 저장
+                speed: enemy.speed,
+                direction: enemy.direction,
+                pattern: enemy.pattern,
+                level: enemy.level,
+                experience: enemy.experience,
+                experienceToNextLevel: enemy.experienceToNextLevel,
+                baseReward: enemy.baseReward,
+                baseExperience: enemy.baseExperience,
+                currentPath: enemy.currentPath,
+                targetX: enemy.targetX,
+                targetY: enemy.targetY
             })),
             enemyGroups: enemyGroups.map(group => ({
                 id: group.id,
@@ -4063,6 +4069,16 @@ function loadGame() {
             return group;
         });
         groupIdCounter = data.groupIdCounter || 1;
+
+        // 적 그룹 멤버 복원
+        enemies.forEach(enemy => {
+            if (enemy && enemy.groupId) {  // enemy가 존재하는지 확인
+                const group = enemyGroups.find(g => g.id === enemy.groupId);
+                if (group) {
+                    group.members.push(enemy);
+                }
+            }
+        });
         // 업적 복원
         Object.entries(data.achievements).forEach(([key, unlocked]) => {
             if (ACHIEVEMENTS[key]) {
@@ -4082,7 +4098,10 @@ function loadGame() {
         showSaveLoadNotification('게임을 불러왔습니다.');
         // 웨이브 진행 중이었다면 적 스폰 재개
         if (gameState.waveInProgress) {
-            spawnNextEnemy();
+            // 이미 복원된 적이 있으면 spawnNextEnemy를 호출하지 않음
+            if (enemies.length === 0) {
+                spawnNextEnemy();
+            }
             updateWaveProgress();
         }
         // 불러오기 후 일시정지 해제
@@ -6586,9 +6605,31 @@ function showLevelUpEffect(tower) {
 
 // Enemy 복원 팩토리 함수
 function enemyFromData(data) {
-    const enemy = Object.create(Enemy.prototype);
-    Object.assign(enemy, data);
+    const enemy = new Enemy(data.wave || 1, data.isBoss);
+    enemy.x = data.x;
+    enemy.y = data.y;
+    enemy.type = data.type;
+    enemy.health = data.health;
+    enemy.maxHealth = data.maxHealth;
     enemy.statusEffects = new Map(data.statusEffects);
+    enemy.pathIndex = data.pathIndex;
+    enemy.isBoss = data.isBoss;
+    enemy.zigzagFrame = data.zigzagFrame;
+    enemy.groupId = data.groupId;
+
+    // 추가 상태 복원
+    if (data.speed !== undefined) enemy.speed = data.speed;
+    if (data.direction !== undefined) enemy.direction = data.direction;
+    if (data.pattern !== undefined) enemy.pattern = data.pattern;
+    if (data.level !== undefined) enemy.level = data.level;
+    if (data.experience !== undefined) enemy.experience = data.experience;
+    if (data.experienceToNextLevel !== undefined) enemy.experienceToNextLevel = data.experienceToNextLevel;
+    if (data.baseReward !== undefined) enemy.baseReward = data.baseReward;
+    if (data.baseExperience !== undefined) enemy.baseExperience = data.baseExperience;
+    if (data.currentPath !== undefined) enemy.currentPath = data.currentPath;
+    if (data.targetX !== undefined) enemy.targetX = data.targetX;
+    if (data.targetY !== undefined) enemy.targetY = data.targetY;
+
     return enemy;
 }
 // Tower 복원 팩토리 함수
