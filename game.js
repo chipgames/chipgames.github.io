@@ -1695,14 +1695,29 @@ class Tower {
 
     // 판매 가격 계산
     getSellValue() {
-        const baseValue = TOWER_TYPES[this.type].cost || 100; // 기본 타워 가치
-        const totalUpgradeCost = 
-            this.getUpgradeCost('range') +
-            this.getUpgradeCost('damage') +
-            this.getUpgradeCost('speed') +
-            this.getUpgradeCost('bullet') +
-            (this.level >= 3 ? this.getUpgradeCost('special') : 0);
-        return Math.floor((baseValue + totalUpgradeCost) * 0.7);
+        const baseValue = TOWER_TYPES[this.type].cost || 100;
+        // 실제 투자한 업그레이드 비용 누적
+        let upgradeCost = 0;
+        const baseUpgradeCost = 100;
+        for (let i = 0; i < this.rangeLevel; i++) {
+            upgradeCost += Math.floor(baseUpgradeCost * Math.pow(1.5, i));
+        }
+        for (let i = 0; i < this.damageLevel; i++) {
+            upgradeCost += Math.floor(baseUpgradeCost * Math.pow(1.5, i));
+        }
+        for (let i = 0; i < this.speedLevel; i++) {
+            upgradeCost += Math.floor(baseUpgradeCost * Math.pow(1.5, i));
+        }
+        for (let i = 0; i < this.bulletLevel; i++) {
+            upgradeCost += Math.floor(baseUpgradeCost * Math.pow(1.5, i));
+        }
+        // 특수 업그레이드(레벨 3 이상)
+        if (this.specialLevel) {
+            for (let i = 0; i < this.specialLevel; i++) {
+                upgradeCost += Math.floor(baseUpgradeCost * Math.pow(1.5, i));
+            }
+        }
+        return Math.floor((baseValue + upgradeCost) * 0.7);
     }
 
     // 타워 범위 미리보기
