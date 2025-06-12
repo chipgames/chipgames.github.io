@@ -3920,13 +3920,30 @@ function saveGame() {
                 ...gameState,
                 isPaused: true
             },
+            gameStats: { ...gameStats },
             towers: towers.map(tower => ({
                 x: tower.x,
                 y: tower.y,
                 type: tower.type,
                 level: tower.level,
                 experience: tower.experience,
-                experienceToNextLevel: tower.experienceToNextLevel
+                experienceToNextLevel: tower.experienceToNextLevel,
+                rangeLevel: tower.rangeLevel,
+                damageLevel: tower.damageLevel,
+                speedLevel: tower.speedLevel,
+                bulletLevel: tower.bulletLevel,
+                specialLevel: tower.specialLevel || 0,
+                cooldown: tower.cooldown || 0
+            })),
+            enemies: enemies.map(enemy => ({
+                x: enemy.x,
+                y: enemy.y,
+                type: enemy.type,
+                health: enemy.health,
+                maxHealth: enemy.maxHealth,
+                statusEffects: Array.from(enemy.statusEffects.entries()),
+                pathIndex: enemy.pathIndex,
+                isBoss: enemy.isBoss || false
             })),
             achievements: Object.fromEntries(
                 Object.entries(ACHIEVEMENTS).map(([key, achievement]) => [key, achievement.unlocked])
@@ -3994,6 +4011,7 @@ function loadGame() {
         
         // 게임 상태 복원
         Object.assign(gameState, data.gameState);
+        if (data.gameStats) Object.assign(gameStats, data.gameStats); // 게임 통계 복원
         gameState.currentMap = data.currentMap;
         selectMap(data.currentMap);
         
@@ -4002,13 +4020,30 @@ function loadGame() {
             const tower = new Tower(towerData.x, towerData.y, towerData.type);
             tower.experience = towerData.experience;
             tower.experienceToNextLevel = towerData.experienceToNextLevel;
-            for (let i = 1; i < towerData.level; i++) {
-                tower.level++;
-                tower.damage = Math.floor(tower.damage * 1.5);
-                tower.range += 0.5;
-                if (tower.splashRadius) tower.splashRadius += 0.5;
-            }
+            tower.level = towerData.level;
+            tower.rangeLevel = towerData.rangeLevel || 0;
+            tower.damageLevel = towerData.damageLevel || 0;
+            tower.speedLevel = towerData.speedLevel || 0;
+            tower.bulletLevel = towerData.bulletLevel || 0;
+            tower.specialLevel = towerData.specialLevel || 0;
+            tower.cooldown = towerData.cooldown || 0;
+            // 레벨에 따른 능력치 재계산(기존 루프 제거)
+            // 필요시 추가 특수 상태 복원
             return tower;
+        });
+        
+        // 적 복원
+        enemies = (data.enemies || []).map(enemyData => {
+            const enemy = new Enemy(gameState.wave, enemyData.isBoss);
+            enemy.x = enemyData.x;
+            enemy.y = enemyData.y;
+            enemy.type = enemyData.type;
+            enemy.health = enemyData.health;
+            enemy.maxHealth = enemyData.maxHealth;
+            enemy.statusEffects = new Map(enemyData.statusEffects);
+            enemy.pathIndex = enemyData.pathIndex;
+            // 필요시 추가 상태 복원
+            return enemy;
         });
         
         // 업적 복원
@@ -4019,6 +4054,8 @@ function loadGame() {
         });
         
         updateTowerLimit();
+        updateInfoBar(); // UI 정보 갱신
+        updateStats();   // 통계 UI 갱신
         showSaveLoadNotification('게임을 불러왔습니다.');
     } catch (error) {
         console.error('게임 불러오기 실패:', error);
@@ -4028,7 +4065,7 @@ function loadGame() {
 
 // 저장 데이터 검증
 function validateSaveData(saveData) {
-    const requiredFields = ['gameState', 'towers', 'achievements', 'currentMap', 'timestamp'];
+    const requiredFields = ['gameState', 'gameStats', 'towers', 'enemies', 'achievements', 'currentMap', 'timestamp'];
     
     // 필수 필드 확인
     for (const field of requiredFields) {
@@ -4051,9 +4088,20 @@ function validateSaveData(saveData) {
     }
     
     for (const tower of saveData.towers) {
-        const towerFields = ['x', 'y', 'type', 'level', 'experience', 'experienceToNextLevel'];
+        const towerFields = ['x', 'y', 'type', 'level', 'experience', 'experienceToNextLevel', 'rangeLevel', 'damageLevel', 'speedLevel', 'bulletLevel', 'specialLevel'];
         for (const field of towerFields) {
             if (!(field in tower)) {
+                return false;
+            }
+        }
+    }
+    
+    // 적 정보 필드도 검증
+    if (!Array.isArray(saveData.enemies)) return false;
+    for (const enemy of saveData.enemies) {
+        const enemyFields = ['x', 'y', 'type', 'health', 'maxHealth', 'statusEffects', 'pathIndex', 'isBoss'];
+        for (const field of enemyFields) {
+            if (!(field in enemy)) {
                 return false;
             }
         }
