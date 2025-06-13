@@ -6679,6 +6679,7 @@ function towerFromData(data) {
     Object.assign(tower, data);
     tower.activeBuffs = new Set(data.activeBuffs);
     tower.activeCombos = new Set(data.activeCombos);
+    if (!tower.buffedTowers) tower.buffedTowers = new Set();
     // 기본값 보정
     if (!isFinite(tower.baseDamage)) tower.baseDamage = TOWER_TYPES[tower.type]?.damage || 1;
     if (!isFinite(tower.baseRange)) tower.baseRange = TOWER_TYPES[tower.type]?.range || 1;
@@ -6687,8 +6688,7 @@ function towerFromData(data) {
     if (!isFinite(tower.damage)) tower.damage = tower.baseDamage;
     if (!isFinite(tower.maxCooldown)) tower.maxCooldown = tower.baseCooldown;
     if (!tower.color) tower.color = TOWER_TYPES[tower.type]?.color || '#888888';
-
-    //console.log('[타워 복원]', tower);
+    
     return tower;
 }
 
