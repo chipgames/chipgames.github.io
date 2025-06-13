@@ -2126,127 +2126,136 @@ const ENEMY_SKILLS = {
 
 // 이제 class Enemy를 전역에 선언
 class Enemy {
-    constructor(wave, isBoss = false, initialPattern = null) {
-        // 기본 속성 초기화
-        this.pathIndex = 0;
-        this.x = currentMap.path[0].x;
-        this.y = currentMap.path[0].y;
+    constructor(wave, isBoss = false, initialPattern = null, initialX = 0, initialY = 0, type = null) {
+        this.x = initialX;
+        this.y = initialY;
         this.isDead = false;
         this.isInvincible = false;
-        this.lastDamage = null;
+        this.health = 0;
+        this.maxHealth = 0;
+        this.speed = 0;
+        this.baseSpeed = 0;
+        this.type = null;
+        this.level = 1;
+        this.experience = 0;
+        this.experienceToNextLevel = 100;
+        this.baseReward = 0;
+        this.baseExperience = 0;
         this.statusEffects = new Map();
-        this.continuousDamage = 0;
-        this.defense = 0;
-        this.isInvincible = false;
+        this.pathIndex = 0;
+        this.isBoss = isBoss;
+        this.zigzagFrame = 0;
+        this.groupId = 0;
+        this.skill = null;
+        this.skillCooldown = 0;
         this.patternCooldown = 0;
         this.healCooldown = 0;
-
-        // 1. 먼저 pattern 보호용 defineProperty 선언
-        let _pattern;
+        this.healEffectTime = 0;
+        this.continuousDamage = 0;
+        this.lastDamage = null;
+        this.lastAttacker = null;
+        this.defense = 10;
+        this.groupDefenseBuff = 1;
+        this.groupSpeedBuff = 1;
+        this._isLoading = false;
+        
+        // 현재 경로 설정
+        this.currentPath = currentMap.path;
+        
+        // 패턴 설정
+        let _pattern = initialPattern;
         Object.defineProperty(this, 'pattern', {
             get() { return _pattern; },
             set(v) {
-                if (_pattern !== undefined && !this._isLoading) {  // 불러오기 중이 아닐 때만 경고
-                    console.warn('[Enemy] pattern은 생성자 외부에서 변경할 수 없습니다!', this, v, new Error().stack);
-                    return;
-                }
                 _pattern = v;
-            },
-            configurable: false,
-            enumerable: true
+                if (v && v.cooldown) {
+                    this.patternCooldown = v.cooldown;
+                }
+            }
         });
-
-        // pattern 설정 부분 수정
-        if (initialPattern) {
-            this.pattern = initialPattern;        
-        // AI 패턴 및 타입/이름 초기화
-        } else if (!isBoss) {
-            // 적 타입 랜덤 선택
-            const enemyTypes = Object.keys(ENEMY_TYPES);
-            const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-            const enemyType = ENEMY_TYPES[randomType];
-            this.type = randomType;
-            // 패턴 랜덤 선택 (생성자에서 한 번만!)
-            const patterns = Object.keys(ENEMY_PATTERNS);
-            const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
-            this.pattern = ENEMY_PATTERNS[randomPattern];
-            // 레벨/스탯/이름 등 초기화
-            this.level = this.calculateInitialLevel(wave);
-            this.levelUpCount = 0;
-            this.baseSpeed = enemyType.speed;
-            this.maxHealth = this.calculateLeveledHealth(enemyType.health);
-            this.health = this.maxHealth;
-            this.speed = this.calculateLeveledSpeed(this.baseSpeed);
-            this.reward = Math.floor(this.calculateLeveledReward(enemyType.reward));
-            this.experienceValue = Math.floor(this.calculateLeveledExperience(enemyType.experienceValue));
-            this.name = `${enemyType.name} Lv.${this.level} (${this.pattern.name})`;
-
-            
-
-            this.color = enemyType.color;
-            // 일반 적만 타입별 스킬/쿨다운 세팅
-            if (this.type === 'TANK') {
-                this.skill = ENEMY_SKILLS.SHIELD;
-                this.skillCooldown = this.skill.cooldown;
-            } else if (this.type === 'HEALER') {
-                this.skill = ENEMY_SKILLS.HEAL_AOE;
-                this.skillCooldown = this.skill.cooldown;
-            } else {
-                this.skill = null;
-                this.skillCooldown = 0;
-            }
-        } else {
-            // 보스 타입 랜덤 선택
-            const bossTypes = Object.keys(BOSS_TYPES);
-            const randomBossType = bossTypes[Math.floor(Math.random() * bossTypes.length)];
-            const bossType = BOSS_TYPES[randomBossType];
+        
+        // 초기 레벨 설정
+        this.level = this.calculateInitialLevel(wave);
+        
+        // 타입과 기본 스탯 및 이름 설정
+        if (isBoss) {
             this.type = 'BOSS';
-            this.bossType = randomBossType; // 실제 타입 저장
-            this.level = this.calculateInitialLevel(wave);
-            this.levelUpCount = 0;
-            this.baseSpeed = bossType.speed;
-            this.maxHealth = this.calculateLeveledHealth(bossType.health);
-            this.health = this.maxHealth;
-            this.speed = this.calculateLeveledSpeed(this.baseSpeed);
-            this.reward = Math.floor(this.calculateLeveledReward(bossType.reward));
-            this.experienceValue = Math.floor(this.calculateLeveledExperience(200)); // 보스 경험치 상향
-            this.name = `${bossType.name} Lv.${this.level}`;
-            this.color = bossType.color;
-            this.ability = bossType.ability;
-            // 타입별 패턴/스킬/쿨다운 고정 (생성자에서 한 번만!)
-            switch (randomBossType) {
+            this.name = '보스';
+            this.baseSpeed = 0.01;
+            this.speed = this.baseSpeed;
+            this.health = 1000;
+            this.maxHealth = 1000;
+            this.baseReward = 100;
+            this.baseExperience = 50;
+            this.color = 'red';
+        } else {
+            this.type = type || 'NORMAL';
+            switch (this.type) {
+                case 'NORMAL':
+                    this.name = '일반 적';
+                    this.baseSpeed = 0.015;
+                    this.speed = this.baseSpeed;
+                    this.health = 100;
+                    this.maxHealth = 100;
+                    this.baseReward = 10;
+                    this.baseExperience = 5;
+                    this.color = 'red';
+                    break;
+                case 'FAST':
+                    this.name = '빠른 적';
+                    this.baseSpeed = 0.025;
+                    this.speed = this.baseSpeed;
+                    this.health = 50;
+                    this.maxHealth = 50;
+                    this.baseReward = 15;
+                    this.baseExperience = 8;
+                    this.color = 'yellow';
+                    break;
                 case 'TANK':
-                    this.pattern = BOSS_PATTERNS.SHIELD;
+                    this.name = '탱커';
+                    this.baseSpeed = 0.01;
+                    this.speed = this.baseSpeed;
+                    this.health = 200;
+                    this.maxHealth = 200;
+                    this.baseReward = 20;
+                    this.baseExperience = 10;
+                    this.color = 'blue';
                     this.skill = ENEMY_SKILLS.SHIELD;
-                    this.patternCooldown = this.pattern.cooldown;
-                    this.skillCooldown = this.skill.cooldown;                    
-                    break;
-                case 'SPEED':
-                    this.pattern = BOSS_PATTERNS.TELEPORT;
-                    this.skill = ENEMY_SKILLS.TELEPORT;
-                    this.patternCooldown = this.pattern.cooldown;
                     this.skillCooldown = this.skill.cooldown;
                     break;
-                case 'SUMMONER':
-                    this.pattern = BOSS_PATTERNS.HEAL;
+                case 'HEALER':
+                    this.name = '치유사';
+                    this.baseSpeed = 0.012;
+                    this.speed = this.baseSpeed;
+                    this.health = 80;
+                    this.maxHealth = 80;
+                    this.baseReward = 25;
+                    this.baseExperience = 12;
+                    this.color = 'green';
                     this.skill = ENEMY_SKILLS.HEAL_AOE;
-                    this.patternCooldown = this.pattern.cooldown;
-                    this.skillCooldown = this.pattern.cooldown + 40; // 쿨다운 다르게
-                    break;
-                default:
-                    this.pattern = BOSS_PATTERNS.SHIELD;
-                    this.skill = ENEMY_SKILLS.SHIELD;
-                    this.patternCooldown = this.pattern.cooldown;
                     this.skillCooldown = this.skill.cooldown;
+                    break;
             }
+            this.name += ` Lv.${this.level}`;
         }
+        
+        // 레벨에 따른 스탯 보정
+        this.health = this.calculateLeveledHealth(this.health);
+        this.maxHealth = this.health;
+        this.speed = this.calculateLeveledSpeed(this.baseSpeed);
+        this.baseReward = this.calculateLeveledReward(this.baseReward);
+        this.baseExperience = this.calculateLeveledExperience(this.baseExperience);
+        
+        // 보상 값 항상 세팅
+        this.reward = this.baseReward;
+        this.experienceValue = this.baseExperience;
     }
 
     calculateInitialLevel(wave) {
-        // 웨이브에 따라 초기 레벨 계산
+        // 웨이브에 따라 초기 레벨 계산 (최소 1)
         const baseLevel = Math.floor(wave / 2);
         const randomBonus = Math.random() < 0.3 ? 1 : 0; // 30% 확률로 추가 레벨
-        return Math.min(baseLevel + randomBonus, ENEMY_LEVEL_SETTINGS.maxLevel);
+        return Math.max(1, Math.min(baseLevel + randomBonus, ENEMY_LEVEL_SETTINGS.maxLevel));
     }
 
     calculateLeveledHealth(baseHealth) {
@@ -2392,7 +2401,9 @@ class Enemy {
         }
         
         // 기본 이동 로직 추가
-        const target = currentMap.path[this.pathIndex + 1];
+        const target = this.currentPath[this.pathIndex + 1];
+        if (!target) return true; // 경로의 끝에 도달했으면 제거
+        
         const dx = target.x - this.x;
         const dy = target.y - this.y;
         if (Math.abs(dx) < this.speed && Math.abs(dy) < this.speed) {
@@ -2904,7 +2915,16 @@ function spawnNextEnemy() {
     }
     
     // 현재 그룹에 적 추가
-    const enemy = new Enemy(gameState.wave);
+    const types = ['NORMAL', 'FAST', 'TANK', 'HEALER'];
+    const randomType = types[Math.floor(Math.random() * types.length)];
+    const enemy = new Enemy(
+        gameState.wave,
+        false,
+        null,
+        currentMap.path[0].x,
+        currentMap.path[0].y,
+        randomType // 타입 전달
+    );
     enemyGroups[gameState.currentGroup - 1].add(enemy);
     enemies.push(enemy);
     gameState.enemiesRemaining--;
@@ -6615,39 +6635,78 @@ function showLevelUpEffect(tower) {
 
 // Enemy 복원 팩토리 함수
 function enemyFromData(data) {
-    // pattern 정보를 먼저 추출
-    const patternName = data.pattern;
+    console.log('enemyFromData 시작:', data);
+
+    // 패턴 이름을 영문으로 변환
+    const patternMap = {
+        "매복": "AMBUSH",
+        "무리": "SWARM",
+        "일반": "NORMAL",
+        "지그재그": "ZIGZAG",
+        "집단 돌진": "GROUP_RUSH",
+        "GROUP": "SWARM"  // 추가
+    };
+
+    // 패턴 이름 변환 로직 수정
+    const patternName = patternMap[data.pattern] || data.pattern;
+    console.log('원본 패턴:', data.pattern);
+    console.log('변환된 패턴:', patternName);
+
     const patternData = patternName ? ENEMY_PATTERNS[patternName] : null;
+    console.log('패턴 데이터:', patternData);
 
-    // Enemy 생성 시 pattern 정보 전달
-    const enemy = new Enemy(data.wave || 1, data.isBoss, patternData);
+    // Enemy 생성 시 type 전달
+    const enemy = new Enemy(
+        data.wave || 1,
+        data.isBoss,
+        patternData,
+        parseFloat(data.x) || 0,
+        parseFloat(data.y) || 0,
+        data.type // 타입 전달
+    );
+    console.log('Enemy 생성됨:', enemy);
 
-    // 숫자형 필드는 반드시 Number()로 변환해서 할당
-    enemy.x = Number(data.x);
-    enemy.y = Number(data.y);
-    enemy.type = data.type;
-    enemy.health = Number(data.health);
-    enemy.maxHealth = Number(data.maxHealth);
-    enemy.statusEffects = new Map(data.statusEffects);
-    enemy.pathIndex = Number(data.pathIndex);
+    // 기본 속성 복원 (Number 변환 시 안전하게 처리)
+    enemy.health = parseFloat(data.health) || 0;
+    enemy.maxHealth = parseFloat(data.maxHealth) || 0;
+    enemy.statusEffects = new Map(data.statusEffects || []);
+    enemy.pathIndex = parseInt(data.pathIndex) || 0;
     enemy.isBoss = data.isBoss;
-    enemy.zigzagFrame = Number(data.zigzagFrame);
-    enemy.groupId = Number(data.groupId);
-    enemy.speed = Number(data.speed);
+    enemy.zigzagFrame = parseInt(data.zigzagFrame) || 0;
+    enemy.groupId = parseInt(data.groupId) || 0;
+    enemy.speed = parseFloat(data.speed) || 0;
+
+    // 현재 경로 설정
+    enemy.currentPath = currentMap.path;
 
     // 추가 상태 복원
     if (data.direction !== undefined) enemy.direction = data.direction;
-    if (data.level !== undefined) enemy.level = Number(data.level);
-    if (data.experience !== undefined) enemy.experience = Number(data.experience);
-    if (data.experienceToNextLevel !== undefined) enemy.experienceToNextLevel = Number(data.experienceToNextLevel);
-    if (data.baseReward !== undefined) enemy.baseReward = Number(data.baseReward);
-    if (data.baseExperience !== undefined) enemy.baseExperience = Number(data.baseExperience);
-    if (data.currentPath !== undefined) enemy.currentPath = data.currentPath;
-    if (data.targetX !== undefined) enemy.targetX = Number(data.targetX);
-    if (data.targetY !== undefined) enemy.targetY = Number(data.targetY);
+    if (data.level !== undefined) enemy.level = parseInt(data.level) || 1;
+    if (data.experience !== undefined) enemy.experience = parseFloat(data.experience) || 0;
+    if (data.experienceToNextLevel !== undefined) enemy.experienceToNextLevel = parseFloat(data.experienceToNextLevel) || 0;
+    if (data.baseReward !== undefined) enemy.baseReward = parseFloat(data.baseReward);
+    if (data.baseExperience !== undefined) enemy.baseExperience = parseFloat(data.baseExperience);
+    if (data.reward !== undefined) enemy.reward = parseFloat(data.reward);
+    if (data.experienceValue !== undefined) enemy.experienceValue = parseFloat(data.experienceValue);
+    if (data.targetX !== undefined) enemy.targetX = parseFloat(data.targetX) || 0;
+    if (data.targetY !== undefined) enemy.targetY = parseFloat(data.targetY) || 0;
 
+    // 타입별 스킬/쿨다운 세팅
+    if (enemy.type === 'TANK') {
+        enemy.skill = ENEMY_SKILLS.SHIELD;
+        enemy.skillCooldown = enemy.skill.cooldown;
+    } else if (enemy.type === 'HEALER') {
+        enemy.skill = ENEMY_SKILLS.HEAL_AOE;
+        enemy.skillCooldown = enemy.skill.cooldown;
+    } else {
+        enemy.skill = null;
+        enemy.skillCooldown = 0;
+    }
+
+    console.log('최종 복원된 적:', enemy);
     return enemy;
 }
+
 // Tower 복원 팩토리 함수
 function towerFromData(data) {
     const tower = Object.create(Tower.prototype);
@@ -6663,3 +6722,4 @@ function towerFromData(data) {
     if (!isFinite(tower.maxCooldown)) tower.maxCooldown = tower.baseCooldown;
     return tower;
 }
+
