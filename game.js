@@ -6686,6 +6686,9 @@ function towerFromData(data) {
     if (!isFinite(tower.range)) tower.range = tower.baseRange;
     if (!isFinite(tower.damage)) tower.damage = tower.baseDamage;
     if (!isFinite(tower.maxCooldown)) tower.maxCooldown = tower.baseCooldown;
+    if (!tower.color) tower.color = TOWER_TYPES[tower.type]?.color || '#888888';
+
+    console.log('[타워 복원]', tower);
     return tower;
 }
 
