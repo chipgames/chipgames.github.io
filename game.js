@@ -2126,7 +2126,7 @@ const ENEMY_SKILLS = {
 
 // 이제 class Enemy를 전역에 선언
 class Enemy {
-    constructor(wave, isBoss = false) {
+    constructor(wave, isBoss = false, initialPattern = null) {
         // 기본 속성 초기화
         this.pathIndex = 0;
         this.x = currentMap.path[0].x;
@@ -2146,7 +2146,7 @@ class Enemy {
         Object.defineProperty(this, 'pattern', {
             get() { return _pattern; },
             set(v) {
-                if (_pattern !== undefined) {
+                if (_pattern !== undefined && !this._isLoading) {  // 불러오기 중이 아닐 때만 경고
                     console.warn('[Enemy] pattern은 생성자 외부에서 변경할 수 없습니다!', this, v, new Error().stack);
                     return;
                 }
@@ -2156,8 +2156,11 @@ class Enemy {
             enumerable: true
         });
 
+        // pattern 설정 부분 수정
+        if (initialPattern) {
+            this.pattern = initialPattern;        
         // AI 패턴 및 타입/이름 초기화
-        if (!isBoss) {
+        } else if (!isBoss) {
             // 적 타입 랜덤 선택
             const enemyTypes = Object.keys(ENEMY_TYPES);
             const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
@@ -2387,14 +2390,7 @@ class Enemy {
             this.takeDamage(damage);
             this.continuousDamage = Math.max(0, this.continuousDamage * 0.95);
         }
-
-        // 경로 종료 체크 (pathIndex 초과 방지)
-        if (this.pathIndex >= currentMap.path.length - 1) {
-            gameState.lives--;
-            this.isDead = true;
-            return true;
-        }
-
+        
         // 기본 이동 로직 추가
         const target = currentMap.path[this.pathIndex + 1];
         const dx = target.x - this.x;
@@ -3503,6 +3499,7 @@ document.head.insertAdjacentHTML('beforeend', `
         @media (max-width: 768px) {
             .tower-build-menu {
                 width: 95%;
+                
                 max-width: none;
             }
             
@@ -3958,7 +3955,7 @@ function saveGame() {
                 // 추가 상태 저장
                 speed: enemy.speed,
                 direction: enemy.direction,
-                pattern: enemy.pattern,
+                pattern: enemy.pattern ? enemy.pattern.name : null,  // pattern 이름만 저장
                 level: enemy.level,
                 experience: enemy.experience,
                 experienceToNextLevel: enemy.experienceToNextLevel,
@@ -4061,8 +4058,17 @@ function loadGame() {
         gameState.enemiesInCurrentGroup = data.gameState.enemiesInCurrentGroup;
         // 타워 복원 (팩토리 함수 사용)
         towers = data.towers.map(towerFromData);
+        
         // 적 복원 (팩토리 함수 사용)
-        enemies = (data.enemies || []).map(enemyFromData);
+        console.log('저장된 적 데이터:', data.enemies);
+        enemies = (data.enemies || []).map(enemyData => {
+            console.log('적 데이터 복원 중:', enemyData);
+            const enemy = enemyFromData(enemyData);
+            console.log('복원된 적:', enemy);
+            return enemy;
+        });
+        console.log('복원된 적 배열:', enemies);
+        
         // 적 그룹 복원
         enemyGroups = (data.enemyGroups || []).map(groupData => {
             const group = new EnemyGroup(groupData.id, groupData.size, groupData.type);
@@ -4100,7 +4106,11 @@ function loadGame() {
         if (gameState.waveInProgress) {
             // 이미 복원된 적이 있으면 spawnNextEnemy를 호출하지 않음
             if (enemies.length === 0) {
-                spawnNextEnemy();
+                // 웨이브가 아직 끝나지 않았고, 현재 그룹의 적 수가 그룹 크기보다 작으면 스폰
+                if (gameState.currentGroup <= gameState.totalGroups && 
+                    gameState.enemiesInCurrentGroup < gameState.groupSize) {
+                    spawnNextEnemy();
+                }
             }
             updateWaveProgress();
         }
@@ -6605,30 +6615,36 @@ function showLevelUpEffect(tower) {
 
 // Enemy 복원 팩토리 함수
 function enemyFromData(data) {
-    const enemy = new Enemy(data.wave || 1, data.isBoss);
-    enemy.x = data.x;
-    enemy.y = data.y;
+    // pattern 정보를 먼저 추출
+    const patternName = data.pattern;
+    const patternData = patternName ? ENEMY_PATTERNS[patternName] : null;
+
+    // Enemy 생성 시 pattern 정보 전달
+    const enemy = new Enemy(data.wave || 1, data.isBoss, patternData);
+
+    // 숫자형 필드는 반드시 Number()로 변환해서 할당
+    enemy.x = Number(data.x);
+    enemy.y = Number(data.y);
     enemy.type = data.type;
-    enemy.health = data.health;
-    enemy.maxHealth = data.maxHealth;
+    enemy.health = Number(data.health);
+    enemy.maxHealth = Number(data.maxHealth);
     enemy.statusEffects = new Map(data.statusEffects);
-    enemy.pathIndex = data.pathIndex;
+    enemy.pathIndex = Number(data.pathIndex);
     enemy.isBoss = data.isBoss;
-    enemy.zigzagFrame = data.zigzagFrame;
-    enemy.groupId = data.groupId;
+    enemy.zigzagFrame = Number(data.zigzagFrame);
+    enemy.groupId = Number(data.groupId);
+    enemy.speed = Number(data.speed);
 
     // 추가 상태 복원
-    if (data.speed !== undefined) enemy.speed = data.speed;
     if (data.direction !== undefined) enemy.direction = data.direction;
-    if (data.pattern !== undefined) enemy.pattern = data.pattern;
-    if (data.level !== undefined) enemy.level = data.level;
-    if (data.experience !== undefined) enemy.experience = data.experience;
-    if (data.experienceToNextLevel !== undefined) enemy.experienceToNextLevel = data.experienceToNextLevel;
-    if (data.baseReward !== undefined) enemy.baseReward = data.baseReward;
-    if (data.baseExperience !== undefined) enemy.baseExperience = data.baseExperience;
+    if (data.level !== undefined) enemy.level = Number(data.level);
+    if (data.experience !== undefined) enemy.experience = Number(data.experience);
+    if (data.experienceToNextLevel !== undefined) enemy.experienceToNextLevel = Number(data.experienceToNextLevel);
+    if (data.baseReward !== undefined) enemy.baseReward = Number(data.baseReward);
+    if (data.baseExperience !== undefined) enemy.baseExperience = Number(data.baseExperience);
     if (data.currentPath !== undefined) enemy.currentPath = data.currentPath;
-    if (data.targetX !== undefined) enemy.targetX = data.targetX;
-    if (data.targetY !== undefined) enemy.targetY = data.targetY;
+    if (data.targetX !== undefined) enemy.targetX = Number(data.targetX);
+    if (data.targetY !== undefined) enemy.targetY = Number(data.targetY);
 
     return enemy;
 }
