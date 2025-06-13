@@ -3188,7 +3188,12 @@ function gameLoop() {
     // 적 업데이트 및 그리기
     enemies = enemies.filter(enemy => {
         if (enemy.draw) enemy.draw();
-        return !enemy.update();
+        const shouldRemove = enemy.update();
+        if (shouldRemove && enemy.health > 0) { // 경로 끝에 도달(살아있는 적)
+            gameState.lives--;
+            updateInfoBar();
+        }
+        return !shouldRemove;
     });
 
     // 웨이브 종료 체크
