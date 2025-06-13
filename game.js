@@ -2639,8 +2639,8 @@ class Enemy {
         if (this.lastAttacker && typeof this.lastAttacker.gainExperience === 'function') {
             this.lastAttacker.gainExperience(this.experienceValue);
         }
-        gameState.gold += this.reward * (gameState.goldMultiplier || 1);
-        gameStats.totalGold += this.reward * (gameState.goldMultiplier || 1);
+        gameState.gold += Math.floor(this.reward * (gameState.goldMultiplier || 1));
+        gameStats.totalGold += Math.floor(this.reward * (gameState.goldMultiplier || 1));
         gameStats.enemiesKilled++;
         let scoreToAdd = this.reward;
         if (this.lastDamage && this.lastDamage.isCritical) scoreToAdd *= 2;
@@ -2651,7 +2651,7 @@ class Enemy {
             this.patternCooldown = 99999;
             this.skillCooldown = 99999;
         }
-        gameState.score += scoreToAdd;
+        gameState.score += Math.floor(scoreToAdd);
         playSound('enemy_death');
         updateStats();
     }
@@ -6688,7 +6688,7 @@ function towerFromData(data) {
     if (!isFinite(tower.maxCooldown)) tower.maxCooldown = tower.baseCooldown;
     if (!tower.color) tower.color = TOWER_TYPES[tower.type]?.color || '#888888';
 
-    console.log('[타워 복원]', tower);
+    //console.log('[타워 복원]', tower);
     return tower;
 }
 
