@@ -1390,15 +1390,12 @@ class Tower {
     }
 
     gainExperience(amount) {
-        //console.log('경험치 획득:', amount, '현재 경험치:', this.experience, '다음 레벨까지:', this.experienceToNextLevel);
         this.experience += amount;
         
         // 타워 레벨업 체크
         while (this.experience >= this.experienceToNextLevel) {
-            //console.log('레벨업! 현재 레벨:', this.level);
             this.experience -= this.experienceToNextLevel;
             this.level++;
-            //console.log('[타워 레벨업]', '좌표:', this.x, this.y, '새 레벨:', this.level);
             this.experienceToNextLevel = Math.floor(this.experienceToNextLevel * 1.5);
             
             // 레벨업 시 능력치 상승
@@ -1416,7 +1413,6 @@ class Tower {
             }
             
             // 레벨업 이펙트
-            //console.log('레벨업 이펙트 호출');
             showLevelUpEffect(this);
             playSound('powerup');
         }
@@ -2388,7 +2384,6 @@ class Enemy {
         }
 
         // 이동 전 로그
-        //console.log('[Enemy.update] 이동 전', {x: this.x, y: this.y, pathIndex: this.pathIndex, pattern: this.pattern?.name});
         this.updateStatusEffects();
         // 레벨업 시도
         this.tryLevelUp();
@@ -2418,7 +2413,6 @@ class Enemy {
             const before = {x: this.x, y: this.y, pathIndex: this.pathIndex};
             const shouldRemove = this.pattern.update(this);
             // 이동 후 로그
-            //console.log(`[Enemy.pattern.update] 패턴: ${this.pattern.name}`, {before, after: {x: this.x, y: this.y, pathIndex: this.pathIndex}});
             if (shouldRemove) return true;
         }
 
@@ -2430,7 +2424,6 @@ class Enemy {
             this.skillCooldown--;
         }
         if (this.skill && this.skillCooldown === 0) {
-            //console.log(`[스킬발동]`, this.x, this.y, this.skill.name, this);
             this.skill.effect(this);
             showSpecialEffect(this.x, this.y, this.skill.name);
             this.skillCooldown = this.skill.cooldown > 0 ? this.skill.cooldown : 1; // 즉시 쿨다운 세팅
@@ -2458,7 +2451,6 @@ class Enemy {
     }
 
     draw() {
-        //console.log('Enemy draw 호출', this);
         if (this.isDead) return;
         ctx.save();
 
@@ -2816,7 +2808,6 @@ document.addEventListener('DOMContentLoaded', () => {
         startBtn.parentNode.replaceChild(newStartBtn, startBtn);
         
         newStartBtn.addEventListener('click', () => {
-            console.log('게임 시작 버튼 클릭됨'); // 디버깅용 로그
             if (!gameState.isStarted) {
                 // 게임 시작
                 gameState.isStarted = true;
@@ -2891,10 +2882,6 @@ function startWave() {
 function spawnNextEnemy() {
     // 웨이브가 진행 중이 아니거나 적이 더 이상 없으면 종료
     if (!gameState.waveInProgress || gameState.enemiesRemaining <= 0) {
-        //console.log('적 생성 종료:', {
-        //    waveInProgress: gameState.waveInProgress,
-        //    enemiesRemaining: gameState.enemiesRemaining
-        //});
         if (gameState.spawnTimer) {
             clearTimeout(gameState.spawnTimer);
             gameState.spawnTimer = null;
@@ -2906,36 +2893,36 @@ function spawnNextEnemy() {
     if (gameState.enemiesInCurrentGroup === 0) {
         const group = new EnemyGroup(groupIdCounter++, gameState.groupSize);
         enemyGroups.push(group);
-        gameState.currentGroup++;
-        //console.log('새 그룹 시작:', {
-        //    groupId: groupIdCounter - 1,
-        //    currentGroup: gameState.currentGroup,
-        //    totalGroups: gameState.totalGroups
-        //});
+        gameState.currentGroup++;        
     }
     
     // 현재 그룹에 적 추가
     const types = ['NORMAL', 'FAST', 'TANK', 'HEALER'];
     const randomType = types[Math.floor(Math.random() * types.length)];
+
+    // 타입별 패턴 후보
+    const patternCandidates = {
+        NORMAL: [null, ENEMY_PATTERNS.NORMAL, ENEMY_PATTERNS.ZIGZAG],
+        FAST: [null, ENEMY_PATTERNS.GROUP_RUSH, ENEMY_PATTERNS.ZIGZAG],
+        TANK: [null, ENEMY_PATTERNS.AMBUSH],
+        HEALER: [null]
+    };
+    const patterns = patternCandidates[randomType] || [null];
+    const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
+
     const enemy = new Enemy(
         gameState.wave,
         false,
-        null,
+        randomPattern,
         currentMap.path[0].x,
         currentMap.path[0].y,
-        randomType // 타입 전달
+        randomType
     );
     enemyGroups[gameState.currentGroup - 1].add(enemy);
     enemies.push(enemy);
     gameState.enemiesRemaining--;
     gameState.enemiesInCurrentGroup++;
     gameState.lastSpawnTime = Date.now();
-    
-    //console.log('적 생성:', {
-    //    enemiesRemaining: gameState.enemiesRemaining,
-    //    enemiesInCurrentGroup: gameState.enemiesInCurrentGroup,
-    //    totalEnemies: gameState.totalEnemies
-    //});
     
     // 그룹이 가득 찼으면 다음 그룹 준비
     if (gameState.enemiesInCurrentGroup >= gameState.groupSize) {
@@ -2948,11 +2935,7 @@ function spawnNextEnemy() {
         if (gameState.spawnTimer) {
             clearTimeout(gameState.spawnTimer);
         }
-        gameState.spawnTimer = setTimeout(spawnNextEnemy, randomDelay);
-        //console.log('다음 적 생성 예약:', {
-        //    delay: randomDelay,
-        //    enemiesRemaining: gameState.enemiesRemaining
-        //});
+        gameState.spawnTimer = setTimeout(spawnNextEnemy, randomDelay);        
     }
 }
 
@@ -3134,7 +3117,6 @@ function checkWaveEnd() {
 function gameLoop() {
     // 게임이 시작되지 않았거나 일시정지 상태일 때는 프리뷰 화면만 표시
     if (!gameState.isStarted || gameState.isPaused) {
-        //console.log('게임이 시작되지 않음, gameState.isStarted:', gameState.isStarted); // 디버깅용 로그
         requestAnimationFrame(gameLoop);
         return;
     }
@@ -3169,7 +3151,6 @@ function gameLoop() {
 
     // 타워 그리기 및 공격
     towers.forEach(tower => {
-        //console.log('타워 draw:', tower, '레벨:', tower.level); // 레벨 디버깅
         tower.draw();
         tower.attack(enemies);
     });
@@ -4085,14 +4066,10 @@ function loadGame() {
         towers = data.towers.map(towerFromData);
         
         // 적 복원 (팩토리 함수 사용)
-        console.log('저장된 적 데이터:', data.enemies);
         enemies = (data.enemies || []).map(enemyData => {
-            console.log('적 데이터 복원 중:', enemyData);
             const enemy = enemyFromData(enemyData);
-            console.log('복원된 적:', enemy);
             return enemy;
         });
-        console.log('복원된 적 배열:', enemies);
         
         // 적 그룹 복원
         enemyGroups = (data.enemyGroups || []).map(groupData => {
@@ -5962,13 +5939,9 @@ if (startBtn) {
     const newStartBtn = document.getElementById('startBtn');
     
     newStartBtn.addEventListener('click', () => {
-        //console.log('게임 시작 버튼 클릭됨'); // 디버깅용 로그
-        //console.log('현재 gameState.isStarted:', gameState.isStarted); // 현재 상태 확인
-        
         if (!gameState.isStarted) {
             // 게임 시작
             gameState.isStarted = true;
-            //console.log('게임 시작됨, gameState.isStarted:', gameState.isStarted); // 상태 변경 확인
             
             newStartBtn.textContent = '재시작';
             document.getElementById('tutorial').style.display = 'none';
@@ -5990,7 +5963,6 @@ if (startBtn) {
             // 게임 재시작
             restartGame();
             gameState.isStarted = true;
-            //console.log('게임 재시작됨, gameState.isStarted:', gameState.isStarted); // 상태 변경 확인
             updateControlVisibility();
         }
     });
@@ -6087,14 +6059,12 @@ const EffectPool = {
 };
 
 function initializeEffects() {
-    //console.log('이펙트 초기화 시작');
     // 이펙트 풀 초기화
     EffectPool.init('attack', 20);
     EffectPool.init('damage', 30);
     EffectPool.init('special', 5);
     EffectPool.init('upgrade', 5);
     EffectPool.init('levelUp', 5);  // 레벨업 이펙트 풀 추가
-    //console.log('이펙트 초기화 완료');
 }
 
 // 공격 이펙트 표시 (최적화)
@@ -6560,10 +6530,8 @@ function showLevelUpEffect(tower) {
         console.error('showLevelUpEffect는 반드시 타워 객체로 호출해야 합니다!', tower);
         return;
     }
-    //console.log('showLevelUpEffect 호출됨:', tower);
     // 이펙트 풀에서 이펙트 가져오기
     const effect = EffectPool.get('levelUp');
-    //console.log('이펙트 가져옴:', effect);
     if (!effect) return;
 
     // 이펙트 초기화
@@ -6640,8 +6608,6 @@ function showLevelUpEffect(tower) {
 
 // Enemy 복원 팩토리 함수
 function enemyFromData(data) {
-    console.log('enemyFromData 시작:', data);
-
     // 패턴 이름을 영문으로 변환
     const patternMap = {
         "매복": "AMBUSH",
@@ -6654,12 +6620,9 @@ function enemyFromData(data) {
 
     // 패턴 이름 변환 로직 수정
     const patternName = patternMap[data.pattern] || data.pattern;
-    console.log('원본 패턴:', data.pattern);
-    console.log('변환된 패턴:', patternName);
-
+    
     const patternData = patternName ? ENEMY_PATTERNS[patternName] : null;
-    console.log('패턴 데이터:', patternData);
-
+    
     // Enemy 생성 시 type 전달
     const enemy = new Enemy(
         data.wave || 1,
@@ -6669,8 +6632,7 @@ function enemyFromData(data) {
         parseFloat(data.y) || 0,
         data.type // 타입 전달
     );
-    console.log('Enemy 생성됨:', enemy);
-
+    
     // 기본 속성 복원 (Number 변환 시 안전하게 처리)
     enemy.health = parseFloat(data.health) || 0;
     enemy.maxHealth = parseFloat(data.maxHealth) || 0;
@@ -6708,7 +6670,6 @@ function enemyFromData(data) {
         enemy.skillCooldown = 0;
     }
 
-    console.log('최종 복원된 적:', enemy);
     return enemy;
 }
 
