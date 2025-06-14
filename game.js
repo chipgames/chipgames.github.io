@@ -2175,15 +2175,17 @@ class Enemy {
         
         // 타입과 기본 스탯 및 이름 설정
         if (isBoss) {
-            this.type = 'BOSS';
-            this.name = '보스';
-            this.baseSpeed = 0.01;
+            this.type = type;
+            const bossInfo = BOSS_TYPES[type] || BOSS_TYPES.TANK;
+            this.name = bossInfo.name;
+            this.baseSpeed = bossInfo.speed;
             this.speed = this.baseSpeed;
-            this.health = 1000;
-            this.maxHealth = 1000;
-            this.baseReward = 100;
+            this.health = bossInfo.health;
+            this.maxHealth = bossInfo.health;
+            this.baseReward = bossInfo.reward;
             this.baseExperience = 50;
-            this.color = 'red';
+            this.color = bossInfo.color;
+            this.ability = bossInfo.ability;
         } else {
             this.type = type || 'NORMAL';
             switch (this.type) {
@@ -2842,8 +2844,12 @@ function startWave() {
     
     // 보스 웨이브 처리
     if (gameState.wave % gameState.bossWave === 0) {
-        // 보스 1기
-        const boss = new Enemy(gameState.wave, true);
+        // 보스 타입 순환
+        const bossTypes = Object.keys(BOSS_TYPES);
+        const bossType = bossTypes[Math.floor((gameState.wave / gameState.bossWave - 1) % bossTypes.length)];
+        const startX = currentMap.path[0].x;
+        const startY = currentMap.path[0].y;
+        const boss = new Enemy(gameState.wave, true, null, startX, startY, bossType);
         enemies.push(boss);
         // 일반 적 5기
         const normalCount = 5;
@@ -6466,7 +6472,8 @@ function showWaveStartMessage(wave) {
     gameState.waveMessageStartTime = Date.now();
     gameState.currentWaveMessage = {
         wave: wave,
-        reward: calculateWaveReward(wave)
+        reward: calculateWaveReward(wave),
+        isBoss: wave % gameState.bossWave === 0
     };
 }
 
@@ -6480,16 +6487,16 @@ function drawWaveMessage() {
         return;
     }
 
-    const alpha = elapsed < 500 ? elapsed / 500 : 
-                 elapsed > 1500 ? (2000 - elapsed) / 500 : 1;
+    const alpha = elapsed < 500 ? elapsed / 500 :
+        elapsed > 1500 ? (2000 - elapsed) / 500 : 1;
 
     ctx.save();
-    
+
     // 배경
     ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
     ctx.fillRect(
-        canvas.width/2 - 150,
-        canvas.height/2 - 80,
+        canvas.width / 2 - 150,
+        canvas.height / 2 - 80,
         300,
         160
     );
@@ -6497,33 +6504,55 @@ function drawWaveMessage() {
     // 웨이브 시작 텍스트
     ctx.font = 'bold 24px Arial';
     ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`; // 골드 색상
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-    ctx.fillText(
-        `웨이브 ${gameState.currentWaveMessage.wave} 시작!`,
-        canvas.width/2,
-        canvas.height/2 - 40
-    );
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
 
-    // 현재 레벨
-    ctx.font = '18px Arial';
-    ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-    ctx.fillText(
-        `현재 레벨: ${gameState.currentWaveMessage.wave}`,
-        canvas.width/2,
-        canvas.height/2
-    );
+    if (gameState.currentWaveMessage.isBoss) {
+        // 보스 웨이브 메시지
+        ctx.fillText(
+            `보스 웨이브 ${gameState.currentWaveMessage.wave} 시작!`,
+            canvas.width / 2,
+            canvas.height / 2 - 40
+        );
+
+        // 보스 타입 표시
+        ctx.font = '18px Arial';
+        ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`; // 빨간색
+        const bossTypes = Object.keys(BOSS_TYPES);
+        const randomBossType = bossTypes[Math.floor(Math.random() * bossTypes.length)];
+        ctx.fillText(
+            `${BOSS_TYPES[randomBossType].name} 출현!`,
+            canvas.width / 2,
+            canvas.height / 2
+        );
+    } else {
+        // 일반 웨이브 메시지
+        ctx.fillText(
+            `웨이브 ${gameState.currentWaveMessage.wave} 시작!`,
+            canvas.width / 2,
+            canvas.height / 2 - 40
+        );
+
+        // 현재 레벨
+        ctx.font = '18px Arial';
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.fillText(
+            `현재 레벨: ${gameState.currentWaveMessage.wave}`,
+            canvas.width / 2,
+            canvas.height / 2
+        );
+    }
 
     // 보상
     ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`; // 골드 색상
     ctx.fillText(
         `보상: ${gameState.currentWaveMessage.reward} 골드`,
-        canvas.width/2,
-        canvas.height/2 + 40
+        canvas.width / 2,
+        canvas.height / 2 + 40
     );
 
-            ctx.restore();
-        }
+    ctx.restore();
+}
 
 function showLevelUpEffect(tower) {
     if (!tower || typeof tower !== 'object' || tower.x === undefined || tower.y === undefined) {
