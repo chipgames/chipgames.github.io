@@ -2852,11 +2852,11 @@ function startWave() {
         const boss = new Enemy(gameState.wave, true, null, startX, startY, bossType);
         enemies.push(boss);
         // 일반 적 5기
-        const normalCount = 5;
-        for (let i = 0; i < normalCount; i++) {
-            const enemy = new Enemy(gameState.wave, false);
-            enemies.push(enemy);
-        }
+        const normalCount = 10;
+        //for (let i = 0; i < normalCount; i++) {
+        //    const enemy = new Enemy(gameState.wave, false);
+        //    enemies.push(enemy);
+        //}
         gameState.enemiesRemaining = 1 + normalCount;
         gameState.totalEnemies = 1 + normalCount;
         showWaveStartEffect();
