@@ -6030,3 +6030,71 @@ function showPlaceablePositions() {
 }
 // ... existing code ...
 
+// ... existing code ...
+// 정보 바 업데이트
+function updateInfoBar() {
+    const elements = {
+        'infoGold': `골드: ${gameState.gold}`,
+        'infoLives': `생명: ${gameState.lives}`,
+        'infoWave': `웨이브: ${gameState.wave}`,
+        'infoScore': `점수: ${gameState.score}`
+    };
+
+    for (const [id, text] of Object.entries(elements)) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = text;
+        }
+    }
+}
+
+// 웨이브 진행 상태 표시
+function updateWaveProgress() {
+    const progress = document.getElementById('waveProgress');
+    const fill = progress.querySelector('.fill');
+    let text = progress.querySelector('.progress-text');
+
+    // 전체 적의 수 대비 현재 진행률 계산
+    const total = gameState.totalEnemies;
+    const remaining = gameState.enemiesRemaining;
+    const percentage = total > 0 ? ((total - remaining) / total) * 100 : 0;
+
+    fill.style.width = `${percentage}%`;
+    progress.style.display = gameState.waveInProgress ? 'block' : 'none';
+
+    // 진행률 텍스트 동적 추가/갱신
+    if (!text) {
+        text = document.createElement('span');
+        text.className = 'progress-text';
+        progress.appendChild(text);
+    }
+    text.textContent = `${Math.round(percentage)}%`;
+}
+
+
+// 게임 통계 업데이트
+function updateStats() {
+    // 통계 요소 업데이트
+    document.getElementById('enemiesKilled').textContent = `처치한 적: ${gameStats.enemiesKilled}`;
+    document.getElementById('bossesKilled').textContent = `처치한 보스: ${gameStats.bossesKilled}`;
+    document.getElementById('totalGold').textContent = `총 획득 골드: ${gameStats.totalGold}`;
+    document.getElementById('highestWave').textContent = `최고 웨이브: ${gameStats.highestWave}`;
+
+    // 업적 업데이트
+    Object.entries(ACHIEVEMENTS).forEach(([key, achievement]) => {
+        const achievementElement = document.getElementById(`achievement-${key}`);
+        if (achievementElement) {
+            achievementElement.className = achievement.unlocked ? 'achievement unlocked' : 'achievement';
+        }
+    });
+
+    // 이벤트 트리거 업데이트
+    const eventsList = document.getElementById('eventsList');
+    if (eventsList) {
+        eventsList.innerHTML = gameStats.eventsTriggered
+            .map(event => `<li>${SPECIAL_EVENTS[event].name}</li>`)
+            .join('');
+    }
+}
+// ... existing code ...
+
