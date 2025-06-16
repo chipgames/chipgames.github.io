@@ -6098,3 +6098,81 @@ function updateStats() {
 }
 // ... existing code ...
 
+// 타워 정보 표시
+function showTowerInfo(tower) {
+    const info = document.createElement('div');
+    info.className = 'tower-info';
+    info.innerHTML = `
+        <div class="tower-name">${TOWER_TYPES[tower.type].name}</div>
+        <div class="tower-level">Level ${tower.level}</div>
+        <div class="tower-stats">
+            <div>⚔️ ${tower.damage}</div>
+            <div>🎯 ${tower.range}</div>
+            <div>⚡ ${(60 / tower.maxCooldown).toFixed(1)}</div>
+        </div>
+    `;
+    
+    // 위치 설정
+    const centerX = tower.x * TILE_SIZE + TILE_SIZE/2;
+    const centerY = tower.y * TILE_SIZE + TILE_SIZE/2;
+    
+    info.style.left = `${centerX}px`;
+    info.style.top = `${centerY - 80}px`;
+    info.style.transform = 'translateX(-50%)';
+    
+    document.getElementById('game-container').appendChild(info);
+    return info;
+}
+
+// 타워 호버 효과
+function handleTowerHover(tower) {
+    let infoElement = null;
+    
+    const showInfo = () => {
+        if (!infoElement) {
+            infoElement = showTowerInfo(tower);
+        }
+    };
+    
+    const hideInfo = () => {
+        if (infoElement) {
+            infoElement.remove();
+            infoElement = null;
+        }
+    };
+    
+    return { showInfo, hideInfo };
+}
+
+// 웨이브 메시지 관련 변수
+let currentWaveMessage = null;
+let waveMessageStartTime = 0;
+
+function showWaveStartMessage(wave) {
+    // 초기 셋팅값일 때는 메시지 표시하지 않음
+    if (wave <= 0) return;
+
+    // 메시지 표시 시작 시간 저장
+    gameState.waveMessageStartTime = Date.now();
+    gameState.currentWaveMessage = {
+        wave: wave,
+        reward: calculateWaveReward(wave),
+        isBoss: wave % gameState.bossWave === 0
+    };
+}
+
+// 메뉴 닫기 핸들러
+function setupMenuCloseHandler(menu) {
+    const closeMenu = (e) => {
+        if (!menu.contains(e.target) && e.target !== canvas) {
+            if (menu.parentNode) {
+                menu.parentNode.removeChild(menu);
+            }
+            document.removeEventListener('click', closeMenu);
+        }
+    };
+    setTimeout(() => {
+        document.addEventListener('click', closeMenu);
+    }, 100);
+}
+
