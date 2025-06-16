@@ -754,7 +754,7 @@ const ACHIEVEMENTS = {
         description: '모든 타워 종류를 설치했습니다.',
         condition: () => {
             const towerTypes = new Set(towers.map(t => t.type));
-            return towerTypes.size === Object.keys(TOWER_TYPES).length;
+            return towerTypes.size === Object.keys(window.TOWER_TYPES).length;
         },
         unlocked: false
     },
@@ -2275,27 +2275,6 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 document.getElementById('loadBtn').addEventListener('click', () => {
     loadGame();
 });
-
-function getSpecialDescription(type) {
-    switch(type) {
-        case 'ICE':
-            return '범위 내 모든 적을 5초 동안 얼립니다.';
-        case 'POISON':
-            return '적에게 지속적인 독 데미지를 줍니다.';
-        case 'SUPPORT':
-            return '주변 타워의 공격력을 20% 증가시킵니다.';
-        case 'BASIC':
-            return '기본적인 공격력과 범위를 가진 타워입니다.';
-        case 'SNIPER':
-            return '관통 공격이 가능한 타워입니다.';
-        case 'SPLASH':
-            return '범위 공격과 감속 효과를 가진 타워입니다.';
-        case 'LASER':
-            return '지속적인 데미지를 주는 타워입니다.';
-        default:
-            return '특수 능력이 없습니다.';
-    }
-}
 
 // CSS 스타일 추가
 document.head.insertAdjacentHTML('beforeend', `
