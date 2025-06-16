@@ -5931,3 +5931,102 @@ function towerFromData(data) {
     return tower;
 }
 
+// ... existing code ...
+// 게임 루프에서 메시지 그리기
+function drawWaveMessage() {
+    if (!gameState.currentWaveMessage) return;
+
+    const elapsed = Date.now() - gameState.waveMessageStartTime;
+    if (elapsed > 2000) {
+        gameState.currentWaveMessage = null;
+        return;
+    }
+
+    const alpha = elapsed < 500 ? elapsed / 500 :
+        elapsed > 1500 ? (2000 - elapsed) / 500 : 1;
+
+    ctx.save();
+
+    // 배경
+    ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
+    ctx.fillRect(
+        canvas.width / 2 - 150,
+        canvas.height / 2 - 80,
+        300,
+        160
+    );
+
+    // 웨이브 시작 텍스트
+    ctx.font = 'bold 24px Arial';
+    ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`; // 골드 색상
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    if (gameState.currentWaveMessage.isBoss) {
+        // 보스 웨이브 메시지
+        ctx.fillText(
+            `보스 웨이브 ${gameState.currentWaveMessage.wave} 시작!`,
+            canvas.width / 2,
+            canvas.height / 2 - 40
+        );
+
+        // 보스 타입 표시
+        ctx.font = '18px Arial';
+        ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`; // 빨간색
+        const bossTypes = Object.keys(BOSS_TYPES);
+        const randomBossType = bossTypes[Math.floor(Math.random() * bossTypes.length)];
+        ctx.fillText(
+            `${BOSS_TYPES[randomBossType].name} 출현!`,
+            canvas.width / 2,
+            canvas.height / 2
+        );
+    } else {
+        // 일반 웨이브 메시지
+        ctx.fillText(
+            `웨이브 ${gameState.currentWaveMessage.wave} 시작!`,
+            canvas.width / 2,
+            canvas.height / 2 - 40
+        );
+
+        // 현재 레벨
+        ctx.font = '18px Arial';
+        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+        ctx.fillText(
+            `현재 레벨: ${gameState.currentWaveMessage.wave}`,
+            canvas.width / 2,
+            canvas.height / 2
+        );
+    }
+
+    // 보상
+    ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`; // 골드 색상
+    ctx.fillText(
+        `보상: ${gameState.currentWaveMessage.reward} 골드`,
+        canvas.width / 2,
+        canvas.height / 2 + 40
+    );
+
+    ctx.restore();
+}
+
+// 타워 설치 가능한 위치 표시
+function showPlaceablePositions() {
+    for (let i = 0; i < GRID_WIDTH; i++) {
+        for (let j = 0; j < GRID_HEIGHT; j++) {
+            const isOnPath = currentMap.path.some(point => point.x === i && point.y === j);
+            const hasTower = towers.some(tower => tower.x === i && tower.y === j);
+            
+            if (!isOnPath && !hasTower) {
+                ctx.fillStyle = 'rgba(76, 175, 80, 0.2)';
+                ctx.strokeStyle = '#4CAF50';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([5, 5]);
+                ctx.strokeRect(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                ctx.fillRect(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+                ctx.setLineDash([]);
+            }
+        }
+    }
+}
+// ... existing code ...
+
