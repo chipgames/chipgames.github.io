@@ -2659,146 +2659,12 @@ class Enemy {
     }
 }
 
-// 게임 시작 시 튜토리얼 표시
-function showTutorial() {
-    document.getElementById('tutorial').style.display = 'block';
-}
-
-// 카운트다운 상태 변수 추가
-let isCountdownActive = false;
-
-// 카운트다운 표시
-function showCountdown() {
-    if (isCountdownActive) return; // 이미 카운트다운이 진행 중이면 중단
-    
-    isCountdownActive = true;
-    const countdown = document.getElementById('countdown');
-    if (!countdown) {
-        console.error('카운트다운 요소를 찾을 수 없습니다.');
-        isCountdownActive = false;
-        startWave();
-        return;
-    }
-    
-    countdown.style.display = 'block';
-    countdown.textContent = ''; // 카운트다운 시작 시 텍스트 초기화
-    let count = 3;
-    
-    const interval = setInterval(() => {
-        if (count > 0) {
-            countdown.textContent = count;
-            count--;
-        } else {
-            countdown.style.display = 'none';
-            countdown.textContent = ''; // 카운트다운 종료 시 텍스트 초기화
-            clearInterval(interval);
-            isCountdownActive = false;
-            startWave();
-        }
-    }, 1000);
-}
-
 // 게임 오버 화면 표시
 function showGameOver() {
     const gameOver = document.getElementById('gameOver');
     document.getElementById('finalScore').textContent = gameState.score;
     document.getElementById('finalWave').textContent = gameState.wave;
     gameOver.style.display = 'block';
-}
-
-// 게임 재시작
-function restartGame() {
-    gameState.gold = DIFFICULTY_SETTINGS[gameState.difficulty].gold;
-    gameState.lives = DIFFICULTY_SETTINGS[gameState.difficulty].lives;
-    gameState.wave = 1;
-    gameState.isGameOver = false;
-    gameState.waveInProgress = false;
-    gameState.enemiesRemaining = 0;
-    gameState.isPaused = false;
-    gameState.score = 0;
-    towers = [];
-    enemies = [];
-    document.getElementById('gameOver').style.display = 'none';
-    document.getElementById('tutorial').style.display = 'none';
-}
-
-// 타워 설치 가능한 위치 표시
-function showPlaceablePositions() {
-    for (let i = 0; i < GRID_WIDTH; i++) {
-        for (let j = 0; j < GRID_HEIGHT; j++) {
-            const isOnPath = currentMap.path.some(point => point.x === i && point.y === j);
-            const hasTower = towers.some(tower => tower.x === i && tower.y === j);
-            
-            if (!isOnPath && !hasTower) {
-                ctx.fillStyle = 'rgba(76, 175, 80, 0.2)';
-                ctx.strokeStyle = '#4CAF50';
-                ctx.lineWidth = 2;
-                ctx.setLineDash([5, 5]);
-                ctx.strokeRect(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                ctx.fillRect(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE);
-                ctx.setLineDash([]);
-            }
-        }
-    }
-}
-
-// 타워 설치/업그레이드 이펙트
-function showTowerEffect(x, y) {
-    if (lowSpecMode) return;
-    const effect = EffectPool.get('tower');
-    
-    const centerX = x * TILE_SIZE + TILE_SIZE/2;
-    const centerY = y * TILE_SIZE + TILE_SIZE/2;
-    
-    effect.style.cssText = `
-        display: block;
-        left: ${centerX - TILE_SIZE/2}px;
-        top: ${centerY - TILE_SIZE/2}px;
-        width: ${TILE_SIZE}px;
-        height: ${TILE_SIZE}px;
-    `;
-    
-    // 사운드 재생
-    playSound('tower_build');
-    
-    // 애니메이션 종료 후 풀로 반환
-    effect.addEventListener('animationend', () => {
-        EffectPool.release(effect);
-    }, { once: true });
-}
-
-// 타워 업그레이드 이펙트
-function showUpgradeEffect(x, y) {
-    if (lowSpecMode) return;
-    // 업그레이드 이펙트 생성
-    const effect = document.createElement('div');
-    effect.className = 'upgrade-effect';
-    
-    // 타워 중심을 기준으로 계산
-    const centerX = x * TILE_SIZE + TILE_SIZE/2;
-    const centerY = y * TILE_SIZE + TILE_SIZE/2;
-    
-    effect.style.left = `${centerX}px`;
-    effect.style.top = `${centerY}px`;
-    
-    // 이펙트 내용
-    effect.innerHTML = `
-        <div class="upgrade-ring"></div>
-        <div class="upgrade-particles">
-            ${Array(8).fill().map(() => '<div class="particle"></div>').join('')}
-        </div>
-        <div class="upgrade-text">업그레이드!</div>
-    `;
-    
-    document.querySelector('.game-area').appendChild(effect);
-    
-    // 사운드 재생
-    playSound('upgrade');
-    
-    // 애니메이션 종료 후 제거
-    effect.addEventListener('animationend', () => {
-        effect.remove();
-    });
 }
 
 // 게임 시작 버튼 이벤트 수정
@@ -2945,155 +2811,32 @@ function spawnNextEnemy() {
     }
 }
 
-// 웨이브 시작 이펙트
-function showWaveStartEffect() {
-    const effect = document.createElement('div');
-    effect.className = 'wave-start-effect';
-    effect.innerHTML = `
-        <h2>웨이브 ${gameState.wave} 시작!</h2>
-        <p>적의 수: ${gameState.enemiesRemaining}</p>
-    `;
-    
-    // .game-area에 추가
-    const parent = document.querySelector('.game-area');
-    if (!parent) {
-        console.error('게임 영역을 찾을 수 없습니다.');
-        return;
-    }
-    parent.appendChild(effect);
-
-    // 중앙 배치 스타일
-    effect.style.position = 'absolute';
-    effect.style.left = '50%';
-    effect.style.top = '50%';
-    effect.style.transform = 'translate(-50%, -50%)';
-    effect.style.zIndex = '2000';
-    effect.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-    effect.style.padding = '20px';
-    effect.style.borderRadius = '10px';
-    effect.style.color = '#fff';
-    effect.style.textAlign = 'center';
-    effect.style.animation = 'fadeInOut 2s ease-in-out';
-    
-    setTimeout(() => {
-        effect.remove();
-    }, 2000);
-}
-
-// 정보 바 업데이트
-function updateInfoBar() {
-    const elements = {
-        'infoGold': `골드: ${gameState.gold}`,
-        'infoLives': `생명: ${gameState.lives}`,
-        'infoWave': `웨이브: ${gameState.wave}`,
-        'infoScore': `점수: ${gameState.score}`
-    };
-
-    for (const [id, text] of Object.entries(elements)) {
-        const element = document.getElementById(id);
-        if (element) {
-            element.textContent = text;
-        }
-    }
-}
-
-// 웨이브 진행 상황 업데이트 함수 수정
-function updateWaveProgress() {
-    const progress = document.getElementById('waveProgress');
-    const fill = progress.querySelector('.fill');
-    let text = progress.querySelector('.progress-text');
-    
-    // 전체 적의 수 대비 현재 진행률 계산
-    const total = gameState.totalEnemies;
-    const remaining = gameState.enemiesRemaining;
-    const percentage = total > 0 ? ((total - remaining) / total) * 100 : 0;
-    
-    fill.style.width = `${percentage}%`;
-    progress.style.display = gameState.waveInProgress ? 'block' : 'none';
-
-    // 진행률 텍스트 동적 추가/갱신
-    if (!text) {
-        text = document.createElement('span');
-        text.className = 'progress-text';
-        progress.appendChild(text);
-    }
-    text.textContent = `${Math.round(percentage)}%`;
-}
-
-// 보상 팝업 표시
-function showRewardPopup(amount) {
-    // 기존 팝업이 있다면 제거
-    const existingPopup = document.getElementById('rewardPopup');
-    if (existingPopup) {
-        existingPopup.remove();
-    }
-
-    // 새로운 팝업 생성
-    const popup = document.createElement('div');
-    popup.id = 'rewardPopup';
-    popup.className = 'reward-popup';
-    
-    // 팝업 내용 설정
-    popup.innerHTML = `
-        <div class="reward-content">
-            <h3>웨이브 완료!</h3>
-            <p>보상: <span class="gold-amount">${amount}</span> 골드</p>
-        </div>
-    `;
-    
-    // 팝업을 body에 추가
-    document.body.appendChild(popup);
-    
-    // 3초 후 팝업 제거
-    setTimeout(() => {
-        popup.remove();
-    }, 3000);
-}
-
-// 골드 부족 메시지 표시
-function showInsufficientGold() {
-    const message = document.getElementById('insufficientGold');
-    message.style.display = 'block';
-    
-    setTimeout(() => {
-        message.style.display = 'none';
-    }, 1000);
-}
-
 // 타워 범위 미리보기
 let rangePreview = null;
-
 
 function showTowerRangePreview(x, y, range, type) {
     if (rangePreview) {
         rangePreview.remove();
     }
-
+    
     rangePreview = document.createElement('div');
     rangePreview.className = 'tower-range-preview';
-
+    
     // 타워 중심을 기준으로 계산
-    const centerX = x * TILE_SIZE + TILE_SIZE / 2;
-    const centerY = y * TILE_SIZE + TILE_SIZE / 2;
+    const centerX = x * TILE_SIZE + TILE_SIZE/2;
+    const centerY = y * TILE_SIZE + TILE_SIZE/2;
     const diameter = range * TILE_SIZE * 2;
-
-    // 캔버스의 위치(오프셋) 보정
-    //const canvas = document.getElementById('gameCanvas');
-    const canvasRect = canvas.getBoundingClientRect();
-    const parentRect = canvas.parentElement.getBoundingClientRect();
-    const offsetX = canvasRect.left - parentRect.left;
-    const offsetY = canvasRect.top - parentRect.top;
-
-    rangePreview.style.left = `${offsetX + centerX - diameter / 2}px`;
-    rangePreview.style.top = `${offsetY + centerY - diameter / 2}px`;
+    
+    rangePreview.style.left = `${centerX - diameter/2}px`;
+    rangePreview.style.top = `${centerY - diameter/2}px`;
     rangePreview.style.width = `${diameter}px`;
     rangePreview.style.height = `${diameter}px`;
-
+    
     // 타워 종류에 따른 색상 설정
     const tower = TOWER_TYPES[type];
     rangePreview.style.backgroundColor = `${tower.color}20`;
     rangePreview.style.borderColor = tower.color;
-
+    
     document.querySelector('.game-area').appendChild(rangePreview);
 }
 
@@ -3293,20 +3036,6 @@ canvas.addEventListener('click', (e) => {
     showTowerEffect(x, y);
 });
 
-function setupMenuCloseHandler(menu) {
-    const closeMenu = (e) => {
-        if (!menu.contains(e.target) && e.target !== canvas) {
-            if (menu.parentNode) {
-                menu.parentNode.removeChild(menu);
-            }
-            document.removeEventListener('click', closeMenu);
-        }
-    };
-    setTimeout(() => {
-        document.addEventListener('click', closeMenu);
-    }, 100);
-}
-
 // 게임 컨트롤 이벤트
 document.getElementById('pauseBtn').addEventListener('click', () => {
     if (gameState.isStarted) {
@@ -3349,18 +3078,6 @@ function checkAchievements() {
             showAchievement(achievement.name);
         }
     });
-}
-
-// 업적 표시
-function showAchievement(name) {
-    const achievement = document.getElementById('achievement');
-    if (achievement) {
-        achievement.textContent = `업적 달성: ${name}!`;
-        achievement.style.display = 'block';
-        setTimeout(() => {
-            achievement.style.display = 'none';
-        }, 3000);
-    }
 }
 
 // 게임 저장
@@ -3522,286 +3239,6 @@ document.head.insertAdjacentHTML('beforeend', `
     </style>
 `);
 
-// 타워 설치 메뉴 표시 함수 수정
-function showTowerBuildMenu(x, y, clientX, clientY) {
-    if (gameState.towerCount >= gameState.maxTowers) {
-        showSaveLoadNotification('타워 설치 한도에 도달했습니다!');
-        return;
-    }
-    
-    const existingMenu = document.querySelector('.tower-build-menu');
-    if (existingMenu && existingMenu.parentNode) {
-        existingMenu.parentNode.removeChild(existingMenu);
-    }
-
-    const towerMenu = document.createElement('div');
-    towerMenu.className = 'tower-build-menu';
-
-    // 메뉴 위치 계산 (화면 밖으로 나가지 않도록)
-    const menuWidth = 300;
-    const menuHeight = 400;
-    const padding = 20;
-    
-    let left = clientX;
-    let top = clientY;
-    
-    // 오른쪽으로 넘치면 왼쪽에 표시
-    if (left + menuWidth > window.innerWidth) {
-        left = window.innerWidth - menuWidth - padding;
-    }
-    
-    // 아래로 넘치면 위에 표시
-    if (top + menuHeight > window.innerHeight) {
-        top = window.innerHeight - menuHeight - padding;
-    }
-    
-    towerMenu.style.left = `${left}px`;
-    towerMenu.style.top = `${top}px`;
-
-    const header = document.createElement('div');
-    header.className = 'tower-build-header';
-    header.innerHTML = `
-        <h2>타워 설치</h2>
-        <p>골드: ${gameState.gold}</p>
-    `;
-    towerMenu.appendChild(header);
-
-    const towerList = document.createElement('div');
-    towerList.className = 'tower-list';
-
-    Object.entries(TOWER_TYPES).forEach(([type, tower]) => {
-        const card = document.createElement('div');
-        card.className = `tower-card ${gameState.gold < tower.cost ? 'disabled' : ''}`;
-        
-        card.innerHTML = `
-            <div class="tower-card-header">
-                <div class="tower-icon" style="background: ${tower.color}">${type[0]}</div>
-                <div class="tower-name">${tower.name}</div>
-            </div>
-            <div class="tower-cost">${tower.cost} 골드</div>
-            <div class="tower-stats">
-                <div class="tower-stat">
-                    <span class="tower-stat-label">공격력</span>
-                    <span class="tower-stat-value">${tower.damage}</span>
-                </div>
-                <div class="tower-stat">
-                    <span class="tower-stat-label">범위</span>
-                    <span class="tower-stat-value">${tower.range}</span>
-                </div>
-                <div class="tower-stat">
-                    <span class="tower-stat-label">쿨다운</span>
-                    <span class="tower-stat-value">${(tower.cooldown/60).toFixed(2)}초</span>
-                </div>
-            </div>
-            <div class="tower-description">${getSpecialDescription(type)}</div>
-        `;
-
-            if (gameState.gold >= tower.cost) {
-            card.onmouseover = () => showTowerRangePreview(x, y, tower.range, type);
-            card.onmouseout = hideTowerRangePreview;
-            
-            card.onclick = () => {
-                towers.push(new Tower(x, y, type));
-                gameState.gold -= tower.cost;
-                gameState.towerCount++;
-                updateTowerLimit();
-                playSound('tower_place');
-                hideTowerRangePreview(); // 타워 설치 후 미리보기 즉시 제거
-                if (towerMenu.parentNode) {
-                    towerMenu.parentNode.removeChild(towerMenu);
-                }
-                const highlight = document.querySelector('.grid-highlight');
-                if (highlight) highlight.remove();
-            };
-        }
-        
-        towerList.appendChild(card);
-    });
-
-    towerMenu.appendChild(towerList);
-    document.body.appendChild(towerMenu);
-    setupMenuCloseHandler(towerMenu);
-}
-
-// 타워 업그레이드 메뉴 표시 함수 수정
-function showTowerUpgradeMenu(tower, clientX, clientY) {
-    const menu = document.createElement('div');
-    menu.className = 'tower-upgrade-menu';
-    
-    // 메뉴 위치 계산 (화면 밖으로 나가지 않도록)
-    const menuWidth = 280;
-    const menuHeight = 400;
-    const padding = 20;
-    
-    let left = clientX;
-    let top = clientY;
-    
-    // 오른쪽으로 넘치면 왼쪽에 표시
-    if (left + menuWidth > window.innerWidth) {
-        left = window.innerWidth - menuWidth - padding;
-    }
-    
-    // 아래로 넘치면 위에 표시
-    if (top + menuHeight > window.innerHeight) {
-        top = window.innerHeight - menuHeight - padding;
-    }
-    
-    menu.style.left = `${left}px`;
-    menu.style.top = `${top}px`;
-    
-    // 타워 정보 헤더
-    const header = document.createElement('div');
-    header.className = 'upgrade-header';
-    header.innerHTML = `
-        <h3>${TOWER_TYPES[tower.type].name} Lv.${tower.level}</h3>
-        <div class="tower-stats">
-            <div class="stat">
-                <span class="stat-icon">⚔️</span>
-                <span class="stat-value">${Math.floor(tower.damage)}</span>
-            </div>
-            <div class="stat">
-                <span class="stat-icon">🎯</span>
-                <span class="stat-value">${tower.range}</span>
-            </div>
-            <div class="stat">
-                <span class="stat-icon">⚡</span>
-                <span class="stat-value">${(60 / tower.maxCooldown).toFixed(1)}</span>
-            </div>
-        </div>
-    `;
-    menu.appendChild(header);
-    
-    // 업그레이드 옵션들
-    const upgradeTypes = ['damage', 'range', 'speed'];
-    const upgradeIcons = ['⚔️', '🎯', '⚡'];
-    const upgradeNames = ['공격력', '사거리', '공격속도'];
-    
-    upgradeTypes.forEach((type, index) => {
-        const isSupport = tower.type === 'SUPPORT';
-        // 지원 타워는 range만 활성화
-        const canUpgrade = isSupport ? (type === 'range' && tower.canUpgrade(type)) : tower.canUpgrade(type);
-
-        const option = document.createElement('div');
-        option.className = `upgrade-option ${canUpgrade ? '' : 'disabled'}`;
-
-        // 값 표시 형식 분기
-        let currentValue, nextValue;
-        if (type === 'damage') {
-            currentValue = Math.floor(tower[type]);
-            nextValue = Math.floor(tower[type] * 1.2);
-        } else if (type === 'range') {
-            currentValue = tower[type].toFixed(1);
-            nextValue = (tower[type] * 1.2).toFixed(1);
-        } else if (type === 'speed') {
-            currentValue = (60 / tower.maxCooldown).toFixed(1);
-            nextValue = (60 / Math.max(10, tower.maxCooldown * 0.9)).toFixed(1);
-        } else {
-            currentValue = tower[type];
-            nextValue = tower[type];
-        }
-
-        option.innerHTML = `
-            <div class="upgrade-info">
-                <span class="upgrade-icon">${upgradeIcons[index]}</span>
-                <div class="upgrade-details">
-                    <span class="upgrade-name">${upgradeNames[index]}</span>
-                    <div class="upgrade-values">
-                        <span class="current-value">${currentValue}</span>
-                        <span class="arrow">→</span>
-                        <span class="next-value">${nextValue}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="upgrade-cost ${canUpgrade ? '' : 'insufficient'}">
-                <span class="cost-icon">💰</span>
-                <span class="cost-value">${tower.getUpgradeCost(type)}</span>
-            </div>
-        `;
-
-        if (canUpgrade) {
-            option.addEventListener('click', () => {
-                tower.upgrade(type);
-                showUpgradeEffect(tower.x, tower.y);
-                updateInfoBar();
-                menu.remove();
-            });
-        }
-
-        menu.appendChild(option);
-    });
-    
-    // 특수능력 업그레이드 (레벨 3 이상)
-    if (tower.level >= 3) {
-        const specialOption = document.createElement('div');
-        specialOption.className = 'upgrade-option special';
-        
-        const specialCost = tower.getUpgradeCost('special');
-        const canUpgradeSpecial = tower.canUpgrade('special');
-        
-        specialOption.innerHTML = `
-            <div class="upgrade-info">
-                <span class="upgrade-icon">✨</span>
-                <div class="upgrade-details">
-                    <span class="upgrade-name">특수능력 강화</span>
-                    <div class="upgrade-description">
-                        ${getSpecialDescription(tower.type)}
-                    </div>
-                </div>
-            </div>
-            <div class="upgrade-cost ${canUpgradeSpecial ? '' : 'insufficient'}">
-                <span class="cost-icon">💰</span>
-                <span class="cost-value">${specialCost}</span>
-            </div>
-        `;
-        
-        if (canUpgradeSpecial) {
-            specialOption.addEventListener('click', () => {
-                tower.upgrade('special');
-                showUpgradeEffect(tower.x, tower.y);
-                updateInfoBar();
-                menu.remove();
-            });
-        }
-        
-        menu.appendChild(specialOption);
-    }
-    
-    // 판매 버튼
-    const sellButton = document.createElement('button');
-    sellButton.className = 'sell-button';
-    sellButton.innerHTML = `
-        <span class="sell-icon">💎</span>
-        <span class="sell-text">판매</span>
-        <span class="sell-value">+${tower.getSellValue()}</span>
-    `;
-    
-    sellButton.addEventListener('click', () => {
-        const sellValue = tower.getSellValue();
-        
-        // 버프 효과 제거
-        if (tower.type === 'SUPPORT') {
-            tower.removeBuffs();
-        }
-        
-        // 타워 제거 및 상태 업데이트
-        towers = towers.filter(t => t !== tower);
-        gameState.towerCount--;
-        gameState.gold += sellValue;
-        
-        // UI 업데이트
-        updateInfoBar();
-        updateTowerLimit(); // 타워 개수 UI 즉시 갱신
-        showRewardPopup(sellValue);
-        menu.remove();
-    });
-    
-    menu.appendChild(sellButton);
-    document.body.appendChild(menu);
-    
-    // 메뉴 외부 클릭 시 닫기
-    setupMenuCloseHandler(menu);
-}
-
 // 게임 시작 시 로딩 화면
 window.addEventListener('load', () => {
     initializeGame(); // 페이지 진입 시 게임 초기화
@@ -3885,23 +3322,6 @@ function highlightGrid(x, y) {
 function updateTowerLimit() {
     document.getElementById('towerLimitCount').textContent = gameState.towerCount;
     document.getElementById('towerLimitMax').textContent = gameState.maxTowers;
-}
-
-// 저장/불러오기 알림
-function showSaveLoadNotification(message, isError = false) {
-    const notification = document.getElementById('saveLoadNotification');
-    if (!notification) {
-        console.error('알림 요소를 찾을 수 없습니다.');
-        return;
-    }
-    
-    notification.textContent = message;
-    notification.style.display = 'block';
-    notification.style.backgroundColor = isError ? 'rgba(255, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.8)';
-    
-    setTimeout(() => {
-        notification.style.display = 'none';
-    }, 2000);
 }
 
 // 웨이브 클리어 보상 계산
@@ -4188,45 +3608,6 @@ function gainExperience(amount) {
     updateInfoBar();
 }
 
-// 특수 이벤트 표시
-function showEventNotification(message) {
-    if (lowSpecMode) return;
-    // 이미 표시된 알림이 있는지 확인
-    const existingNotification = document.querySelector('.event-notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-
-    const notification = document.createElement('div');
-    notification.className = 'event-notification';
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, 3000);
-}
-
-// HTML에 이벤트 알림 스타일 추가
-document.head.insertAdjacentHTML('beforeend', `
-    <style>
-        .event-notification {
-            position: fixed;
-            top: 20%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: gold;
-            padding: 10px 20px;
-            border-radius: 5px;
-            z-index: 1000;
-            animation: fadeInOut 3s ease-in-out;
-        }
-    </style>
-`);
-
 // 보스 패턴 이펙트 표시 함수
 function showBossPatternEffect(x, y, patternName) {
     const parent = document.querySelector('.game-area');
@@ -4469,31 +3850,6 @@ function showComboEffect(comboName) {
 
 // 게임 시작
 gameLoop(); 
-
-// 게임 통계 업데이트 함수
-function updateStats() {
-    // 통계 요소 업데이트
-    document.getElementById('enemiesKilled').textContent = `처치한 적: ${gameStats.enemiesKilled}`;
-    document.getElementById('bossesKilled').textContent = `처치한 보스: ${gameStats.bossesKilled}`;
-    document.getElementById('totalGold').textContent = `총 획득 골드: ${gameStats.totalGold}`;
-    document.getElementById('highestWave').textContent = `최고 웨이브: ${gameStats.highestWave}`;
-    
-    // 업적 업데이트
-    Object.entries(ACHIEVEMENTS).forEach(([key, achievement]) => {
-        const achievementElement = document.getElementById(`achievement-${key}`);
-        if (achievementElement) {
-            achievementElement.className = achievement.unlocked ? 'achievement unlocked' : 'achievement';
-        }
-    });
-    
-    // 이벤트 트리거 업데이트
-    const eventsList = document.getElementById('eventsList');
-    if (eventsList) {
-        eventsList.innerHTML = gameStats.eventsTriggered
-            .map(event => `<li>${SPECIAL_EVENTS[event].name}</li>`)
-            .join('');
-    }
-}
 
 // CSS 스타일 추가
 document.head.insertAdjacentHTML('beforeend', `
@@ -6269,12 +5625,6 @@ function showSpecialEffect(x, y, name) {
 // 저사양 모드 상태
 let lowSpecMode = false;
 
-function applyLowSpecMode(enabled) {
-    lowSpecMode = enabled;
-    document.body.classList.toggle('low-spec-mode', enabled);
-    localStorage.setItem('lowSpecMode', enabled ? '1' : '0');
-}
-
 window.addEventListener('DOMContentLoaded', function() {
     // ... 기존 초기화 코드 ...
     // 저사양 모드 체크박스 연동
@@ -6413,146 +5763,6 @@ Enemy.prototype.applyStatusEffect = function(effectType, duration) {
 };
 
 // ... existing code ...
-
-// 타워 호버 정보 표시
-function showTowerInfo(tower) {
-    const info = document.createElement('div');
-    info.className = 'tower-info';
-    info.innerHTML = `
-        <div class="tower-name">${TOWER_TYPES[tower.type].name}</div>
-        <div class="tower-level">Level ${tower.level}</div>
-        <div class="tower-stats">
-            <div>⚔️ ${tower.damage}</div>
-            <div>🎯 ${tower.range}</div>
-            <div>⚡ ${(60 / tower.maxCooldown).toFixed(1)}</div>
-        </div>
-    `;
-    
-    // 위치 설정
-    const centerX = tower.x * TILE_SIZE + TILE_SIZE/2;
-    const centerY = tower.y * TILE_SIZE + TILE_SIZE/2;
-    
-    info.style.left = `${centerX}px`;
-    info.style.top = `${centerY - 80}px`;
-    info.style.transform = 'translateX(-50%)';
-    
-    document.getElementById('game-container').appendChild(info);
-    return info;
-}
-
-// 타워 호버 이벤트 처리
-function handleTowerHover(tower) {
-    let infoElement = null;
-    
-    const showInfo = () => {
-        if (!infoElement) {
-            infoElement = showTowerInfo(tower);
-        }
-    };
-    
-    const hideInfo = () => {
-        if (infoElement) {
-            infoElement.remove();
-            infoElement = null;
-        }
-    };
-    
-    return { showInfo, hideInfo };
-}
-
-// 웨이브 메시지 관련 변수
-let currentWaveMessage = null;
-let waveMessageStartTime = 0;
-
-function showWaveStartMessage(wave) {
-    // 초기 셋팅값일 때는 메시지 표시하지 않음
-    if (wave <= 0) return;
-
-    // 메시지 표시 시작 시간 저장
-    gameState.waveMessageStartTime = Date.now();
-    gameState.currentWaveMessage = {
-        wave: wave,
-        reward: calculateWaveReward(wave),
-        isBoss: wave % gameState.bossWave === 0
-    };
-}
-
-// 게임 루프에서 메시지 그리기
-function drawWaveMessage() {
-    if (!gameState.currentWaveMessage) return;
-
-    const elapsed = Date.now() - gameState.waveMessageStartTime;
-    if (elapsed > 2000) {
-        gameState.currentWaveMessage = null;
-        return;
-    }
-
-    const alpha = elapsed < 500 ? elapsed / 500 :
-        elapsed > 1500 ? (2000 - elapsed) / 500 : 1;
-
-    ctx.save();
-
-    // 배경
-    ctx.fillStyle = `rgba(0, 0, 0, ${alpha * 0.8})`;
-    ctx.fillRect(
-        canvas.width / 2 - 150,
-        canvas.height / 2 - 80,
-        300,
-        160
-    );
-
-    // 웨이브 시작 텍스트
-    ctx.font = 'bold 24px Arial';
-    ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`; // 골드 색상
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    if (gameState.currentWaveMessage.isBoss) {
-        // 보스 웨이브 메시지
-        ctx.fillText(
-            `보스 웨이브 ${gameState.currentWaveMessage.wave} 시작!`,
-            canvas.width / 2,
-            canvas.height / 2 - 40
-        );
-
-        // 보스 타입 표시
-        ctx.font = '18px Arial';
-        ctx.fillStyle = `rgba(255, 0, 0, ${alpha})`; // 빨간색
-        const bossTypes = Object.keys(BOSS_TYPES);
-        const randomBossType = bossTypes[Math.floor(Math.random() * bossTypes.length)];
-        ctx.fillText(
-            `${BOSS_TYPES[randomBossType].name} 출현!`,
-            canvas.width / 2,
-            canvas.height / 2
-        );
-    } else {
-        // 일반 웨이브 메시지
-        ctx.fillText(
-            `웨이브 ${gameState.currentWaveMessage.wave} 시작!`,
-            canvas.width / 2,
-            canvas.height / 2 - 40
-        );
-
-        // 현재 레벨
-        ctx.font = '18px Arial';
-        ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
-        ctx.fillText(
-            `현재 레벨: ${gameState.currentWaveMessage.wave}`,
-            canvas.width / 2,
-            canvas.height / 2
-        );
-    }
-
-    // 보상
-    ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`; // 골드 색상
-    ctx.fillText(
-        `보상: ${gameState.currentWaveMessage.reward} 골드`,
-        canvas.width / 2,
-        canvas.height / 2 + 40
-    );
-
-    ctx.restore();
-}
 
 function showLevelUpEffect(tower) {
     if (!tower || typeof tower !== 'object' || tower.x === undefined || tower.y === undefined) {
