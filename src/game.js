@@ -756,21 +756,6 @@ const ACHIEVEMENTS = {
     }
 };
 
-// 사운드 관리
-const sounds = {
-    bgm: new Audio('sounds/bgm.mp3'),
-    tower_place: new Audio('sounds/tower_place.mp3'),
-    tower_attack: new Audio('sounds/tower_attack.mp3'),
-    enemy_death: new Audio('sounds/enemy_death.mp3'),
-    game_start: new Audio('sounds/game_start.mp3'),
-    game_over: new Audio('sounds/game_over.mp3'),
-    ui_click: new Audio('sounds/ui_click.mp3')
-};
-
-// 사운드 설정
-let soundEnabled = true;
-let musicEnabled = true;
-
 // 타워 조합 정의 개선
 const TOWER_COMBOS = {
     ICE_POISON: {

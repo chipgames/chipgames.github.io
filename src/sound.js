@@ -1,3 +1,16 @@
+// 사운드 관련 전역 변수
+let soundEnabled = true;
+let musicEnabled = true;
+let sounds = {
+    bgm: new Audio('sounds/bgm.mp3'),
+    enemy_death: new Audio('sounds/enemy_death.mp3'),
+    game_over: new Audio('sounds/game_over.mp3'),
+    game_start: new Audio('sounds/game_start.mp3'),
+    tower_attack: new Audio('sounds/tower_attack.mp3'),
+    tower_place: new Audio('sounds/tower_place.mp3'),
+    ui_click: new Audio('sounds/ui_click.mp3')
+};
+
 // 사운드 설정 저장
 function saveSoundSettings() {
     const soundSettings = {
