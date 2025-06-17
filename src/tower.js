@@ -832,12 +832,6 @@ function hideTowerRangePreview() {
     }
 }
 
-// 타워 제한 업데이트
-function updateTowerLimit() {
-    document.getElementById('towerLimitCount').textContent = gameState.towerCount;
-    document.getElementById('towerLimitMax').textContent = gameState.maxTowers;
-}
-
 function checkTowerCombos() {
     Object.entries(TOWER_COMBOS).forEach(([comboKey, combo]) => {
         // 조합 조건을 만족하는지 확인
@@ -1007,7 +1001,6 @@ window.Tower = Tower;
 window.towerFromData = towerFromData;
 window.showTowerRangePreview = showTowerRangePreview;
 window.hideTowerRangePreview = hideTowerRangePreview;
-window.updateTowerLimit = updateTowerLimit;
 window.checkTowerCombos = checkTowerCombos;
 window.showLevelUpEffect = showLevelUpEffect;
 window.showTowerInfo = showTowerInfo;
