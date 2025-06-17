@@ -325,24 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
             applyLowSpecMode(this.checked);
         });
     }
-
-    // 저장/불러오기 알림
-    function showSaveLoadNotification(message, isError = false) {
-        const notification = document.getElementById('saveLoadNotification');
-        if (!notification) {
-            console.error('알림 요소를 찾을 수 없습니다.');
-            return;
-        }
         
-        notification.textContent = message;
-        notification.style.display = 'block';
-        notification.style.backgroundColor = isError ? 'rgba(255, 0, 0, 0.8)' : 'rgba(0, 0, 0, 0.8)';
-        
-        setTimeout(() => {
-            notification.style.display = 'none';
-        }, 2000);
-    }
-
     // 특수 이벤트 표시
     function showEventNotification(message) {
         if (lowSpecMode) return;
@@ -598,8 +581,7 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('lowSpecMode', enabled ? '1' : '0');
     }
 
-    // 전역 객체에 함수들 노출
-    window.showSaveLoadNotification = showSaveLoadNotification;
+    // 전역 객체에 함수들 노출    
     window.showEventNotification = showEventNotification;
     window.showTowerEffect = showTowerEffect;
     window.showUpgradeEffect = showUpgradeEffect;
