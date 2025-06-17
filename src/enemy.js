@@ -848,10 +848,60 @@ function enemyFromData(data) {
     return enemy;
 }
 
+// 적 관리 변수
+let enemies = [];
+let enemyGroups = [];
+
+// 그룹 시각화 효과
+function drawGroupConnections() {
+    const groups = new Map();
+
+    // 그룹별로 적 분류
+    enemies.forEach(enemy => {
+        if (enemy.groupId) {
+            if (!groups.has(enemy.groupId)) {
+                groups.set(enemy.groupId, []);
+            }
+            groups.get(enemy.groupId).push(enemy);
+        }
+    });
+
+    // 각 그룹의 연결선 그리기
+    groups.forEach(members => {
+        if (members.length > 1) {
+            ctx.save();
+            ctx.strokeStyle = members[0].groupColor;
+            ctx.lineWidth = 2;
+            ctx.globalAlpha = 0.3;
+
+            // 모든 멤버를 연결하는 선 그리기
+            for (let i = 0; i < members.length - 1; i++) {
+                const start = members[i];
+                const end = members[i + 1];
+
+                ctx.beginPath();
+                ctx.moveTo(
+                    start.x * TILE_SIZE + TILE_SIZE / 2,
+                    start.y * TILE_SIZE + TILE_SIZE / 2
+                );
+                ctx.lineTo(
+                    end.x * TILE_SIZE + TILE_SIZE / 2,
+                    end.y * TILE_SIZE + TILE_SIZE / 2
+                );
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+    });
+}
+
 // 전역 변수로 노출
 window.ENEMY_TYPES = ENEMY_TYPES;
 window.ENEMY_PATTERNS = ENEMY_PATTERNS;
 window.BOSS_TYPES = BOSS_TYPES;
 window.Enemy = Enemy;
 window.EnemyGroup = EnemyGroup;
-window.enemyFromData = enemyFromData; 
+window.enemyFromData = enemyFromData;
+window.enemies = enemies;
+window.enemyGroups = enemyGroups;
+window.drawGroupConnections = drawGroupConnections; 

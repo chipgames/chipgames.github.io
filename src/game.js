@@ -628,9 +628,6 @@ let currentMap = MAPS[gameState.currentMap];
 // 타워 배열
 let towers = [];
 
-// 적 배열
-let enemies = [];
-
 // 타워 아이콘 정의
 const TOWER_ICONS = {
     BASIC: '⚔️',
@@ -1657,49 +1654,6 @@ window.addEventListener('load', () => {
         loadingScreen.style.display = 'none';
     }
 });
-
-// 그룹 시각화 효과
-function drawGroupConnections() {
-    const groups = new Map();
-    
-    // 그룹별로 적 분류
-    enemies.forEach(enemy => {
-        if (enemy.groupId) {
-            if (!groups.has(enemy.groupId)) {
-                groups.set(enemy.groupId, []);
-            }
-            groups.get(enemy.groupId).push(enemy);
-        }
-    });
-
-    // 각 그룹의 연결선 그리기
-    groups.forEach(members => {
-        if (members.length > 1) {
-            ctx.save();
-            ctx.strokeStyle = members[0].groupColor;
-            ctx.lineWidth = 2;
-            ctx.globalAlpha = 0.3;
-            
-            // 모든 멤버를 연결하는 선 그리기
-            for (let i = 0; i < members.length - 1; i++) {
-                const start = members[i];
-                const end = members[i + 1];
-                
-            ctx.beginPath();
-                ctx.moveTo(
-                    start.x * TILE_SIZE + TILE_SIZE/2,
-                    start.y * TILE_SIZE + TILE_SIZE/2
-                );
-                ctx.lineTo(
-                    end.x * TILE_SIZE + TILE_SIZE/2,
-                    end.y * TILE_SIZE + TILE_SIZE/2
-                );
-                ctx.stroke();
-            }
-            ctx.restore();
-        }
-    });
-}
 
 // 그리드 하이라이트 함수
 function highlightGrid(x, y) {
@@ -3480,7 +3434,6 @@ function showSkillEffect(x, y, name) {
 }
 
 // 그룹 관리 배열
-let enemyGroups = [];
 let groupIdCounter = 1;
 
 // 그룹 버프/효과 적용 함수
