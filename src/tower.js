@@ -839,7 +839,7 @@ function showTowerRangePreview(x, y, range, type) {
     
     // 타워 중심을 기준으로 계산
     const centerX = x * TILE_SIZE + TILE_SIZE/2;
-    const centerY = y * TILE_SIZE + TILE_SIZE/2;
+    const centerY = (y * TILE_SIZE + TILE_SIZE * 2) + TILE_SIZE;
     const diameter = range * TILE_SIZE * 2;
     
     rangePreview.style.left = `${centerX - diameter/2}px`;
