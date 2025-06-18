@@ -711,246 +711,122 @@ body {
 }
 
 .tower-upgrade-menu {
-    position: static;
+    width: 100%;
+    max-width: 900px;
+    background: #181f1b;
+    border: 2px solid #4CAF50;
+    border-radius: 14px;
+    padding: 16px 12px 12px 12px;
+    color: #fff;
+    box-shadow: 0 4px 24px rgba(76,175,80,0.15);
     margin: 0 auto;
-    background: #1e293b;
-    border-radius: 12px;
-    padding: 20px;
-    width: 280px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    color: #e2e8f0;
+    overflow-y: auto;
+    max-height: 44vh;
+    font-size: 0.97em;
 }
 
-.upgrade-header {
-    text-align: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.upgrade-header h3 {
-    color: #a5b4fc;
-    margin: 0 0 10px 0;
-    font-size: 1.2em;
-}
-
-.tower-stats {
-    display: flex;
-    justify-content: space-around;
-    gap: 10px;
-}
-
-.stat {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: rgba(255, 255, 255, 0.1);
-    padding: 5px 10px;
-    border-radius: 6px;
-}
-
-.stat-icon {
-    font-size: 1.1em;
-}
-
-.stat-value {
-    font-weight: bold;
-    color: #a5b4fc;
-}
-
-.upgrade-option {
+.tower-upgrade-header-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
+    font-size: 1.05em;
     margin-bottom: 10px;
-    background: rgba(255, 255, 255, 0.05);
+    gap: 12px;
+}
+.tower-upgrade-header-title {
+    font-weight: bold;
+    color: #fff;
+    font-size: 0.98em;
+    white-space: nowrap;
+}
+.tower-upgrade-header-stats {
+    display: flex;
+    gap: 12px;
+    font-size: 0.98em;
+    color: #b2dfdb;
+    align-items: center;
+    white-space: nowrap;
+}
+.tower-upgrade-row {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+    margin-bottom: 0;
+}
+.upgrade-option, .sell-button {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-bottom: 0;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    height: 44px;
     border-radius: 8px;
+}
+.upgrade-option {
+    background: #232b23;
+    border: 1.5px solid #4CAF50;
+    color: #fff;
+    gap: 4px;
+    transition: border 0.2s, box-shadow 0.2s;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
-
-.upgrade-option:hover:not(.disabled) {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-1px);
-}
-
 .upgrade-option.disabled {
     opacity: 0.5;
     cursor: not-allowed;
 }
-
-.upgrade-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.upgrade-icon {
-    font-size: 1.3em;
-}
-
-.upgrade-details {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.upgrade-name {
+.upgrade-label {
+    color: #b2dfdb;
     font-weight: bold;
-    color: #a5b4fc;
+    margin-right: 2px;
 }
-
-.upgrade-values {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 0.9em;
+.upgrade-arrow {
+    color: #81c784;
+    margin: 0 2px;
 }
-
-.current-value {
-    color: #94a3b8;
-}
-
-.arrow {
-    color: #64748b;
-}
-
-.next-value {
-    color: #22c55e;
-}
-
 .upgrade-cost {
+    color: gold;
+    font-size: 0.97em;
+    margin-left: 4px;
     display: flex;
     align-items: center;
-    gap: 5px;
-    padding: 5px 10px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    font-weight: bold;
+    gap: 2px;
 }
-
-.upgrade-cost.insufficient {
-    color: #ef4444;
-}
-
-.upgrade-option.special {
-    background: rgba(139, 92, 246, 0.1);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-}
-
-.upgrade-option.special:hover:not(.disabled) {
-    background: rgba(139, 92, 246, 0.2);
-}
-
-.upgrade-description {
-    font-size: 0.85em;
-    color: #94a3b8;
-    margin-top: 4px;
-}
-
 .sell-button {
-    width: 100%;
-    padding: 12px;
-    margin-top: 15px;
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    border-radius: 8px;
-    color: #ef4444;
+    background: linear-gradient(to bottom, #f44336, #d32f2f);
+    border: none;
+    color: white;
     font-weight: bold;
+    font-size: 0.8em;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s ease;
+    transition: background 0.2s;
+    gap: 4px;
+    flex: 0.5 1 0;
 }
-
 .sell-button:hover {
-    background: rgba(239, 68, 68, 0.2);
-    transform: translateY(-1px);
+    background: linear-gradient(to bottom, #d32f2f, #b71c1c);
 }
-
-.sell-icon {
-    font-size: 1.2em;
+@media (max-width: 900px) {
+    .tower-upgrade-menu {
+        max-width: 98vw;
+        padding: 8px 1vw;
+    }
+    .tower-upgrade-row {
+        gap: 6px;
+    }
 }
-
-.sell-value {
-    color: #22c55e;
-}
-
-.upgrade-effect {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 103;
-}
-
-.upgrade-ring {
-    position: absolute;
-    width: 60px;
-    height: 60px;
-    border: 3px solid #fbbf24;
-    border-radius: 50%;
-    animation: upgradeRing 0.8s ease-out;
-}
-
-.upgrade-particles {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-}
-
-.particle {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: #fbbf24;
-    border-radius: 50%;
-    animation: particleFloat 0.8s ease-out;
-}
-
-.particle:nth-child(1) { transform: rotate(0deg) translateY(-30px); }
-.particle:nth-child(2) { transform: rotate(45deg) translateY(-30px); }
-.particle:nth-child(3) { transform: rotate(90deg) translateY(-30px); }
-.particle:nth-child(4) { transform: rotate(135deg) translateY(-30px); }
-.particle:nth-child(5) { transform: rotate(180deg) translateY(-30px); }
-.particle:nth-child(6) { transform: rotate(225deg) translateY(-30px); }
-.particle:nth-child(7) { transform: rotate(270deg) translateY(-30px); }
-.particle:nth-child(8) { transform: rotate(315deg) translateY(-30px); }
-
-.upgrade-text {
-    position: absolute;
-    top: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #fbbf24;
-    font-weight: bold;
-    font-size: 1.0em;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    animation: upgradeText 0.8s ease-out;
-    /* 세로쓰기 방지 */
-    writing-mode: initial !important;
-    white-space: nowrap !important;
-    letter-spacing: 0.02em;
-}
-
-@keyframes upgradeRing {
-    0% { transform: scale(0.5); opacity: 0; }
-    50% { transform: scale(1.2); opacity: 1; }
-    100% { transform: scale(1); opacity: 0; }
-}
-
-@keyframes particleFloat {
-    0% { transform: rotate(var(--rotation)) translateY(-30px) scale(1); opacity: 1; }
-    100% { transform: rotate(var(--rotation)) translateY(-60px) scale(0); opacity: 0; }
-}
-
-@keyframes upgradeText {
-    0% { transform: translateX(-50%) translateY(0) scale(0.5); opacity: 0; }
-    50% { transform: translateX(-50%) translateY(-20px) scale(1.2); opacity: 1; }
-    100% { transform: translateX(-50%) translateY(-40px) scale(1); opacity: 0; }
+@media (max-width: 600px) {
+    .tower-upgrade-row {
+        flex-direction: column;
+        gap: 6px;
+    }
+    .sell-button {
+        margin-left: 0;
+        width: 100%;
+    }
 }
 
 .low-spec-mode .tower-effect,

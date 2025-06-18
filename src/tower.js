@@ -1179,27 +1179,22 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     const menu = document.createElement('div');
     menu.className = 'tower-upgrade-menu';
 
-    // 타워 정보 헤더
-    const header = document.createElement('div');
-    header.className = 'upgrade-header';
-    header.innerHTML = `
-        <h3>${TOWER_TYPES[tower.type].name} Lv.${tower.level}</h3>
-        <div class="tower-stats">
-            <div class="stat">
-                <span class="stat-icon">⚔️</span>
-                <span class="stat-value">${Math.floor(tower.damage)}</span>
-            </div>
-            <div class="stat">
-                <span class="stat-icon">🎯</span>
-                <span class="stat-value">${tower.range}</span>
-            </div>
-            <div class="stat">
-                <span class="stat-icon">⚡</span>
-                <span class="stat-value">${(60 / tower.maxCooldown).toFixed(1)}</span>
-            </div>
-        </div>
+    // 상단: 타워명/레벨/스탯 요약 한 줄
+    const headerRow = document.createElement('div');
+    headerRow.className = 'tower-upgrade-header-row';
+    headerRow.innerHTML = `
+        <span class="tower-upgrade-header-title">${TOWER_TYPES[tower.type].name} Lv.${tower.level}</span>
+        <span class="tower-upgrade-header-stats">
+            <span>⚔️ ${Math.floor(tower.damage)}</span>
+            <span>🎯 ${tower.range}</span>
+            <span>⚡ ${(60 / tower.maxCooldown).toFixed(1)}</span>
+        </span>
     `;
-    menu.appendChild(header);
+    menu.appendChild(headerRow);
+
+    // 하단: 업그레이드 옵션 3개 + 판매 버튼 한 줄
+    const row = document.createElement('div');
+    row.className = 'tower-upgrade-row';
 
     // 업그레이드 옵션들
     const upgradeTypes = ['damage', 'range', 'speed'];
@@ -1208,13 +1203,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
 
     upgradeTypes.forEach((type, index) => {
         const isSupport = tower.type === 'SUPPORT';
-        // 지원 타워는 range만 활성화
         const canUpgrade = isSupport ? (type === 'range' && tower.canUpgrade(type)) : tower.canUpgrade(type);
-
-        const option = document.createElement('div');
-        option.className = `upgrade-option ${canUpgrade ? '' : 'disabled'}`;
-
-        // 값 표시 형식 분기
         let currentValue, nextValue;
         if (type === 'damage') {
             currentValue = Math.floor(tower[type]);
@@ -1229,25 +1218,16 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
             currentValue = tower[type];
             nextValue = tower[type];
         }
-
+        const option = document.createElement('div');
+        option.className = `upgrade-option ${canUpgrade ? '' : 'disabled'}`;
         option.innerHTML = `
-            <div class="upgrade-info">
-                <span class="upgrade-icon">${upgradeIcons[index]}</span>
-                <div class="upgrade-details">
-                    <span class="upgrade-name">${upgradeNames[index]}</span>
-                    <div class="upgrade-values">
-                        <span class="current-value">${currentValue}</span>
-                        <span class="arrow">→</span>
-                        <span class="next-value">${nextValue}</span>
-                    </div>
-                </div>
-            </div>
-            <div class="upgrade-cost ${canUpgrade ? '' : 'insufficient'}">
-                <span class="cost-icon">💰</span>
-                <span class="cost-value">${tower.getUpgradeCost(type)}</span>
-            </div>
+            <span class="upgrade-label">${upgradeNames[index]}</span>
+            <span>${upgradeIcons[index]}</span>
+            <span>${currentValue}</span>
+            <span class="upgrade-arrow">→</span>
+            <span>${nextValue}</span>
+            <span class="upgrade-cost">💰${tower.getUpgradeCost(type)}</span>
         `;
-
         if (canUpgrade) {
             option.addEventListener('click', () => {
                 tower.upgrade(type);
@@ -1256,79 +1236,28 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
                 menu.remove();
             });
         }
-
-        menu.appendChild(option);
+        row.appendChild(option);
     });
-
-    // 특수능력 업그레이드 (레벨 3 이상)
-    if (tower.level >= 3) {
-        const specialOption = document.createElement('div');
-        specialOption.className = 'upgrade-option special';
-
-        const specialCost = tower.getUpgradeCost('special');
-        const canUpgradeSpecial = tower.canUpgrade('special');
-
-        specialOption.innerHTML = `
-            <div class="upgrade-info">
-                <span class="upgrade-icon">✨</span>
-                <div class="upgrade-details">
-                    <span class="upgrade-name">특수능력 강화</span>
-                    <div class="upgrade-description">
-                        ${getSpecialDescription(tower.type)}
-                    </div>
-                </div>
-            </div>
-            <div class="upgrade-cost ${canUpgradeSpecial ? '' : 'insufficient'}">
-                <span class="cost-icon">💰</span>
-                <span class="cost-value">${specialCost}</span>
-            </div>
-        `;
-
-        if (canUpgradeSpecial) {
-            specialOption.addEventListener('click', () => {
-                tower.upgrade('special');
-                showUpgradeEffect(tower.x, tower.y);
-                updateInfoBar();
-                menu.remove();
-            });
-        }
-
-        menu.appendChild(specialOption);
-    }
 
     // 판매 버튼
     const sellButton = document.createElement('button');
     sellButton.className = 'sell-button';
-    sellButton.innerHTML = `
-        <span class="sell-icon">💎</span>
-        <span class="sell-text">판매</span>
-        <span class="sell-value">+${tower.getSellValue()}</span>
-    `;
-
+    sellButton.innerHTML = `💎 판매 +${tower.getSellValue()}`;
     sellButton.addEventListener('click', () => {
-        const sellValue = tower.getSellValue();
-
-        // 버프 효과 제거
-        if (tower.type === 'SUPPORT') {
-            tower.removeBuffs();
+        gameState.gold += tower.getSellValue();
+        const index = towers.indexOf(tower);
+        if (index > -1) {
+            towers.splice(index, 1);
+            gameState.towerCount--;
+            updateTowerLimit();
         }
-
-        // 타워 제거 및 상태 업데이트
-        towers = towers.filter(t => t !== tower);
-        gameState.towerCount--;
-        gameState.gold += sellValue;
-
-        // UI 업데이트
         updateInfoBar();
-        updateTowerLimit(); // 타워 개수 UI 즉시 갱신
-        showRewardPopup(sellValue);
         menu.remove();
     });
+    row.appendChild(sellButton);
 
-    menu.appendChild(sellButton);
+    menu.appendChild(row);
     towerMenu.appendChild(menu);
-
-    // 메뉴 외부 클릭 시 닫기
     setupMenuCloseHandler(menu);
 }
 
