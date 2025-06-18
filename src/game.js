@@ -1,12 +1,17 @@
+/**
+ * 게임 메인 파일
+ * 게임의 핵심 로직과 게임 루프를 관리
+ */
 
-// 현재 선택된 맵
+// 현재 선택된 맵 정보를 저장
 let currentMap = MAPS[gameState.currentMap];
 
 // ... existing code ...
 
-
-
-// 게임 오버 화면 표시
+/**
+ * 게임 오버 화면을 표시하는 함수
+ * 최종 점수와 웨이브 정보를 화면에 표시
+ */
 function showGameOver() {
     const gameOver = document.getElementById('gameOver');
     document.getElementById('finalScore').textContent = gameState.score;
@@ -14,7 +19,10 @@ function showGameOver() {
     gameOver.style.display = 'block';
 }
 
-// 게임 시작 버튼 이벤트 수정
+/**
+ * 게임 시작 버튼 이벤트 리스너
+ * 게임 시작/재시작 기능을 처리
+ */
 document.addEventListener('DOMContentLoaded', () => {
     const startBtn = document.getElementById('startBtn');
     if (startBtn) {
@@ -49,7 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 웨이브 시작 함수 수정
+/**
+ * 웨이브 시작 함수
+ * 일반 웨이브와 보스 웨이브를 처리하고 적을 생성
+ */
 function startWave() {
     if (gameState.waveInProgress) return;
     
@@ -97,7 +108,10 @@ function startWave() {
     playSound('wave_start');
 }
 
-// 다음 적 생성 함수
+/**
+ * 다음 적을 생성하는 함수
+ * 웨이브 진행 중에 적을 순차적으로 생성
+ */
 function spawnNextEnemy() {
     // 웨이브가 진행 중이 아니거나 적이 더 이상 없으면 종료
     if (!gameState.waveInProgress || gameState.enemiesRemaining <= 0) {
@@ -158,7 +172,10 @@ function spawnNextEnemy() {
     }
 }
 
-// 게임 루프 수정
+/**
+ * 게임 메인 루프
+ * 매 프레임마다 게임 상태를 업데이트하고 화면을 갱신
+ */
 function gameLoop() {
     // 게임이 시작되지 않았거나 일시정지 상태일 때는 프리뷰 화면만 표시
     if (!gameState.isStarted || gameState.isPaused) {
@@ -366,7 +383,10 @@ document.querySelectorAll('.powerup-item').forEach(item => {
     });
 });
 
-// 업적 체크
+/**
+ * 업적 체크 함수
+ * 게임 진행 중 달성한 업적을 확인하고 처리
+ */
 function checkAchievements() {
     Object.entries(ACHIEVEMENTS).forEach(([key, achievement]) => {
         if (!achievement.unlocked && achievement.condition()) {
@@ -537,7 +557,10 @@ window.addEventListener('load', () => {
     }
 });
 
-// 그리드 하이라이트 함수
+/**
+ * 그리드 하이라이트 함수
+ * 타워 설치 가능한 위치를 시각적으로 표시
+ */
 function highlightGrid(x, y) {
     const highlight = document.createElement('div');
     highlight.className = 'grid-highlight';
@@ -550,7 +573,10 @@ function highlightGrid(x, y) {
     return highlight;
 }
 
-// 웨이브 클리어 보상 계산
+/**
+ * 웨이브 보상 계산 함수
+ * 웨이브 클리어 시 지급할 골드를 계산
+ */
 function calculateWaveReward() {
     const baseReward = 50;
     const waveBonus = gameState.wave * 10;
@@ -561,8 +587,10 @@ function calculateWaveReward() {
     return Math.floor((baseReward + waveBonus + towerBonus + levelBonus) * difficultyMultiplier);
 }
 
-
-// 저장 데이터 검증
+/**
+ * 저장 데이터 검증 함수
+ * 게임 저장 데이터의 유효성을 검사
+ */
 function validateSaveData(saveData) {
     // 웨이브/스폰, 환경설정, 그룹 등 필드도 검증
     const requiredFields = ['version', 'gameState', 'gameStats', 'towers', 'enemies', 'enemyGroups', 'groupIdCounter', 'achievements', 'currentMap', 'timestamp', 'soundEnabled', 'musicEnabled', 'lowSpecMode'];
@@ -601,7 +629,10 @@ function validateSaveData(saveData) {
     return true;
 }
 
-// 경험치 획득 및 레벨업
+/**
+ * 경험치 획득 함수
+ * 경험치를 획득하고 레벨업을 처리
+ */
 function gainExperience(amount) {
     gameState.experience += amount;
     
@@ -620,7 +651,10 @@ function gainExperience(amount) {
     updateInfoBar();
 }
 
-// 보스 패턴 이펙트 표시 함수
+/**
+ * 보스 패턴 이펙트 표시 함수
+ * 보스의 특수 패턴 사용 시 시각 효과를 표시
+ */
 function showBossPatternEffect(x, y, patternName) {
     const parent = document.querySelector('.game-area');
     if (!parent) return;
@@ -655,7 +689,10 @@ function showBossPatternEffect(x, y, patternName) {
     }, 1200);
 }
 
-// 맵 선택 함수
+/**
+ * 맵 선택 함수
+ * 게임 맵을 변경하고 관련 설정을 업데이트
+ */
 function selectMap(mapKey) {
     if (!MAPS[mapKey]) {
         alert('맵 데이터가 없습니다.');
@@ -727,7 +764,10 @@ document.getElementById('mapSelect').addEventListener('change', (e) => {
     }
 });
 
-// 미니맵 그리기 함수
+/**
+ * 미니맵 그리기 함수
+ * 게임 화면 우측에 미니맵을 표시
+ */
 function drawMinimap() {
     const minimapCanvas = document.getElementById('minimapCanvas');
     if (!minimapCanvas) return;
@@ -806,7 +846,10 @@ function drawMinimap() {
     }
 }
 
-// 조합 이펙트 표시 함수
+/**
+ * 조합 이펙트 표시 함수
+ * 타워 조합 발견 시 시각 효과를 표시
+ */
 function showComboEffect(comboName) {
     if (lowSpecMode) return;
     const effect = document.createElement('div');
@@ -1898,7 +1941,10 @@ document.head.insertAdjacentHTML('beforeend', `
 `);
 
 
-// 상태 효과 이펙트 표시 함수
+/**
+ * 상태 효과 표시 함수
+ * 적에게 적용된 상태 효과를 시각적으로 표시
+ */
 function showStatusEffect(x, y, effectType) {
     const effect = document.createElement('div');
     effect.className = 'status-effect';
@@ -1914,7 +1960,10 @@ function showStatusEffect(x, y, effectType) {
     }, 1000);
 }
 
-// 상태 효과 업데이트 함수
+/**
+ * 상태 효과 업데이트 함수
+ * 적의 상태 효과 지속시간과 효과를 관리
+ */
 function updateStatusEffects(enemy) {
     if (enemy.isDead) return;
     
@@ -1950,6 +1999,10 @@ function updateStatusEffects(enemy) {
     }
 }
 
+/**
+ * 힐 이펙트 표시 함수
+ * 힐링 효과 발생 시 시각 효과를 표시
+ */
 function showHealEffect(x, y) {
     const effect = {
         x: x * TILE_SIZE + TILE_SIZE / 2,
@@ -1985,7 +2038,10 @@ function showHealEffect(x, y) {
     animate();
 }
 
-// 매복 효과 표시 함수
+/**
+ * 매복 이펙트 표시 함수
+ * 매복 패턴 사용 시 시각 효과를 표시
+ */
 function showAmbushEffect(x, y) {
     const effect = {
         x: x * TILE_SIZE + TILE_SIZE / 2,
@@ -2022,7 +2078,10 @@ function showAmbushEffect(x, y) {
     animate();
 }
 
-// 적 스킬 시각 효과
+/**
+ * 스킬 이펙트 표시 함수
+ * 적의 스킬 사용 시 시각 효과를 표시
+ */
 function showSkillEffect(x, y, name) {
     const parent = document.querySelector('.game-area');
     if (!parent) return;
@@ -2061,7 +2120,10 @@ function showSkillEffect(x, y, name) {
     }, 1200);
 }
 
-// 그룹 버프/효과 적용 함수
+/**
+ * 그룹 버프 적용 함수
+ * 적 그룹에 버프 효과를 적용
+ */
 function applyGroupBuffs() {
     enemyGroups.forEach(group => {
         const alive = group.members.filter(e => e.health > 0 && !e.isDead);
@@ -2149,8 +2211,11 @@ if (startBtn) {
         }
     });
 }
-// ... existing code ...
 
+/**
+ * 이펙트 초기화 함수
+ * 게임에서 사용할 이펙트 풀을 초기화
+ */
 function initializeEffects() {
     // 이펙트 풀 초기화
     EffectPool.init('attack', 20);
@@ -2160,7 +2225,10 @@ function initializeEffects() {
     EffectPool.init('levelUp', 5);  // 레벨업 이펙트 풀 추가
 }
 
-// 공격 이펙트 표시 (최적화)
+/**
+ * 공격 이펙트 표시 함수
+ * 타워의 공격 시 시각 효과를 표시
+ */
 function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
     if (lowSpecMode) return;
     const effect = EffectPool.get('attack');
@@ -2196,7 +2264,10 @@ function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
     }, { once: true });
 }
 
-// 데미지 숫자 표시 (최적화)
+/**
+ * 데미지 숫자 표시 함수
+ * 적에게 입힌 데미지를 숫자로 표시
+ */
 function showDamageNumber(x, y, damage, isCritical = false) {
     if (lowSpecMode) return;
 
@@ -2329,7 +2400,10 @@ document.head.insertAdjacentHTML('beforeend', `
     </style>
 `);
 
-// 특수능력 이펙트 표시 (최적화)
+/**
+ * 특수 이펙트 표시 함수
+ * 특수 능력 사용 시 시각 효과를 표시
+ */
 function showSpecialEffect(x, y, name) {
     if (lowSpecMode) return;
     const effect = EffectPool.get('special');
@@ -2370,6 +2444,10 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+/**
+ * 컨트롤 가시성 업데이트 함수
+ * 게임 상태에 따라 UI 컨트롤의 표시 여부를 관리
+ */
 function updateControlVisibility() {
     const isStarted = gameState.isStarted;
     // 게임 시작 버튼은 항상 노출, 텍스트만 변경
@@ -2490,10 +2568,10 @@ Enemy.prototype.applyStatusEffect = function(effectType, duration) {
     }
 };
 
-// ... existing code ...
-
-// ... existing code ...
-// 게임 루프에서 메시지 그리기
+/**
+ * 웨이브 메시지 그리기 함수
+ * 웨이브 시작 시 화면에 메시지를 표시
+ */
 function drawWaveMessage() {
     if (!gameState.currentWaveMessage) return;
 
@@ -2570,7 +2648,10 @@ function drawWaveMessage() {
     ctx.restore();
 }
 
-// 타워 설치 가능한 위치 표시
+/**
+ * 설치 가능 위치 표시 함수
+ * 타워를 설치할 수 있는 위치를 시각적으로 표시
+ */
 function showPlaceablePositions() {
     for (let i = 0; i < GRID_WIDTH; i++) {
         for (let j = 0; j < GRID_HEIGHT; j++) {
@@ -2589,8 +2670,11 @@ function showPlaceablePositions() {
         }
     }
 }
-// ... existing code ...
 
+/**
+ * 웨이브 시작 메시지 표시 함수
+ * 웨이브 시작 시 알림 메시지를 표시
+ */
 function showWaveStartMessage(wave) {
     // 초기 셋팅값일 때는 메시지 표시하지 않음
     if (wave <= 0) return;
@@ -2604,7 +2688,10 @@ function showWaveStartMessage(wave) {
     };
 }
 
-// 메뉴 닫기 핸들러
+/**
+ * 메뉴 닫기 핸들러 설정 함수
+ * 메뉴 외부 클릭 시 메뉴를 닫는 기능을 설정
+ */
 function setupMenuCloseHandler(menu) {
     const closeMenu = (e) => {
         if (!menu.contains(e.target) && e.target !== canvas) {
