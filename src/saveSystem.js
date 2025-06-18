@@ -1,4 +1,10 @@
+/**
+ * 게임 저장 시스템 파일
+ * 게임의 진행 상태, 설정, 통계 등을 저장하고 불러오는 기능을 관리
+ */
+
 // 게임 저장
+// 현재 게임의 상태(타워, 적, 웨이브 등)를 로컬 스토리지에 저장
 function saveGame() {
     try {
         const saveData = {
@@ -109,6 +115,7 @@ function saveGame() {
 }
 
 // 게임 불러오기
+// 저장된 게임 상태를 로컬 스토리지에서 불러와 게임을 복원
 function loadGame() {
     try {
         const saveData = localStorage.getItem('towerDefenseSave');
@@ -214,6 +221,7 @@ function loadGame() {
 }
 
 // 저장/불러오기 알림
+// 저장이나 불러오기 작업의 결과를 사용자에게 알림
 function showSaveLoadNotification(message, isError = false) {
     const notification = document.getElementById('saveLoadNotification');
     if (!notification) {
@@ -230,6 +238,7 @@ function showSaveLoadNotification(message, isError = false) {
     }, 2000);
 }
 
+// 전역 객체에 노출
 window.saveGame = saveGame;
 window.loadGame = loadGame;
 window.showSaveLoadNotification = showSaveLoadNotification;
