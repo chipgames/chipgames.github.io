@@ -848,10 +848,6 @@ function enemyFromData(data) {
     return enemy;
 }
 
-// 적 관리 변수
-let enemies = [];
-let enemyGroups = [];
-
 // 그룹 시각화 효과
 function drawGroupConnections() {
     const groups = new Map();

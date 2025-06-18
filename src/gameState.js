@@ -1,47 +1,3 @@
-// 게임 상태
-const gameState = {
-    gold: 200, // EASY 난이도 초기 골드
-    lives: 25, // EASY 난이도 초기 생명력
-    wave: 1,
-    isGameOver: false,
-    waveInProgress: false,
-    enemiesRemaining: 0,
-    isPaused: false,
-    isStarted: false,
-    score: 0,
-    difficulty: 'EASY', // EASY, NORMAL, HARD
-    bossWave: 5, // 5웨이브마다 보스 등장
-    bossKilled: false,
-    goldMultiplier: 1,
-    maxTowers: 12, // EASY 난이도 최대 타워 수
-    towerCount: 0, // 현재 설치된 타워 수
-    experience: 0,
-    level: 1,
-    experienceToNextLevel: 100,
-    currentMap: 'STRAIGHT', // 현재 맵 정보 추가
-    currentWaveMessage: null, // 웨이브 메시지 관련 변수 추가
-    waveMessageStartTime: 0,   // 웨이브 메시지 시작 시간
-    lastSpawnTime: 0,
-    totalEnemies: 0,
-    currentGroup: 1,
-    totalGroups: 1,
-    groupSize: 1,
-    enemiesInCurrentGroup: 0
-};
-
-// 게임 통계
-const gameStats = {
-    enemiesKilled: 0,
-    bossesKilled: 0,
-    totalGold: 0,
-    highestWave: 0,
-    eventsTriggered: [],
-    playTime: 0,
-    gamesPlayed: 0,
-    gamesWon: 0,
-    gamesLost: 0
-};
-
 // 게임 초기화
 function initializeGame() {
     // 게임 상태 초기화
@@ -76,8 +32,6 @@ function initializeGame() {
     // 이펙트 풀 초기화
     initializeEffects();
     
-    // 맵 선택 드롭다운 초기화
-    const mapSelect = document.getElementById('mapSelect');
     if (mapSelect) {
         mapSelect.value = gameState.currentMap;
     }
