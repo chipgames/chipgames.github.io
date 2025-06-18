@@ -1113,26 +1113,32 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
 
         card.innerHTML = `
             <div class="tower-card-header">
-                <div class="tower-icon" style="background: ${tower.color}">${type[0]}</div>
+                <div class="tower-icon" tabindex="0" style="background: ${tower.color}">${type[0]}</div>
                 <div class="tower-name">${tower.name}</div>
+                <div class="tower-cost">${tower.cost} 골드</div>
             </div>
-            <div class="tower-cost">${tower.cost} 골드</div>
-            <div class="tower-stats">
-                <div class="tower-stat">
-                    <span class="tower-stat-label">공격력</span>
-                    <span class="tower-stat-value">${tower.damage}</span>
+            <div class="tower-details">
+                <div class="tower-stats">
+                    <span class="tower-stat-label">공격력</span> ${tower.damage} /
+                    <span class="tower-stat-label">범위</span> ${tower.range} /
+                    <span class="tower-stat-label">쿨다운</span> ${(tower.cooldown / 60).toFixed(2)}초
                 </div>
-                <div class="tower-stat">
-                    <span class="tower-stat-label">범위</span>
-                    <span class="tower-stat-value">${tower.range}</span>
-                </div>
-                <div class="tower-stat">
-                    <span class="tower-stat-label">쿨다운</span>
-                    <span class="tower-stat-value">${(tower.cooldown / 60).toFixed(2)}초</span>
-                </div>
+                <div class="tower-description">${getSpecialDescription(type)}</div>
             </div>
-            <div class="tower-description">${getSpecialDescription(type)}</div>
         `;
+
+        const icon = card.querySelector('.tower-icon');
+        icon.addEventListener('mouseenter', () => card.classList.add('show-details'));
+        icon.addEventListener('mouseleave', () => card.classList.remove('show-details'));
+        icon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            card.classList.toggle('show-details');
+        });
+        icon.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                card.classList.toggle('show-details');
+            }
+        });
 
         if (gameState.gold >= tower.cost) {
             card.onmouseover = () => showTowerRangePreview(x, y, tower.range, type);

@@ -1163,209 +1163,178 @@ body {
     }
 }
 
-.tower-build-menu {
-    position: static;
+.tower-menu-container {
+    width: 100%;
+    max-width: 950px;
     margin: 0 auto;
-    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    padding: 10px 0 0 0;
+    background: none;
+    box-shadow: none;
+}
+
+.tower-build-menu {
+    width: 100%;
+    max-width: 900px;
+    background: #181f1b;
     border: 2px solid #4CAF50;
-    border-radius: 10px;
-    padding: 20px;
+    border-radius: 14px;
+    padding: 18px 12px 12px 12px;
     color: #fff;
-    font-family: 'Arial', sans-serif;
-    width: 300px;
-    max-height: 80vh;
+    box-shadow: 0 4px 24px rgba(76,175,80,0.15);
+    margin: 0 auto;
     overflow-y: auto;
-    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
-    animation: modalFadeIn 0.3s ease-out;
+    max-height: 44vh;
+    font-size: 0.97em;
 }
 
 .tower-build-header {
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid #4CAF50;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.97em;
+    margin-bottom: 4px;
+    padding-bottom: 0;
+    min-height: 24px;
+    height: 24px;
 }
 
-.tower-build-header h2 {
-    margin: 0 0 8px 0;
+.tower-build-header h2,
+.tower-build-header .header-title {
+    margin: 0;
     color: #4CAF50;
-    font-size: 1.4em;
+    font-size: 1em;
+    font-weight: bold;
+    letter-spacing: 0.01em;
+}
+.tower-build-header p,
+.tower-build-header .header-gold {
+    margin: 0;
+    font-size: 0.93em;
+    color: #fff;
+    font-weight: normal;
+    white-space: nowrap;
 }
 
 .tower-list {
     display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
-    max-height: 400px;
-    overflow-y: auto;
 }
 
 .tower-card {
-    background: #2c2c2c;
-    border: 1px solid #4CAF50;
-    border-radius: 8px;
-    padding: 12px;
+    background: #232b23;
+    border: 1.5px solid #4CAF50;
+    border-radius: 10px;
+    padding: 8px 6px 6px 6px;
+    transition: box-shadow 0.2s, border 0.2s;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    min-height: 56px;
+    box-shadow: 0 2px 8px rgba(76,175,80,0.07);
+    font-size: 0.91em;
 }
-
 .tower-card:hover:not(.disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+    border: 2px solid #81c784;
+    box-shadow: 0 4px 16px rgba(76,175,80,0.18);
+    background: #263326;
 }
-
 .tower-card.disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
 }
 
 .tower-card-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 0.98em;
 }
-
 .tower-icon {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
+    background: #4CAF50;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
+    font-size: 1.1em;
     color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    border: 2px solid #4CAF50;
+    transition: border 0.2s;
 }
-
+.tower-icon:hover, .tower-icon:focus {
+    border: 2px solid #81c784;
+}
 .tower-name {
     font-weight: bold;
-    font-size: 1.1em;
-}
-
-.tower-cost {
-    color: #FFD700;
-    font-weight: bold;
-    margin-bottom: 8px;
-}
-
-.tower-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-bottom: 8px;
-}
-
-.tower-stat {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 0.9em;
-}
-
-.tower-stat-label {
-    color: #888;
-    font-size: 0.8em;
-}
-
-.tower-stat-value {
     color: #4CAF50;
+    font-size: 1em;
+}
+.tower-cost {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    background: rgba(0,0,0,0.7);
+    padding: 2px 10px;
+    border-radius: 8px;
+    color: gold;
+    font-size: 0.95em;
     font-weight: bold;
 }
-
+.tower-stats {
+    display: flex;
+    gap: 18px;
+    font-size: 0.92em;
+    color: #b2dfdb;
+    margin-bottom: 4px;
+}
+.tower-stat-label {
+    color: #b2dfdb;
+    margin-right: 2px;
+}
 .tower-description {
-    font-size: 0.9em;
-    color: #aaa;
+    font-size: 0.82em;
+    color: #bdbdbd;
+    margin-top: 4px;
     line-height: 1.4;
 }
 
-.tower-info {
-    position: absolute;
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid #fff;
-    border-radius: 4px;
-    padding: 8px;
-    color: #fff;
-    font-size: 12px;
-    pointer-events: none;
-    z-index: 1000;
-    min-width: 120px;
-    text-align: center;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+.tower-card .tower-details {
+    display: none;
+    margin-top: 6px;
+    font-size: 0.88em;
+    color: #bdbdbd;
+    line-height: 1.4;
+}
+.tower-card.show-details .tower-details {
+    display: block;
 }
 
-.tower-name {
-    font-weight: bold;
-    margin-bottom: 4px;
-    color: #ffd700;
-    font-size: 14px;
+.tower-build-menu::-webkit-scrollbar {
+    width: 7px;
+    background: #232b23;
+}
+.tower-build-menu::-webkit-scrollbar-thumb {
+    background: #4CAF50;
+    border-radius: 6px;
 }
 
-.tower-level {
-    color: #fff;
-    margin-bottom: 4px;
-    font-size: 12px;
-}
-
-.tower-stats {
-    display: flex;
-    justify-content: space-around;
-    gap: 8px;
-    margin-top: 4px;
-    padding-top: 4px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.tower-stats div {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-/* 타워 메뉴 컨테이너 */
-.tower-menu-container {
-    position: static;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: 10px 0 0 0;
-    z-index: 1000;
-}
-
-/* 타워 설치 메뉴 */
-.tower-build-menu {
-    background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #4CAF50;
-    border-radius: 10px;
-    padding: 20px;
-    color: #fff;
-    font-family: 'Arial', sans-serif;
-    width: 300px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
-    animation: modalFadeIn 0.3s ease-out;
-}
-
-/* 타워 업그레이드 메뉴 */
-.tower-upgrade-menu {
-    background: rgba(0, 0, 0, 0.9);
-    border: 2px solid #4CAF50;
-    border-radius: 10px;
-    padding: 20px;
-    color: #fff;
-    font-family: 'Arial', sans-serif;
-    width: 280px;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
-    animation: modalFadeIn 0.3s ease-out;
-}
-
-@keyframes modalFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
+@media (max-width: 900px) {
+    .tower-build-menu {
+        max-width: 98vw;
+        padding: 8px 1vw;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .tower-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 600px) {
+    .tower-list {
+        grid-template-columns: 1fr;
     }
 }
