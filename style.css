@@ -1214,3 +1214,90 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+.upgrade-effect {
+    position: absolute;
+    z-index: 1200;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: upgradeEffectFade 1.1s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+
+.upgrade-ring {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border: 4px solid #ffd700;
+    border-radius: 50%;
+    opacity: 0.7;
+    animation: upgradeRing 1s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+
+.upgrade-particles {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    pointer-events: none;
+}
+.upgrade-particles .particle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: #fffbe6;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: upgradeParticle 1s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+.upgrade-particles .particle:nth-child(1) { left: 50%; top: 0%;    animation-delay: 0s; }
+.upgrade-particles .particle:nth-child(2) { left: 85%; top: 15%;  animation-delay: 0.05s; }
+.upgrade-particles .particle:nth-child(3) { left: 100%; top: 50%; animation-delay: 0.1s; }
+.upgrade-particles .particle:nth-child(4) { left: 85%; top: 85%;  animation-delay: 0.15s; }
+.upgrade-particles .particle:nth-child(5) { left: 50%; top: 100%; animation-delay: 0.2s; }
+.upgrade-particles .particle:nth-child(6) { left: 15%; top: 85%;  animation-delay: 0.25s; }
+.upgrade-particles .particle:nth-child(7) { left: 0%; top: 50%;   animation-delay: 0.3s; }
+.upgrade-particles .particle:nth-child(8) { left: 15%; top: 15%;  animation-delay: 0.35s; }
+
+.upgrade-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #ffd700;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-shadow: 0 2px 8px #000, 0 0 16px #ffd70099;
+    opacity: 0.95;
+    animation: upgradeTextPop 1s cubic-bezier(0.4,0,0.2,1) forwards;
+    min-width: 100px;
+    padding: 0 16px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+@keyframes upgradeEffectFade {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
+}
+@keyframes upgradeRing {
+    0% { transform: scale(0.5); opacity: 0.7; }
+    60% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1.5); opacity: 0; }
+}
+@keyframes upgradeParticle {
+    0% { transform: scale(0.5); opacity: 0.8; }
+    60% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes upgradeTextPop {
+    0% { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
+    20% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.2); opacity: 0; }
+}
