@@ -1085,43 +1085,25 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
         return;
     }
 
+    const towerMenu = document.getElementById('towerMenu');
     const existingMenu = document.querySelector('.tower-build-menu');
     if (existingMenu && existingMenu.parentNode) {
         existingMenu.parentNode.removeChild(existingMenu);
     }
 
-    const towerMenu = document.createElement('div');
-    towerMenu.className = 'tower-build-menu';
+    const menu = document.createElement('div');
+    menu.className = 'tower-build-menu';
 
-    // 메뉴 위치 계산 (화면 밖으로 나가지 않도록)
-    const menuWidth = 300;
-    const menuHeight = 400;
-    const padding = 20;
-
-    let left = clientX;
-    let top = clientY;
-
-    // 오른쪽으로 넘치면 왼쪽에 표시
-    if (left + menuWidth > window.innerWidth) {
-        left = window.innerWidth - menuWidth - padding;
-    }
-
-    // 아래로 넘치면 위에 표시
-    if (top + menuHeight > window.innerHeight) {
-        top = window.innerHeight - menuHeight - padding;
-    }
-
-    towerMenu.style.left = `${left}px`;
-    towerMenu.style.top = `${top}px`;
-
+    // 헤더 추가
     const header = document.createElement('div');
     header.className = 'tower-build-header';
     header.innerHTML = `
-            <h2>타워 설치</h2>
-            <p>골드: ${gameState.gold}</p>
-        `;
-    towerMenu.appendChild(header);
+        <h2>타워 설치</h2>
+        <p>골드: ${gameState.gold}</p>
+    `;
+    menu.appendChild(header);
 
+    // 타워 리스트 생성
     const towerList = document.createElement('div');
     towerList.className = 'tower-list';
 
@@ -1130,27 +1112,27 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
         card.className = `tower-card ${gameState.gold < tower.cost ? 'disabled' : ''}`;
 
         card.innerHTML = `
-                <div class="tower-card-header">
-                    <div class="tower-icon" style="background: ${tower.color}">${type[0]}</div>
-                    <div class="tower-name">${tower.name}</div>
+            <div class="tower-card-header">
+                <div class="tower-icon" style="background: ${tower.color}">${type[0]}</div>
+                <div class="tower-name">${tower.name}</div>
+            </div>
+            <div class="tower-cost">${tower.cost} 골드</div>
+            <div class="tower-stats">
+                <div class="tower-stat">
+                    <span class="tower-stat-label">공격력</span>
+                    <span class="tower-stat-value">${tower.damage}</span>
                 </div>
-                <div class="tower-cost">${tower.cost} 골드</div>
-                <div class="tower-stats">
-                    <div class="tower-stat">
-                        <span class="tower-stat-label">공격력</span>
-                        <span class="tower-stat-value">${tower.damage}</span>
-                    </div>
-                    <div class="tower-stat">
-                        <span class="tower-stat-label">범위</span>
-                        <span class="tower-stat-value">${tower.range}</span>
-                    </div>
-                    <div class="tower-stat">
-                        <span class="tower-stat-label">쿨다운</span>
-                        <span class="tower-stat-value">${(tower.cooldown / 60).toFixed(2)}초</span>
-                    </div>
+                <div class="tower-stat">
+                    <span class="tower-stat-label">범위</span>
+                    <span class="tower-stat-value">${tower.range}</span>
                 </div>
-                <div class="tower-description">${getSpecialDescription(type)}</div>
-            `;
+                <div class="tower-stat">
+                    <span class="tower-stat-label">쿨다운</span>
+                    <span class="tower-stat-value">${(tower.cooldown / 60).toFixed(2)}초</span>
+                </div>
+            </div>
+            <div class="tower-description">${getSpecialDescription(type)}</div>
+        `;
 
         if (gameState.gold >= tower.cost) {
             card.onmouseover = () => showTowerRangePreview(x, y, tower.range, type);
@@ -1162,9 +1144,9 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
                 gameState.towerCount++;
                 updateTowerLimit();
                 playSound('tower_place');
-                hideTowerRangePreview(); // 타워 설치 후 미리보기 즉시 제거
-                if (towerMenu.parentNode) {
-                    towerMenu.parentNode.removeChild(towerMenu);
+                hideTowerRangePreview();
+                if (menu.parentNode) {
+                    menu.parentNode.removeChild(menu);
                 }
                 const highlight = document.querySelector('.grid-highlight');
                 if (highlight) highlight.remove();
@@ -1174,58 +1156,43 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
         towerList.appendChild(card);
     });
 
-    towerMenu.appendChild(towerList);
-    document.body.appendChild(towerMenu);
-    setupMenuCloseHandler(towerMenu);
+    menu.appendChild(towerList);
+    towerMenu.appendChild(menu);
+    setupMenuCloseHandler(menu);
 }
 
 // 타워 업그레이드 메뉴 표시
 // 타워 업그레이드 시 표시되는 메뉴
 function showTowerUpgradeMenu(tower, clientX, clientY) {
+    const towerMenu = document.getElementById('towerMenu');
+    const existingMenu = document.querySelector('.tower-upgrade-menu');
+    if (existingMenu && existingMenu.parentNode) {
+        existingMenu.parentNode.removeChild(existingMenu);
+    }
+
     const menu = document.createElement('div');
     menu.className = 'tower-upgrade-menu';
-
-    // 메뉴 위치 계산 (화면 밖으로 나가지 않도록)
-    const menuWidth = 280;
-    const menuHeight = 400;
-    const padding = 20;
-
-    let left = clientX;
-    let top = clientY;
-
-    // 오른쪽으로 넘치면 왼쪽에 표시
-    if (left + menuWidth > window.innerWidth) {
-        left = window.innerWidth - menuWidth - padding;
-    }
-
-    // 아래로 넘치면 위에 표시
-    if (top + menuHeight > window.innerHeight) {
-        top = window.innerHeight - menuHeight - padding;
-    }
-
-    menu.style.left = `${left}px`;
-    menu.style.top = `${top}px`;
 
     // 타워 정보 헤더
     const header = document.createElement('div');
     header.className = 'upgrade-header';
     header.innerHTML = `
-            <h3>${TOWER_TYPES[tower.type].name} Lv.${tower.level}</h3>
-            <div class="tower-stats">
-                <div class="stat">
-                    <span class="stat-icon">⚔️</span>
-                    <span class="stat-value">${Math.floor(tower.damage)}</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-icon">🎯</span>
-                    <span class="stat-value">${tower.range}</span>
-                </div>
-                <div class="stat">
-                    <span class="stat-icon">⚡</span>
-                    <span class="stat-value">${(60 / tower.maxCooldown).toFixed(1)}</span>
-                </div>
+        <h3>${TOWER_TYPES[tower.type].name} Lv.${tower.level}</h3>
+        <div class="tower-stats">
+            <div class="stat">
+                <span class="stat-icon">⚔️</span>
+                <span class="stat-value">${Math.floor(tower.damage)}</span>
             </div>
-        `;
+            <div class="stat">
+                <span class="stat-icon">🎯</span>
+                <span class="stat-value">${tower.range}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-icon">⚡</span>
+                <span class="stat-value">${(60 / tower.maxCooldown).toFixed(1)}</span>
+            </div>
+        </div>
+    `;
     menu.appendChild(header);
 
     // 업그레이드 옵션들
@@ -1258,22 +1225,22 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
         }
 
         option.innerHTML = `
-                <div class="upgrade-info">
-                    <span class="upgrade-icon">${upgradeIcons[index]}</span>
-                    <div class="upgrade-details">
-                        <span class="upgrade-name">${upgradeNames[index]}</span>
-                        <div class="upgrade-values">
-                            <span class="current-value">${currentValue}</span>
-                            <span class="arrow">→</span>
-                            <span class="next-value">${nextValue}</span>
-                        </div>
+            <div class="upgrade-info">
+                <span class="upgrade-icon">${upgradeIcons[index]}</span>
+                <div class="upgrade-details">
+                    <span class="upgrade-name">${upgradeNames[index]}</span>
+                    <div class="upgrade-values">
+                        <span class="current-value">${currentValue}</span>
+                        <span class="arrow">→</span>
+                        <span class="next-value">${nextValue}</span>
                     </div>
                 </div>
-                <div class="upgrade-cost ${canUpgrade ? '' : 'insufficient'}">
-                    <span class="cost-icon">💰</span>
-                    <span class="cost-value">${tower.getUpgradeCost(type)}</span>
-                </div>
-            `;
+            </div>
+            <div class="upgrade-cost ${canUpgrade ? '' : 'insufficient'}">
+                <span class="cost-icon">💰</span>
+                <span class="cost-value">${tower.getUpgradeCost(type)}</span>
+            </div>
+        `;
 
         if (canUpgrade) {
             option.addEventListener('click', () => {
@@ -1296,20 +1263,20 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
         const canUpgradeSpecial = tower.canUpgrade('special');
 
         specialOption.innerHTML = `
-                <div class="upgrade-info">
-                    <span class="upgrade-icon">✨</span>
-                    <div class="upgrade-details">
-                        <span class="upgrade-name">특수능력 강화</span>
-                        <div class="upgrade-description">
-                            ${getSpecialDescription(tower.type)}
-                        </div>
+            <div class="upgrade-info">
+                <span class="upgrade-icon">✨</span>
+                <div class="upgrade-details">
+                    <span class="upgrade-name">특수능력 강화</span>
+                    <div class="upgrade-description">
+                        ${getSpecialDescription(tower.type)}
                     </div>
                 </div>
-                <div class="upgrade-cost ${canUpgradeSpecial ? '' : 'insufficient'}">
-                    <span class="cost-icon">💰</span>
-                    <span class="cost-value">${specialCost}</span>
-                </div>
-            `;
+            </div>
+            <div class="upgrade-cost ${canUpgradeSpecial ? '' : 'insufficient'}">
+                <span class="cost-icon">💰</span>
+                <span class="cost-value">${specialCost}</span>
+            </div>
+        `;
 
         if (canUpgradeSpecial) {
             specialOption.addEventListener('click', () => {
@@ -1327,10 +1294,10 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     const sellButton = document.createElement('button');
     sellButton.className = 'sell-button';
     sellButton.innerHTML = `
-            <span class="sell-icon">💎</span>
-            <span class="sell-text">판매</span>
-            <span class="sell-value">+${tower.getSellValue()}</span>
-        `;
+        <span class="sell-icon">💎</span>
+        <span class="sell-text">판매</span>
+        <span class="sell-value">+${tower.getSellValue()}</span>
+    `;
 
     sellButton.addEventListener('click', () => {
         const sellValue = tower.getSellValue();
@@ -1353,7 +1320,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     });
 
     menu.appendChild(sellButton);
-    document.body.appendChild(menu);
+    towerMenu.appendChild(menu);
 
     // 메뉴 외부 클릭 시 닫기
     setupMenuCloseHandler(menu);

@@ -95,6 +95,9 @@ function initializeGame() {
 
     // 미니맵 초기화
     drawMinimap();
+
+    // 타워 메뉴 표시
+    document.getElementById('towerMenu').style.display = 'flex';
 }
 
 // 정보 바 업데이트
