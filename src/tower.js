@@ -1,3 +1,8 @@
+/**
+ * 타워 관련 모든 로직을 담당하는 파일
+ * 타워의 생성, 업그레이드, 공격, 특수 능력 등 게임 내 타워의 동작을 관리
+ */
+
 // 타워 관련 상수
 const TOWER_TYPES = {
     BASIC: {
@@ -150,7 +155,9 @@ const TOWER_TYPES = {
 };
 
 // Tower 클래스
+// 각 타워 객체는 Tower 클래스를 통해 생성되며, 위치, 공격력, 범위 등 다양한 속성을 가짐
 class Tower {
+    // 생성자: 타워의 초기 속성을 설정
     constructor(x, y, type) {
         this.x = x;
         this.y = y;
@@ -192,7 +199,8 @@ class Tower {
         this.shieldEffectTime = 0;
     }
 
-    // 특수 효과 초기화 함수 추가
+    // 특수 효과 초기화
+    // 타워 타입에 따른 특수 효과 속성을 초기화
     initializeSpecialEffects(type, towerType) {
         switch (type) {
             case 'SPLASH':
@@ -217,7 +225,8 @@ class Tower {
         }
     }
 
-    // 특수 능력 사용 함수 개선
+    // 특수 능력 사용
+    // 타워의 특수 능력을 발동하고 쿨다운을 적용
     useSpecial() {
         if (this.specialCooldown > 0 || this.specialActive) return false;
 
@@ -235,7 +244,8 @@ class Tower {
         return false;
     }
 
-    // 특수 능력 아이콘 반환 함수
+    // 특수 능력 아이콘 반환
+    // 타워 타입에 따른 특수 능력 아이콘을 반환
     getSpecialIcon() {
         switch (this.type) {
             case 'ICE': return '❄️';
@@ -247,7 +257,8 @@ class Tower {
         }
     }
 
-    // 업그레이드 함수 개선
+    // 업그레이드
+    // 타워의 특정 속성을 업그레이드하고 비용을 차감
     upgrade(upgradeType) {
         if (this[`${upgradeType}Level`] >= this.maxUpgradeLevel) {
             return false;
@@ -282,7 +293,8 @@ class Tower {
         return true;
     }
 
-    // 업그레이드 비용 계산 함수
+    // 업그레이드 비용 계산
+    // 업그레이드 타입에 따른 비용을 계산
     getUpgradeCost(upgradeType) {
         const baseCost = 100;
         let level = this[`${upgradeType}Level`];
@@ -290,7 +302,8 @@ class Tower {
         return Math.floor(baseCost * Math.pow(1.5, level));
     }
 
-    // 공격 함수 개선
+    // 공격 실행
+    // 범위 내 적을 찾아 공격을 실행
     attack(enemies) {
         if (this.cooldown > 0) {
             this.cooldown--;
@@ -306,7 +319,8 @@ class Tower {
         this.cooldown = this.maxCooldown;
     }
 
-    // 타겟 찾기 함수
+    // 타겟 찾기
+    // 공격 범위 내 가장 적절한 타겟을 찾음
     findTarget(enemies) {
         if (!enemies || !Array.isArray(enemies)) return null;
         return enemies.filter(enemy => enemy && enemy.x !== undefined && enemy.y !== undefined)  // enemy가 유효한지 확인
@@ -317,7 +331,8 @@ class Tower {
             })[0];
     }
 
-    // 공격 실행 함수
+    // 공격 실행
+    // 선택된 타겟에 대해 공격을 실행
     executeAttack(target) {
         const isCritical = Math.random() < CRITICAL_CHANCE;
         const damage = isCritical ? this.damage * CRITICAL_MULTIPLIER : this.damage;
@@ -359,7 +374,8 @@ class Tower {
         }
     }
 
-    // 스플래시 공격 실행 함수
+    // 스플래시 공격 실행
+    // 주변 적들에게 범위 데미지를 적용
     executeSplashAttack(mainTarget, damage) {
         const actualDamage = mainTarget.takeDamage(damage, false, this);
         mainTarget.applyStatusEffect('SLOWED', this.slowEffect);
@@ -378,7 +394,8 @@ class Tower {
         return actualDamage;
     }
 
-    // 지원 버프 실행 함수
+    // 지원 버프 실행
+    // 주변 타워들에게 버프 효과를 적용
     executeSupportBuff() {
         towers.forEach(tower => {
             if (tower === this) return;
@@ -400,7 +417,8 @@ class Tower {
         });
     }
 
-    // 버프 효과 제거 함수
+    // 버프 제거
+    // 적용된 모든 버프 효과를 제거
     removeBuffs() {
         this.buffedTowers.forEach(tower => {
             tower.damage /= this.buffMultiplier;
@@ -408,6 +426,8 @@ class Tower {
         this.buffedTowers.clear();
     }
 
+    // 경험치 획득
+    // 타워가 경험치를 획득하고 레벨업 처리
     gainExperience(amount) {
         this.experience += amount;
 
@@ -437,12 +457,16 @@ class Tower {
         }
     }
 
+    // 상태 업데이트
+    // 타워의 상태를 한 프레임마다 갱신
     update() {
         if (this.specialCooldown > 0) {
             this.specialCooldown--;
         }
     }
 
+    // 타워 그리기
+    // 타워를 캔버스에 그림
     draw() {
         const centerX = this.x * TILE_SIZE + TILE_SIZE / 2;
         const centerY = this.y * TILE_SIZE + TILE_SIZE / 2;
@@ -702,7 +726,8 @@ class Tower {
         ctx.restore();
     }
 
-    // 판매 가격 계산
+    // 판매 가치 계산
+    // 타워의 판매 시 얻을 수 있는 골드를 계산
     getSellValue() {
         const baseValue = TOWER_TYPES[this.type].cost || 100;
         // 실제 투자한 업그레이드 비용 누적
@@ -729,7 +754,8 @@ class Tower {
         return Math.floor((baseValue + upgradeCost) * 0.7);
     }
 
-    // 타워 범위 미리보기
+    // 타워 범위 미리보기 표시
+    // 타워 설치 전 범위를 미리 보여줌
     showTowerRangePreview(x, y, range, type) {
         if (rangePreview) {
             rangePreview.remove();
@@ -756,6 +782,8 @@ class Tower {
         document.querySelector('.game-area').appendChild(rangePreview);
     }
 
+    // 타워 범위 미리보기 숨기기
+    // 타워 범위 미리보기를 제거
     hideTowerRangePreview() {
         if (rangePreview) {
             rangePreview.remove();
@@ -763,6 +791,8 @@ class Tower {
         }
     }
 
+    // 업그레이드 가능 여부 확인
+    // 특정 업그레이드가 가능한지 확인
     canUpgrade(upgradeType) {
         if (upgradeType === 'special') {
             // 특수 업그레이드는 레벨 3 이상, 골드 충분해야 가능
@@ -779,7 +809,7 @@ class Tower {
     }
 } // ← class Tower 끝에 중괄호 추가
 
-// Tower 복원 팩토리 함수
+// 저장된 데이터로부터 타워 생성
 function towerFromData(data) {
     const tower = Object.create(Tower.prototype);
     Object.assign(tower, data);
@@ -973,7 +1003,8 @@ function showTowerInfo(tower) {
     return info;
 }
 
-// 타워 호버 효과
+// 타워 호버 처리
+// 마우스가 타워 위에 있을 때의 동작 처리
 function handleTowerHover(tower) {
     let infoElement = null;
     
@@ -992,19 +1023,6 @@ function handleTowerHover(tower) {
     
     return { showInfo, hideInfo };
 }
-
-// TOWER_TYPES를 전역 변수로 노출
-window.TOWER_TYPES = TOWER_TYPES;
-
-// 전역 객체에 노출
-window.Tower = Tower;
-window.towerFromData = towerFromData;
-window.showTowerRangePreview = showTowerRangePreview;
-window.hideTowerRangePreview = hideTowerRangePreview;
-window.checkTowerCombos = checkTowerCombos;
-window.showLevelUpEffect = showLevelUpEffect;
-window.showTowerInfo = showTowerInfo;
-window.handleTowerHover = handleTowerHover;
 
 // 타워 툴팁 데이터
 const towerTooltipData = {
@@ -1037,7 +1055,8 @@ function showTowerTooltip(e) {
     tooltipEl.style.top = `${rect.bottom + scrollY + 8}px`;
 }
 
-// 타워 툴팁 숨기기 함수
+// 타워 툴팁 숨기기
+// 타워 툴팁을 제거
 function hideTowerTooltip() {
     if (tooltipEl) {
         tooltipEl.classList.remove('show');
@@ -1160,7 +1179,8 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
     setupMenuCloseHandler(towerMenu);
 }
 
-// 타워 업그레이드 메뉴 표시 함수
+// 타워 업그레이드 메뉴 표시
+// 타워 업그레이드 시 표시되는 메뉴
 function showTowerUpgradeMenu(tower, clientX, clientY) {
     const menu = document.createElement('div');
     menu.className = 'tower-upgrade-menu';
@@ -1339,7 +1359,8 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     setupMenuCloseHandler(menu);
 }
 
-// 특수 능력 설명 가져오기 함수
+// 특수 능력 설명 반환
+// 타워 타입에 따른 특수 능력 설명을 반환
 function getSpecialDescription(type) {
     switch (type) {
         case 'ICE':
@@ -1361,8 +1382,18 @@ function getSpecialDescription(type) {
     }
 }
 
+// TOWER_TYPES를 전역 변수로 노출
+window.TOWER_TYPES = TOWER_TYPES;
 
 // 전역 객체에 노출
+window.Tower = Tower;
+window.towerFromData = towerFromData;
+window.showTowerRangePreview = showTowerRangePreview;
+window.hideTowerRangePreview = hideTowerRangePreview;
+window.checkTowerCombos = checkTowerCombos;
+window.showLevelUpEffect = showLevelUpEffect;
+window.showTowerInfo = showTowerInfo;
+window.handleTowerHover = handleTowerHover;
 window.towerTooltipData = towerTooltipData;
 window.showTowerTooltip = showTowerTooltip;
 window.hideTowerTooltip = hideTowerTooltip;
