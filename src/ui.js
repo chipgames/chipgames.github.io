@@ -1,3 +1,8 @@
+/**
+ * UI 관리 시스템
+ * 게임의 사용자 인터페이스 요소들을 관리하고 업데이트하는 기능을 제공합니다.
+ */
+
 // UI/UX 관련 코드
 document.addEventListener('DOMContentLoaded', function() {
     // 게임 설명 모달
