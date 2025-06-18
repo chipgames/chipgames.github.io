@@ -1,98 +1,110 @@
-// 캔버스 관련
+/**
+ * 게임의 전역 변수와 상수를 관리하는 파일
+ * 모든 게임 관련 기본 설정과 상태를 포함
+ */
+
+// 캔버스 관련 변수
+// 게임의 메인 렌더링 컨텍스트를 관리
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
 // 게임 기본 상수
-const TILE_SIZE = 40;
-const CRITICAL_CHANCE = 0.2; // 20%
-const CRITICAL_MULTIPLIER = 2;
-// 타일 크기 설정
-const GRID_WIDTH = canvas.width / TILE_SIZE;
-const GRID_HEIGHT = canvas.height / TILE_SIZE;
+// 게임의 기본적인 수치와 설정값을 정의
+const TILE_SIZE = 40;                // 타일의 크기 (픽셀)
+const CRITICAL_CHANCE = 0.2;         // 치명타 발생 확률 (20%)
+const CRITICAL_MULTIPLIER = 2;       // 치명타 데미지 배율
+const GRID_WIDTH = canvas.width / TILE_SIZE;    // 그리드 가로 타일 수
+const GRID_HEIGHT = canvas.height / TILE_SIZE;  // 그리드 세로 타일 수
 
-// 게임 상태 관련
+// 게임 상태 관련 변수
+// 게임의 현재 상태와 진행 상황을 추적
 const gameState = {
-    gold: 200, // EASY 난이도 초기 골드
-    lives: 25, // EASY 난이도 초기 생명력
-    wave: 1,
-    isGameOver: false,
-    waveInProgress: false,
-    enemiesRemaining: 0,
-    isPaused: false,
-    isStarted: false,
-    score: 0,
-    difficulty: 'EASY', // EASY, NORMAL, HARD
-    bossWave: 5, // 5웨이브마다 보스 등장
-    bossKilled: false,
-    goldMultiplier: 1,
-    maxTowers: 12, // EASY 난이도 최대 타워 수
-    towerCount: 0, // 현재 설치된 타워 수
-    experience: 0,
-    level: 1,
-    experienceToNextLevel: 100,
-    currentMap: 'STRAIGHT', // 현재 맵 정보 추가
-    currentWaveMessage: null, // 웨이브 메시지 관련 변수 추가
-    waveMessageStartTime: 0,   // 웨이브 메시지 시작 시간
-    lastSpawnTime: 0,
-    totalEnemies: 0,
-    currentGroup: 1,
-    totalGroups: 1,
-    groupSize: 1,
-    enemiesInCurrentGroup: 0
+    gold: 200,           // 현재 보유 골드
+    lives: 25,           // 남은 생명력
+    wave: 1,             // 현재 웨이브
+    isGameOver: false,   // 게임 오버 상태
+    waveInProgress: false, // 웨이브 진행 중 여부
+    enemiesRemaining: 0,  // 남은 적 수
+    isPaused: false,     // 일시정지 상태
+    isStarted: false,    // 게임 시작 여부
+    score: 0,            // 현재 점수
+    difficulty: 'EASY',  // 현재 난이도
+    bossWave: 5,         // 보스 등장 웨이브
+    bossKilled: false,   // 보스 처치 여부
+    goldMultiplier: 1,   // 골드 획득 배율
+    maxTowers: 12,       // 최대 타워 수
+    towerCount: 0,       // 현재 설치된 타워 수
+    experience: 0,       // 현재 경험치
+    level: 1,            // 현재 레벨
+    experienceToNextLevel: 100, // 다음 레벨까지 필요한 경험치
+    currentMap: 'STRAIGHT', // 현재 맵
+    currentWaveMessage: null, // 현재 웨이브 메시지
+    waveMessageStartTime: 0,  // 웨이브 메시지 시작 시간
+    lastSpawnTime: 0,    // 마지막 적 생성 시간
+    totalEnemies: 0,     // 총 적 수
+    currentGroup: 1,     // 현재 적 그룹
+    totalGroups: 1,      // 총 적 그룹 수
+    groupSize: 1,        // 그룹당 적 수
+    enemiesInCurrentGroup: 0 // 현재 그룹의 남은 적 수
 };
 
 // 게임 통계
+// 게임 진행 중의 통계 정보를 저장
 const gameStats = {
-    enemiesKilled: 0,
-    bossesKilled: 0,
-    totalGold: 0,
-    highestWave: 0,
-    eventsTriggered: [],
-    playTime: 0,
-    gamesPlayed: 0,
-    gamesWon: 0,
-    gamesLost: 0
+    enemiesKilled: 0,    // 처치한 적 수
+    bossesKilled: 0,     // 처치한 보스 수
+    totalGold: 0,        // 총 획득 골드
+    highestWave: 0,      // 최고 웨이브
+    eventsTriggered: [], // 발생한 이벤트 목록
+    playTime: 0,         // 플레이 시간
+    gamesPlayed: 0,      // 플레이한 게임 수
+    gamesWon: 0,         // 승리한 게임 수
+    gamesLost: 0         // 패배한 게임 수
 };
 
-// 게임 객체 관련
-let towers = [];                // 타워 배열
-let enemies = [];               // 적 관리 변수
-let enemyGroups = [];
-let groupIdCounter = 1;         // 그룹 관리 배열
-let rangePreview = null;        // 타워 범위 미리보기
-let shownCombos = [];           // 타워 조합 체크 함수  // 이미 표시된 조합을 추적하는 전역 배열 추가
-let currentWaveMessage = null;  // 웨이브 메시지 관련 변수
-let waveMessageStartTime = 0;
-let lowSpecMode = false;        // 저사양 모드 상태
-
+// 게임 객체 관련 변수
+// 게임 내 동적 객체들을 관리
+let towers = [];         // 설치된 타워 배열
+let enemies = [];        // 생성된 적 배열
+let enemyGroups = [];    // 적 그룹 배열
+let groupIdCounter = 1;  // 그룹 ID 카운터
+let rangePreview = null; // 타워 범위 미리보기
+let shownCombos = [];    // 표시된 타워 조합
+let currentWaveMessage = null; // 현재 웨이브 메시지
+let waveMessageStartTime = 0;  // 웨이브 메시지 시작 시간
+let lowSpecMode = false; // 저사양 모드 상태
 
 // UI 요소
-const mapSelect = document.getElementById('mapSelect'); // // 맵 선택 이벤트에서만 initializeGame() 호출
-const startBtn = document.getElementById('startBtn');   // 게임 시작 버튼에서만 initializeGame() 호출
+// 게임의 UI 요소 참조
+const mapSelect = document.getElementById('mapSelect'); // 맵 선택 드롭다운
+const startBtn = document.getElementById('startBtn');   // 게임 시작 버튼
 
 // 게임 설정
+// 게임의 다양한 설정값들을 정의
+
+// 적 레벨 설정
 const ENEMY_LEVEL_SETTINGS = {
-    maxLevel: 999,
-    healthMultiplier: 1.2, // 레벨당 체력 증가율
-    speedMultiplier: 1.05, // 레벨당 속도 증가율
-    rewardMultiplier: 1.15, // 레벨당 보상 증가율
-    experienceMultiplier: 1.1, // 레벨당 경험치 증가율
-    levelUpChance: 0.1, // 적이 레벨업할 확률
-    maxLevelUpPerWave: 2 // 웨이브당 최대 레벨업 횟수
+    maxLevel: 999,               // 최대 레벨
+    healthMultiplier: 1.2,       // 레벨당 체력 증가율
+    speedMultiplier: 1.05,       // 레벨당 속도 증가율
+    rewardMultiplier: 1.15,      // 레벨당 보상 증가율
+    experienceMultiplier: 1.1,   // 레벨당 경험치 증가율
+    levelUpChance: 0.1,          // 레벨업 확률
+    maxLevelUpPerWave: 2         // 웨이브당 최대 레벨업 횟수
 };
 
 // 난이도 설정
 const DIFFICULTY_SETTINGS = {
     EASY: {
-        gold: 200,
-        lives: 25,
-        enemyHealth: 0.8,
-        enemySpeed: 0.8,
-        goldReward: 1.2,
-        maxTowers: 12,
-        enemySpawnRate: 0.03,
-        initialGold: 200,
-        initialLives: 25
+        gold: 200,           // 초기 골드
+        lives: 25,           // 초기 생명력
+        enemyHealth: 0.8,    // 적 체력 배율
+        enemySpeed: 0.8,     // 적 속도 배율
+        goldReward: 1.2,     // 골드 보상 배율
+        maxTowers: 12,       // 최대 타워 수
+        enemySpawnRate: 0.03,// 적 생성 속도
+        initialGold: 200,    // 시작 골드
+        initialLives: 25     // 시작 생명력
     },
     NORMAL: {
         gold: 150,
@@ -119,6 +131,7 @@ const DIFFICULTY_SETTINGS = {
 };
 
 // 맵 정의
+// 게임에서 사용 가능한 맵들의 경로 정의
 const MAPS = {
     STRAIGHT: {
         name: '직선 경로',
@@ -659,16 +672,18 @@ const MAPS = {
 };
 
 // 타워 아이콘 정의
+// 각 타워 타입별 아이콘
 const TOWER_ICONS = {
-    BASIC: '⚔️',
-    ICE: '❄️',
-    POISON: '☠️',
-    LASER: '🔴',
-    SPLASH: '💥',
-    SUPPORT: '💫'
+    BASIC: '⚔️',    // 기본 타워
+    ICE: '❄️',      // 얼음 타워
+    POISON: '☠️',   // 독 타워
+    LASER: '🔴',    // 레이저 타워
+    SPLASH: '💥',   // 스플래시 타워
+    SUPPORT: '💫'   // 지원 타워
 };
 
 // 파워업 정의
+// 게임 내 사용 가능한 파워업 효과
 const POWERUPS = {
     GOLD: {
         name: '골드 부스트',
@@ -714,6 +729,7 @@ const POWERUPS = {
 };
 
 // 특수 이벤트 정의
+// 게임 중 발생하는 특수 이벤트
 const SPECIAL_EVENTS = {
     GOLD_RUSH: {
         name: '골드 러시',
@@ -763,6 +779,7 @@ const SPECIAL_EVENTS = {
 };
 
 // 업적 정의
+// 게임 내 달성 가능한 업적
 const ACHIEVEMENTS = {
     FIRST_TOWER: {
         name: '첫 타워',
@@ -811,7 +828,8 @@ const ACHIEVEMENTS = {
     }
 };
 
-// 타워 조합 정의 개선
+// 타워 조합 정의
+// 타워들 간의 특별한 조합 효과
 const TOWER_COMBOS = {
     ICE_POISON: {
         name: '독성 얼음',
@@ -912,6 +930,7 @@ const TOWER_COMBOS = {
 };
 
 // 특수 능력 정의
+// 타워나 적이 가진 특수 능력
 const ABILITIES = {
     TOWER_BOOST: {
         name: '전체 타워 강화',
