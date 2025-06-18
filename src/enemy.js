@@ -1,4 +1,10 @@
+/**
+ * 적(enemy) 관련 모든 로직을 담당하는 파일
+ * 적의 생성, 이동, 상태 효과, 보스 패턴 등 게임 내 적의 동작을 관리
+ */
+
 // 적 유형 정의
+// 게임 내 등장하는 적의 종류와 각각의 특성을 정의
 const ENEMY_TYPES = {
     NORMAL: {
         name: '일반 적',
@@ -37,6 +43,7 @@ const ENEMY_TYPES = {
 };
 
 // 적 AI 패턴 상수
+// 적의 이동 패턴과 특수 행동을 정의
 const ENEMY_PATTERNS = {
     NORMAL: {
         name: '일반',
@@ -194,6 +201,7 @@ const ENEMY_PATTERNS = {
 };
 
 // 보스 몬스터 정의
+// 보스 타입별 특성과 능력을 정의
 const BOSS_TYPES = {
     TANK: {
         name: '탱크 보스',
@@ -221,10 +229,10 @@ const BOSS_TYPES = {
     }
 };
 
-
 // Enemy 클래스
-// 이제 class Enemy를 전역에 선언
+// 각 적 객체는 Enemy 클래스를 통해 생성되며, 위치, 체력, 속도 등 다양한 속성을 가짐
 class Enemy {
+    // 생성자: 적의 초기 속성을 설정
     constructor(wave, isBoss = false, initialPattern = null, initialX = 0, initialY = 0, type = null) {
         this.x = initialX;
         this.y = initialY;
@@ -352,6 +360,7 @@ class Enemy {
         this.experienceValue = this.baseExperience;
     }
 
+    // 적의 초기 레벨을 계산
     calculateInitialLevel(wave) {
         // 웨이브에 따라 초기 레벨 계산 (최소 1)
         const baseLevel = Math.floor(wave / 2);
@@ -359,22 +368,27 @@ class Enemy {
         return Math.max(1, Math.min(baseLevel + randomBonus, ENEMY_LEVEL_SETTINGS.maxLevel));
     }
 
+    // 레벨에 따른 체력 계산
     calculateLeveledHealth(baseHealth) {
         return Math.floor(baseHealth * Math.pow(ENEMY_LEVEL_SETTINGS.healthMultiplier, this.level - 1));
     }
 
+    // 레벨에 따른 속도 계산
     calculateLeveledSpeed(baseSpeed) {
         return baseSpeed * Math.pow(ENEMY_LEVEL_SETTINGS.speedMultiplier, this.level - 1);
     }
 
+    // 레벨에 따른 보상 계산
     calculateLeveledReward(baseReward) {
         return baseReward * Math.pow(ENEMY_LEVEL_SETTINGS.rewardMultiplier, this.level - 1);
     }
 
+    // 레벨에 따른 경험치 계산
     calculateLeveledExperience(baseExperience) {
         return baseExperience * Math.pow(ENEMY_LEVEL_SETTINGS.experienceMultiplier, this.level - 1);
     }
 
+    // 레벨업 시도
     tryLevelUp() {
         if (this.level < ENEMY_LEVEL_SETTINGS.maxLevel &&
             this.levelUpCount < ENEMY_LEVEL_SETTINGS.maxLevelUpPerWave &&
@@ -398,6 +412,7 @@ class Enemy {
         return false;
     }
 
+    // 상태 효과 적용
     applyStatusEffect(effectType, duration) {
         const effect = STATUS_EFFECTS[effectType];
         if (!effect) return;
@@ -424,6 +439,7 @@ class Enemy {
         }
     }
 
+    // 상태 효과 업데이트
     updateStatusEffects() {
         for (const [effectType, effect] of this.statusEffects) {
             effect.remaining--;
@@ -448,6 +464,7 @@ class Enemy {
         }
     }
 
+    // 주변 적 치유 (치유사 타입 전용)
     healNearbyEnemies() {
         if (this.type !== 'HEALER' || this.healCooldown > 0 || this.isDead) return;
         let healedAny = false;
@@ -472,6 +489,7 @@ class Enemy {
         if (healedAny) this.healCooldown = 60;
     }
 
+    // 적 상태 업데이트
     update() {
         if (this.isDead) return true;
 
@@ -555,6 +573,7 @@ class Enemy {
         return false;
     }
 
+    // 적 그리기
     draw() {
         if (this.isDead) return;
         ctx.save();
@@ -713,7 +732,7 @@ class Enemy {
         ctx.restore();
     }
 
-    // 방어력 일관 적용
+    // 데미지 처리
     takeDamage(damage, isCritical = false, attacker = null) {
         if (this.isDead || this.isInvincible) return 0;
         // 방어력 적용
@@ -727,6 +746,7 @@ class Enemy {
         return actualDamage;
     }
 
+    // 사망 처리
     die() {
         if (this.isDead) return;
         this.isDead = true;
@@ -762,8 +782,10 @@ class Enemy {
     }
 }
 
-// EnemyGroup 클래스
+// 적 그룹 클래스
+// 여러 적을 하나의 그룹으로 관리
 class EnemyGroup {
+    // 생성자: 그룹 초기화
     constructor(id, size, type = null) {
         this.id = id;
         this.size = size;
@@ -771,17 +793,21 @@ class EnemyGroup {
         this.members = [];
         this.color = `hsl(${Math.floor(Math.random() * 360)}, 60%, 60%)`;
     }
+
+    // 적 추가
     add(enemy) {
         enemy.groupId = this.id;
         enemy.groupColor = this.color;
         this.members.push(enemy);
     }
+
+    // 생존한 적 수 계산
     aliveCount() {
         return this.members.filter(e => e.health > 0).length;
     }
 }
 
-// 유틸리티 함수들
+// 저장된 데이터로부터 적 생성
 function enemyFromData(data) {
     // 패턴 이름을 영문으로 변환
     const patternMap = {
@@ -848,7 +874,7 @@ function enemyFromData(data) {
     return enemy;
 }
 
-// 그룹 시각화 효과
+// 그룹 연결선 그리기
 function drawGroupConnections() {
     const groups = new Map();
 
@@ -891,7 +917,7 @@ function drawGroupConnections() {
     });
 }
 
-// 전역 변수로 노출
+// 전역 객체에 노출
 window.ENEMY_TYPES = ENEMY_TYPES;
 window.ENEMY_PATTERNS = ENEMY_PATTERNS;
 window.BOSS_TYPES = BOSS_TYPES;
