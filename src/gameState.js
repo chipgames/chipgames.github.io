@@ -1,4 +1,10 @@
+/**
+ * 게임 상태 관리 파일
+ * 게임의 전반적인 상태(골드, 웨이브, 점수 등)와 게임 진행을 관리
+ */
+
 // 게임 초기화
+// 게임을 시작할 때 모든 상태를 초기값으로 설정
 function initializeGame() {
     // 게임 상태 초기화
     const wasStarted = gameState.isStarted; // 현재 시작 상태 저장
@@ -92,6 +98,7 @@ function initializeGame() {
 }
 
 // 정보 바 업데이트
+// 화면 상단의 게임 정보(골드, 생명, 웨이브, 점수)를 갱신
 function updateInfoBar() {
     const elements = {
         'infoGold': `골드: ${gameState.gold}`,
@@ -109,6 +116,7 @@ function updateInfoBar() {
 }
 
 // 게임 통계 업데이트
+// 게임 통계(처치한 적, 보스, 획득 골드 등)와 업적을 갱신
 function updateStats() {
     // 통계 요소 업데이트
     document.getElementById('enemiesKilled').textContent = `처치한 적: ${gameStats.enemiesKilled}`;
@@ -134,12 +142,14 @@ function updateStats() {
 }
 
 // 타워 제한 업데이트
+// 현재 설치된 타워 수와 최대 타워 수를 화면에 표시
 function updateTowerLimit() {
     document.getElementById('towerLimitCount').textContent = gameState.towerCount;
     document.getElementById('towerLimitMax').textContent = gameState.maxTowers;
 }
 
 // 웨이브 종료 체크
+// 현재 웨이브의 모든 적이 처치되었는지 확인하고 보상 지급
 function checkWaveEnd() {
     if (gameState.waveInProgress && gameState.enemiesRemaining === 0 && enemies.length === 0) {
         gameState.waveInProgress = false;
@@ -154,6 +164,7 @@ function checkWaveEnd() {
 }
 
 // 웨이브 진행 상황 업데이트
+// 현재 웨이브의 진행률을 프로그레스 바로 표시
 function updateWaveProgress() {
     const progress = document.getElementById('waveProgress');
     const fill = progress.querySelector('.fill');
@@ -178,7 +189,6 @@ function updateWaveProgress() {
 
 // 전역 객체에 노출
 window.gameState = gameState;
-window.gameStats = gameStats;
 window.initializeGame = initializeGame;
 window.updateInfoBar = updateInfoBar;
 window.updateStats = updateStats;
