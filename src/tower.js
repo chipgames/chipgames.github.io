@@ -1085,6 +1085,12 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
         return;
     }
 
+    // 타워 업그레이드 모달이 열려 있으면 닫기
+    const existingUpgradeMenu = document.querySelector('.tower-upgrade-menu');
+    if (existingUpgradeMenu && existingUpgradeMenu.parentNode) {
+        existingUpgradeMenu.parentNode.removeChild(existingUpgradeMenu);
+    }
+
     const towerMenu = document.getElementById('towerMenu');
     const existingMenu = document.querySelector('.tower-build-menu');
     if (existingMenu && existingMenu.parentNode) {
@@ -1170,6 +1176,12 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
 // 타워 업그레이드 메뉴 표시
 // 타워 업그레이드 시 표시되는 메뉴
 function showTowerUpgradeMenu(tower, clientX, clientY) {
+    // 타워 설치 모달이 열려 있으면 닫기
+    const existingBuildMenu = document.querySelector('.tower-build-menu');
+    if (existingBuildMenu && existingBuildMenu.parentNode) {
+        existingBuildMenu.parentNode.removeChild(existingBuildMenu);
+    }
+
     const towerMenu = document.getElementById('towerMenu');
     const existingMenu = document.querySelector('.tower-upgrade-menu');
     if (existingMenu && existingMenu.parentNode) {
