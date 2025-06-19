@@ -418,7 +418,7 @@ class Enemy {
         if (!effect) return;
         // 보스는 상태이상 지속시간 50% 감소
         let actualDuration = duration || effect.duration;
-        if (this.type === 'BOSS') actualDuration = Math.ceil(actualDuration * 0.5);
+        if (this.isBoss) actualDuration = Math.ceil(actualDuration * 0.5);
         if (this.statusEffects.has(effectType)) {
             const current = this.statusEffects.get(effectType);
             current.remaining = Math.max(current.remaining, actualDuration);
@@ -769,7 +769,7 @@ class Enemy {
         gameStats.enemiesKilled++;
         let scoreToAdd = this.reward;
         if (this.lastDamage && this.lastDamage.isCritical) scoreToAdd *= 2;
-        if (this.type === 'BOSS') {
+        if (this.isBoss) {
             scoreToAdd = this.reward * 3;
             gameStats.bossesKilled++;
             gameState.bossKilled = true;
