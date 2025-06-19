@@ -337,6 +337,9 @@ class Tower {
         const isCritical = Math.random() < CRITICAL_CHANCE;
         const damage = isCritical ? this.damage * CRITICAL_MULTIPLIER : this.damage;
 
+        // 공격 이펙트와 사운드 재생
+        showAttackEffect(this.x, this.y, target.x, target.y, isCritical);
+
         switch (this.type) {
             case 'BASIC': {
                 const actualDamage = target.takeDamage(damage, isCritical, this);

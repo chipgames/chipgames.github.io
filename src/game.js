@@ -2128,7 +2128,7 @@ function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
     }
     
     // 사운드 재생
-    playSound(isCritical ? 'critical' : 'attack');
+    playSound(isCritical ? 'tower_critical' : 'tower_attack');
     
     // 애니메이션 종료 후 풀로 반환
     effect.addEventListener('animationend', () => {

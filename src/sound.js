@@ -16,6 +16,7 @@ let sounds = {
     game_over: new Audio('sounds/game_over.mp3'),
     game_start: new Audio('sounds/game_start.mp3'),
     tower_attack: new Audio('sounds/tower_attack.mp3'),
+    tower_critical: new Audio('sounds/tower_critical.mp3'),
     tower_place: new Audio('sounds/tower_place.mp3'),
     ui_click: new Audio('sounds/ui_click.mp3')
 };
