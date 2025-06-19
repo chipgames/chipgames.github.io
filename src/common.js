@@ -100,7 +100,7 @@ const DIFFICULTY_SETTINGS = {
         lives: 25,           // 초기 생명력
         enemyHealth: 0.8,    // 적 체력 배율
         enemySpeed: 0.8,     // 적 속도 배율
-        goldReward: 1.2,     // 골드 보상 배율
+        goldReward: 0.9,     // 골드 보상 배율 (1.2 → 0.9)
         maxTowers: 12,       // 최대 타워 수
         enemySpawnRate: 0.03,// 적 생성 속도
         initialGold: 200,    // 시작 골드
@@ -111,7 +111,7 @@ const DIFFICULTY_SETTINGS = {
         lives: 20,
         enemyHealth: 1,
         enemySpeed: 1,
-        goldReward: 1,
+        goldReward: 0.7,     // 골드 보상 배율 (1.0 → 0.7)
         maxTowers: 10,
         enemySpawnRate: 0.05,
         initialGold: 150,
@@ -122,7 +122,7 @@ const DIFFICULTY_SETTINGS = {
         lives: 15,
         enemyHealth: 1.3,
         enemySpeed: 1.2,
-        goldReward: 0.8,
+        goldReward: 0.5,     // 골드 보상 배율 (0.8 → 0.5)
         maxTowers: 8,
         enemySpawnRate: 0.07,
         initialGold: 100,

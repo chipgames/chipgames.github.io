@@ -7,10 +7,10 @@
 const TOWER_TYPES = {
     BASIC: {
         name: '기본 타워',
-        cost: 100,
-        damage: 10,
-        range: 3,
-        cooldown: 30,
+        cost: 30,
+        damage: 5,
+        range: 2,
+        cooldown: 100,
         color: 'blue',
         special: {
             name: '강화 사격',
@@ -27,10 +27,10 @@ const TOWER_TYPES = {
     },
     ICE: {
         name: '얼음 타워',
-        cost: 150,
+        cost: 100,
         damage: 5,
-        range: 3,
-        cooldown: 40,
+        range: 2,
+        cooldown: 90,
         color: 'lightblue',
         freezeDuration: 2,
         special: {
@@ -56,7 +56,7 @@ const TOWER_TYPES = {
         cost: 200,
         damage: 3,
         range: 2,
-        cooldown: 20,
+        cooldown: 60,
         color: 'green',
         poisonDamage: 2,
         poisonDuration: 5,
@@ -79,10 +79,10 @@ const TOWER_TYPES = {
     },
     LASER: {
         name: '레이저 타워',
-        cost: 250,
-        damage: 15,
-        range: 4,
-        cooldown: 50,
+        cost: 300,
+        damage: 8,
+        range: 2.5,
+        cooldown: 120,
         color: 'red',
         continuousDamage: 5,
         special: {
@@ -100,10 +100,10 @@ const TOWER_TYPES = {
     },
     SPLASH: {
         name: '스플래시 타워',
-        cost: 300,
-        damage: 8,
+        cost: 400,
+        damage: 7,
         range: 2,
-        cooldown: 45,
+        cooldown: 110,
         color: 'purple',
         splashRadius: 1.5,
         slowEffect: 0.3,
@@ -124,9 +124,9 @@ const TOWER_TYPES = {
     },
     SUPPORT: {
         name: '지원 타워',
-        cost: 200,
+        cost: 500,
         damage: 0,
-        range: 4,
+        range: 3,
         cooldown: 0,
         color: 'yellow',
         buffRange: 3,

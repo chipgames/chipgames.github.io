@@ -9,7 +9,7 @@ const ENEMY_TYPES = {
     NORMAL: {
         name: '일반 적',
         health: 100,
-        speed: 0.013,
+        speed: 0.007,
         reward: 10,
         color: 'red',
         experienceValue: 10
@@ -17,7 +17,7 @@ const ENEMY_TYPES = {
     FAST: {
         name: '빠른 적',
         health: 50,
-        speed: 0.023,
+        speed: 0.01,
         reward: 15,
         color: 'yellow',
         experienceValue: 15
@@ -25,7 +25,7 @@ const ENEMY_TYPES = {
     TANK: {
         name: '탱커',
         health: 300,
-        speed: 0.007,
+        speed: 0.004,
         reward: 20,
         color: 'purple',
         experienceValue: 20
@@ -33,7 +33,7 @@ const ENEMY_TYPES = {
     HEALER: {
         name: '치유사',
         health: 80,
-        speed: 0.01,
+        speed: 0.005,
         reward: 25,
         color: 'green',
         experienceValue: 25,
@@ -302,7 +302,7 @@ class Enemy {
             switch (this.type) {
                 case 'NORMAL':
                     this.name = '일반 적';
-                    this.baseSpeed = 0.015;
+                    this.baseSpeed = 0.007;
                     this.speed = this.baseSpeed;
                     this.health = 100;
                     this.maxHealth = 100;
@@ -312,7 +312,7 @@ class Enemy {
                     break;
                 case 'FAST':
                     this.name = '빠른 적';
-                    this.baseSpeed = 0.025;
+                    this.baseSpeed = 0.01;
                     this.speed = this.baseSpeed;
                     this.health = 50;
                     this.maxHealth = 50;
@@ -322,7 +322,7 @@ class Enemy {
                     break;
                 case 'TANK':
                     this.name = '탱커';
-                    this.baseSpeed = 0.01;
+                    this.baseSpeed = 0.004;
                     this.speed = this.baseSpeed;
                     this.health = 200;
                     this.maxHealth = 200;
@@ -334,7 +334,7 @@ class Enemy {
                     break;
                 case 'HEALER':
                     this.name = '치유사';
-                    this.baseSpeed = 0.012;
+                    this.baseSpeed = 0.005;
                     this.speed = this.baseSpeed;
                     this.health = 80;
                     this.maxHealth = 80;
