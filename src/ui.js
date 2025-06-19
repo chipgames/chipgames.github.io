@@ -518,10 +518,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 게임 오버 화면
     function showGameOver() {
-        const gameOver = document.getElementById('gameOver');
-        document.getElementById('finalScore').textContent = gameState.score;
-        document.getElementById('finalWave').textContent = gameState.wave;
-        gameOver.style.display = 'block';
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // 반투명 오버레이 그리기
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // 게임 오버 텍스트 그리기
+        ctx.fillStyle = '#FF4444';
+        ctx.font = 'bold 48px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('게임 오버', canvas.width / 2, canvas.height / 2 - 50);
+        
+        // 점수와 웨이브 정보 그리기
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '24px Arial';
+        ctx.fillText(`최종 점수: ${gameState.score}`, canvas.width / 2, canvas.height / 2);
+        ctx.fillText(`도달한 웨이브: ${gameState.wave}`, canvas.width / 2, canvas.height / 2 + 40);
+        
+        // 다시 시작 안내
+        ctx.fillStyle = '#4CAF50';
+        ctx.font = '20px Arial';
+        ctx.fillText('R 키를 눌러 다시 시작', canvas.width / 2, canvas.height / 2 + 100);
     }
 
     // 게임 재시작
@@ -536,7 +555,6 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.score = 0;
         towers = [];
         enemies = [];
-        document.getElementById('gameOver').style.display = 'none';
         document.getElementById('tutorial').style.display = 'none';
     }
 

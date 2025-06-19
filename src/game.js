@@ -54,6 +54,34 @@ function drawGameOver() {
     ctx.fillStyle = '#95a5a6';
     ctx.font = '16px Arial';
     ctx.fillText('다시 시작하려면 페이지를 새로고침하세요', canvas.width / 2, canvas.height / 2 + 90);
+
+    // '다시 시작' 버튼 동적 생성
+    let restartBtn = document.getElementById('canvasRestartBtn');
+    if (!restartBtn) {
+        restartBtn = document.createElement('button');
+        restartBtn.id = 'canvasRestartBtn';
+        restartBtn.textContent = '다시 시작';
+        restartBtn.style.position = 'absolute';
+        restartBtn.style.left = '50%';
+        restartBtn.style.top = 'calc(50%)';
+        restartBtn.style.transform = 'translate(-50%, 0)';
+        restartBtn.style.zIndex = '3000';
+        restartBtn.style.padding = '10px 40px';
+        restartBtn.style.fontSize = '1.2em';
+        restartBtn.style.background = '#4F8CFF';
+        restartBtn.style.color = '#fff';
+        restartBtn.style.border = 'none';
+        restartBtn.style.borderRadius = '8px';
+        restartBtn.style.boxShadow = '0 2px 8px rgba(0,0,0,0.2)';
+        restartBtn.style.cursor = 'pointer';
+        restartBtn.onclick = () => {
+            restartGame();
+            restartBtn.remove();
+        };
+        // 캔버스 부모(게임 영역)에 추가
+        const parent = canvas.parentElement || document.body;
+        parent.appendChild(restartBtn);
+    }
 }
 
 /**
@@ -2614,4 +2642,12 @@ function setupMenuCloseHandler(menu) {
         document.addEventListener('click', closeMenu);
     }, 100);
 }
+
+// 게임이 재시작될 때 버튼 제거
+const origRestartGame = window.restartGame;
+window.restartGame = function() {
+    const btn = document.getElementById('canvasRestartBtn');
+    if (btn) btn.remove();
+    origRestartGame();
+};
 
