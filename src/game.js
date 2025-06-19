@@ -20,6 +20,43 @@ function showGameOver() {
 }
 
 /**
+ * 게임 오버 화면을 캔버스에 그리는 함수
+ * 게임 오버 상태일 때 호출되어 캔버스에 오버레이를 표시
+ */
+function drawGameOver() {
+    // 반투명 배경
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // 게임 오버 텍스트
+    ctx.fillStyle = '#e74c3c';
+    ctx.font = 'bold 48px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('게임 오버', canvas.width / 2, canvas.height / 2 - 60);
+    
+    // 최종 점수
+    ctx.fillStyle = '#f39c12';
+    ctx.font = '24px Arial';
+    ctx.fillText(`최종 점수: ${gameState.score}`, canvas.width / 2, canvas.height / 2);
+    
+    // 최종 웨이브
+    ctx.fillStyle = '#3498db';
+    ctx.font = '20px Arial';
+    ctx.fillText(`최종 웨이브: ${gameState.wave}`, canvas.width / 2, canvas.height / 2 + 30);
+    
+    // 처치한 보스 수
+    ctx.fillStyle = '#9b59b6';
+    ctx.font = '18px Arial';
+    ctx.fillText(`처치한 보스: ${gameStats.bossesKilled}`, canvas.width / 2, canvas.height / 2 + 55);
+    
+    // 안내 메시지
+    ctx.fillStyle = '#95a5a6';
+    ctx.font = '16px Arial';
+    ctx.fillText('다시 시작하려면 페이지를 새로고침하세요', canvas.width / 2, canvas.height / 2 + 90);
+}
+
+/**
  * 게임 시작 버튼 이벤트 리스너
  * 게임 시작/재시작 기능을 처리
  */
