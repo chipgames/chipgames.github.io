@@ -116,6 +116,15 @@ function updateInfoBar() {
             element.textContent = text;
         }
     }
+
+    // 타워 설치 정보 갱신
+    const towerLabel = t('towers');
+    const towerCount = gameState.towerCount;
+    const towerMax = gameState.maxTowers;
+    const infoTowerCount = document.getElementById('infoTowerCount');
+    if (infoTowerCount) {
+        infoTowerCount.innerHTML = `${towerLabel}: <span id="towerLimitCount">${towerCount}</span>/<span id="towerLimitMax">${towerMax}</span>`;
+    }
 }
 
 // 게임 통계 업데이트
