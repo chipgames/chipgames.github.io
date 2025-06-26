@@ -142,7 +142,7 @@ TRANSLATIONS = {
     gameDescriptionTitle: "게임 설명",
     gameDescriptionText: "타워 디펜스 게임은 다양한 타워와 맵, 전략적 업그레이드, 특수 이벤트가 어우러진 전략 시뮬레이션 게임입니다.",
     howToPlayTitle: "이용 방법",
-    helpTitle: "도움말",
+    helpTitle: "게임 도움말",
     close: "닫기",
     
     // 푸터
@@ -446,5 +446,23 @@ TRANSLATIONS = {
     howtoEventDesc: ": 게임 중 무작위로 골드 러시, 타워 강화 등 다양한 이벤트가 발생할 수 있습니다. 화면 하단에서 발생한 이벤트를 확인하세요.",
     howtoAchieveTitle: "업적/통계",
     howtoAchieveDesc: ": 플레이 중 다양한 업적을 달성할 수 있으며, 게임 정보 바에서 실시간 통계를 확인할 수 있습니다.",
-    howtoFooter: "다양한 맵과 난이도, 특수 이벤트, 업적 시스템을 활용해 최고의 기록에 도전해보세요!"
+    howtoFooter: "다양한 맵과 난이도, 특수 이벤트, 업적 시스템을 활용해 최고의 기록에 도전해보세요!",
+    helpShortcutTitle: "단축키",
+    helpShortcutSpace: "스페이스바",
+    helpShortcutSpaceDesc: ": 다음 웨이브 시작",
+    helpShortcutP: "P",
+    helpShortcutPDesc: ": 일시정지/재개",
+    helpShortcutH: "H",
+    helpShortcutHDesc: ": 도움말 열기",
+    helpFaqTitle: "자주 묻는 질문",
+    helpFaq1Title: "타워가 설치되지 않아요",
+    helpFaq1Desc: "경로 위에는 타워를 설치할 수 없습니다. 빈 칸을 클릭해 주세요.",
+    helpFaq2Title: "골드가 부족해요",
+    helpFaq2Desc: "적을 처치하거나 웨이브를 클리어하면 골드를 얻을 수 있습니다.",
+    helpFaq3Title: "특수 이벤트 확인",
+    helpFaq3Desc: "화면 하단 '발생한 특수 이벤트' 영역에서 확인할 수 있습니다.",
+    helpFaq4Title: "저장/불러오기",
+    helpFaq4Desc: "하단의 저장/불러오기 버튼을 이용하세요.",
+    helpFaq5Title: "게임이 멈췄을 때",
+    helpFaq5Desc: "새로고침 후 불러오기 버튼으로 이어서 플레이할 수 있습니다."
 }; 

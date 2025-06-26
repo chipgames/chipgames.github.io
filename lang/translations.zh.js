@@ -142,7 +142,7 @@ TRANSLATIONS = {
     gameDescriptionTitle: "游戏说明",
     gameDescriptionText: "塔防游戏是一款集各种塔、地图、战略升级和特殊事件于一体的战略模拟游戏。",
     howToPlayTitle: "游戏方法",
-    helpTitle: "帮助",
+    helpTitle: "游戏帮助",
     close: "关闭",
     
     // 页脚
@@ -445,5 +445,23 @@ TRANSLATIONS = {
     howtoEventDesc: ": 游戏中会随机发生金币狂潮、塔强化等多种事件。请在屏幕下方查看发生的事件。",
     howtoAchieveTitle: "成就/统计",
     howtoAchieveDesc: ": 游戏过程中可达成多种成就，并在信息栏实时查看统计数据。",
-    howtoFooter: "利用多种地图、难度、特殊事件和成就系统，挑战你的最高纪录！"
+    howtoFooter: "利用多种地图、难度、特殊事件和成就系统，挑战你的最高纪录！",
+    helpShortcutTitle: "快捷键",
+    helpShortcutSpace: "空格键",
+    helpShortcutSpaceDesc: ": 开始下一波",
+    helpShortcutP: "P",
+    helpShortcutPDesc: ": 暂停/继续",
+    helpShortcutH: "H",
+    helpShortcutHDesc: ": 打开帮助",
+    helpFaqTitle: "常见问题",
+    helpFaq1Title: "无法建塔",
+    helpFaq1Desc: "路径上不能建塔。请点击空格。",
+    helpFaq2Title: "金币不足",
+    helpFaq2Desc: "击败敌人或通过波次可获得金币。",
+    helpFaq3Title: "查看特殊事件",
+    helpFaq3Desc: "可在屏幕下方"发生的特殊事件"区域查看。",
+    helpFaq4Title: "存档/读档",
+    helpFaq4Desc: "请使用下方的存档/读档按钮。",
+    helpFaq5Title: "游戏卡住时",
+    helpFaq5Desc: "刷新后用读档按钮继续游戏。"
 }; 

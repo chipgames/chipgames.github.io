@@ -142,7 +142,7 @@ TRANSLATIONS = {
     gameDescriptionTitle: "Game Description",
     gameDescriptionText: "Tower Defense Game is a strategic simulation game featuring various towers, maps, strategic upgrades, and special events.",
     howToPlayTitle: "How to Play",
-    helpTitle: "Help",
+    helpTitle: "Game Help",
     close: "Close",
     
     // Footer
@@ -449,5 +449,23 @@ TRANSLATIONS = {
     howtoEventDesc: ": Random events like Gold Rush and tower boosts can occur during the game. Check the event area at the bottom of the screen.",
     howtoAchieveTitle: "Achievements/Stats",
     howtoAchieveDesc: ": Achieve various accomplishments during play and check real-time stats in the info bar.",
-    howtoFooter: "Use various maps, difficulties, special events, and the achievement system to challenge your best record!"
+    howtoFooter: "Use various maps, difficulties, special events, and the achievement system to challenge your best record!",
+    helpShortcutTitle: "Shortcuts",
+    helpShortcutSpace: "Spacebar",
+    helpShortcutSpaceDesc: ": Start next wave",
+    helpShortcutP: "P",
+    helpShortcutPDesc: ": Pause/Resume",
+    helpShortcutH: "H",
+    helpShortcutHDesc: ": Open help",
+    helpFaqTitle: "Frequently Asked Questions",
+    helpFaq1Title: "Towers cannot be placed",
+    helpFaq1Desc: "You cannot place towers on the path. Click on empty spaces.",
+    helpFaq2Title: "Not enough gold",
+    helpFaq2Desc: "Defeat enemies or clear waves to earn gold.",
+    helpFaq3Title: "Check special events",
+    helpFaq3Desc: "Check the 'Special Events' area at the bottom of the screen.",
+    helpFaq4Title: "Save/Load",
+    helpFaq4Desc: "Use the save/load buttons at the bottom.",
+    helpFaq5Title: "When the game freezes",
+    helpFaq5Desc: "After refreshing, use the load button to continue playing."
 }; 
