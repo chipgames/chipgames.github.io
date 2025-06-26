@@ -548,7 +548,7 @@ class Enemy {
         }
         if (this.skill && this.skillCooldown === 0) {
             this.skill.effect(this);
-            showSpecialEffect(this.x, this.y, this.skill.name);
+            showSpecialEffect(this.x, this.y, t(this.skill.name));
             this.skillCooldown = this.skill.cooldown > 0 ? this.skill.cooldown : 1; // 즉시 쿨다운 세팅
         }
 

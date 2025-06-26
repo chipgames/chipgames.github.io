@@ -2356,7 +2356,7 @@ function showSpecialEffect(x, y, name) {
         top: ${centerY}px;
     `;
     effect.innerHTML = `
-        <div class="special-text">${name}</div>
+        <div class="special-text">${t(name)}</div>
     `;
     playSound('special');
     effect.addEventListener('animationend', () => {
