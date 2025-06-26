@@ -1123,7 +1123,7 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
         card.innerHTML = `
             <div class="tower-card-header">
                 <div class="tower-icon" tabindex="0" style="background: ${tower.color}">${type[0]}</div>
-                <div class="tower-name">${tower.name}</div>
+                <div class="tower-name">${t(tower.name)}</div>
                 <div class="tower-cost">${tower.cost} ${t('gold')}</div>
             </div>
             <div class="tower-details">
