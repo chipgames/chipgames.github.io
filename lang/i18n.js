@@ -10,11 +10,14 @@ function detectLanguage() {
     return 'en';
 }
 
-function t(key) {
-    if (TRANSLATIONS && TRANSLATIONS[key]) {
-        return TRANSLATIONS[key];
+function t(key, params) {
+    let str = TRANSLATIONS && TRANSLATIONS[key] ? TRANSLATIONS[key] : key;
+    if (params) {
+        for (const [k, v] of Object.entries(params)) {
+            str = str.replace(new RegExp(`{${k}}`, 'g'), v);
+        }
     }
-    return key;
+    return str;
 }
 
 function updatePageLanguage() {
@@ -72,21 +75,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('DOMContentLoaded', function () {
     const lang = detectLanguage();
-    // Àü¿ª º¯¼ö µ¿±âÈ­
+    // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½È­
     window.currentLanguage = lang;
 
-    // ¾ð¾î ½ºÅ©¸³Æ® ·Îµå
+    // ï¿½ï¿½ï¿½ ï¿½ï¿½Å©ï¿½ï¿½Æ® ï¿½Îµï¿½
     loadLanguage(lang, function () {
         updatePageLanguage();
 
-        // µå·Ó´Ù¿î µ¿±âÈ­
+        // ï¿½ï¿½Ó´Ù¿ï¿½ ï¿½ï¿½ï¿½ï¿½È­
         const languageSelect = document.getElementById('languageSelect');
         const footerLanguageSelect = document.getElementById('footerLanguageSelect');
         if (languageSelect) languageSelect.value = lang;
         if (footerLanguageSelect) footerLanguageSelect.value = lang;
     });
 
-    // ¾ð¾î º¯°æ ½Ã µå·Ó´Ù¿î °ª µ¿±âÈ­
+    // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½Ó´Ù¿ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½È­
     const originalChangeLanguage = window.changeLanguage;
     window.changeLanguage = function (langCode) {
         originalChangeLanguage(langCode);

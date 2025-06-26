@@ -129,7 +129,7 @@ TRANSLATIONS = {
     finalScore: "Final Score",
     finalWave: "Final Wave",
     restart: "Restart",
-    waveStart: "Wave Start",
+    waveStart: "Wave {wave} Start!",
     bossWave: "Boss Wave",
     currentLevel: "Current Level",
     reward: "Reward",
@@ -283,8 +283,6 @@ TRANSLATIONS = {
     
     // UI Messages
     upgradeComplete: "Upgrade!",
-    waveStart: "Wave {wave} Start!",
-    enemiesCount: "Enemies: {count}",
     waveComplete: "Wave Complete!",
     reward: "Reward",
     achievementUnlocked: "Achievement Unlocked",
@@ -467,5 +465,6 @@ TRANSLATIONS = {
     helpFaq4Title: "Save/Load",
     helpFaq4Desc: "Use the save/load buttons at the bottom.",
     helpFaq5Title: "When the game freezes",
-    helpFaq5Desc: "After refreshing, use the load button to continue playing."
+    helpFaq5Desc: "After refreshing, use the load button to continue playing.",
+    enemiesCount: "Enemies: {count}"
 }; 

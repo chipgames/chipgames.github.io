@@ -129,7 +129,7 @@ TRANSLATIONS = {
     finalScore: "最终分数",
     finalWave: "最终波数",
     restart: "重新开始",
-    waveStart: "波数开始",
+    waveStart: "第{wave}波开始!",
     bossWave: "Boss波数",
     currentLevel: "当前等级",
     reward: "奖励",
@@ -282,8 +282,6 @@ TRANSLATIONS = {
     
     // UI消息
     upgradeComplete: "升级！",
-    waveStart: "第{wave}波开始！",
-    enemiesCount: "敌人数量: {count}",
     waveComplete: "波次完成！",
     achievementUnlocked: "成就解锁",
     reachedWave: "达到波次",
@@ -463,5 +461,6 @@ TRANSLATIONS = {
     helpFaq4Title: "存档/读档",
     helpFaq4Desc: "请使用下方的存档/读档按钮。",
     helpFaq5Title: "游戏卡住时",
-    helpFaq5Desc: "刷新后用读档按钮继续游戏。"
+    helpFaq5Desc: "刷新后用读档按钮继续游戏。",
+    enemiesCount: "敌人数量: {count}"
 }; 

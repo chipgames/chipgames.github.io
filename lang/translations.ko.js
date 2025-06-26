@@ -129,7 +129,7 @@ TRANSLATIONS = {
     finalScore: "최종 점수",
     finalWave: "최종 웨이브",
     restart: "다시 시작",
-    waveStart: "웨이브 시작",
+    waveStart: "웨이브 {wave} 시작!",
     bossWave: "보스 웨이브",
     currentLevel: "현재 레벨",
     reward: "보상",
@@ -283,8 +283,6 @@ TRANSLATIONS = {
     
     // UI 메시지
     upgradeComplete: "업그레이드!",
-    waveStart: "웨이브 {wave} 시작!",
-    enemiesCount: "적의 수: {count}",
     waveComplete: "웨이브 완료!",
     achievementUnlocked: "업적 달성",
     reachedWave: "도달한 웨이브",
@@ -464,5 +462,6 @@ TRANSLATIONS = {
     helpFaq4Title: "저장/불러오기",
     helpFaq4Desc: "하단의 저장/불러오기 버튼을 이용하세요.",
     helpFaq5Title: "게임이 멈췄을 때",
-    helpFaq5Desc: "새로고침 후 불러오기 버튼으로 이어서 플레이할 수 있습니다."
+    helpFaq5Desc: "새로고침 후 불러오기 버튼으로 이어서 플레이할 수 있습니다.",
+    enemiesCount: "적의 수: {count}"
 }; 
