@@ -134,7 +134,7 @@ const DIFFICULTY_SETTINGS = {
 // 게임에서 사용 가능한 맵들의 경로 정의
 const MAPS = {
     STRAIGHT: {
-        name: '직선 경로',
+        get name() { return t('straight'); },
         path: [
             { x: 0, y: 7 },
             { x: 1, y: 7 },
@@ -159,7 +159,7 @@ const MAPS = {
         ]
     },
     ZIGZAG: {
-        name: '지그재그',
+        get name() { return t('zigzag'); },
         path: [
             { x: 0, y: 5 },
             { x: 1, y: 5 },
@@ -188,7 +188,7 @@ const MAPS = {
         ]
     },
     SPIRAL: {
-        name: '나선형',
+        get name() { return t('spiral'); },
         path: [
             { x: 0, y: 7 },
             { x: 1, y: 7 },
@@ -219,7 +219,7 @@ const MAPS = {
         ]
     },
     MAZE: {
-        name: '미로',
+        get name() { return t('maze'); },
         path: [
             { x: 0, y: 7 },
             { x: 1, y: 7 },
@@ -246,7 +246,7 @@ const MAPS = {
         ]
     },
     CROSS: {
-        name: '십자형',
+        get name() { return t('cross'); },
         path: [
             { x: 0, y: 7 },
             { x: 1, y: 7 },
@@ -274,7 +274,7 @@ const MAPS = {
         ]
     },
     SNAKE: {
-        name: '뱀형',
+        get name() { return t('snake'); },
         path: [
             { x: 0, y: 3 },
             { x: 2, y: 3 },
@@ -298,7 +298,7 @@ const MAPS = {
         ]
     },
     DIAMOND: {
-        name: '다이아몬드',
+        get name() { return t('diamond'); },
         path: [
             { x: 0, y: 7 },
             { x: 2, y: 7 },
@@ -327,7 +327,7 @@ const MAPS = {
         ]
     },
     STAR: {
-        name: '별형',
+        get name() { return t('star'); },
         path: [
             { x: 0, y: 7 },  // 시작점
             { x: 4, y: 7 },  // 오른쪽으로 이동
@@ -345,7 +345,7 @@ const MAPS = {
         ]
     },
     VORTEX: {
-        name: '소용돌이',
+        get name() { return t('vortex'); },
         path: [
             { x: 0, y: 7 },
             { x: 1, y: 7 },
@@ -393,7 +393,7 @@ const MAPS = {
         ]
     },
     MAZE2: {
-        name: '맵14',
+        get name() { return t('maze2'); },
         path: [
             { x: 0, y: 7 },
             { x: 1, y: 7 },
@@ -420,7 +420,7 @@ const MAPS = {
         ]
     },
     SNAKE2: {
-        name: '맵15',
+        get name() { return t('snake2'); },
         path: [
             { x: 0, y: 3 },
             { x: 2, y: 3 },
@@ -444,7 +444,7 @@ const MAPS = {
         ]
     },
     TRIANGLE: {
-        name: '맵12',
+        get name() { return t('triangle'); },
         path: [
             { x: 0, y: 7 },   // 시작점
             { x: 4, y: 7 },   // 오른쪽으로
@@ -460,7 +460,7 @@ const MAPS = {
         ]
     },
     WAVE: {
-        name: '파도형',
+        get name() { return t('wave'); },
         path: [
             { x: 0, y: 5 },
             { x: 1, y: 5 },
@@ -489,7 +489,7 @@ const MAPS = {
         ]
     },
     STAIRS: {
-        name: '계단형',
+        get name() { return t('stairs'); },
         path: [
             { x: 0, y: 1 },
             { x: 2, y: 1 },
@@ -514,7 +514,7 @@ const MAPS = {
         ]
     },
     CROSSROADS: {
-        name: '교차로',
+        get name() { return t('crossroads'); },
         path: [
             { x: 0, y: 7 },
             { x: 2, y: 7 },
@@ -548,7 +548,7 @@ const MAPS = {
         ]
     },
     INFINITY: {
-        name: '무한형',
+        get name() { return t('infinity'); },
         path: [
             { x: 0, y: 7 },
             { x: 2, y: 7 },
@@ -586,7 +586,7 @@ const MAPS = {
         ]
     },
     BUTTERFLY: {
-        name: '나비형',
+        get name() { return t('butterfly'); },
         path: [
             { x: 0, y: 7 },
             { x: 2, y: 7 },
@@ -624,7 +624,7 @@ const MAPS = {
         ]
     },
     HOURGLASS: {
-        name: '모래시계',
+        get name() { return t('hourglass'); },
         path: [
             { x: 0, y: 3 },
             { x: 2, y: 3 },
@@ -652,22 +652,6 @@ const MAPS = {
             { x: 18, y: 11 },
             { x: 19, y: 11 }
         ]
-    },
-    TRIANGLE: {
-        name: '삼각형',
-        path: [
-            { x: 0, y: 7 },   // 시작점
-            { x: 4, y: 7 },   // 오른쪽으로
-            { x: 8, y: 3 },   // 상단 꼭지점
-            { x: 12, y: 7 },  // 오른쪽으로
-            { x: 16, y: 7 },  // 오른쪽으로
-            { x: 19, y: 7 },  // 오른쪽 끝
-            { x: 16, y: 11 }, // 하단 꼭지점
-            { x: 12, y: 11 }, // 왼쪽으로
-            { x: 8, y: 11 },  // 왼쪽으로
-            { x: 4, y: 11 },  // 왼쪽으로
-            { x: 0, y: 7 }    // 시작점으로 복귀
-        ]
     }
 };
 
@@ -686,7 +670,7 @@ const TOWER_ICONS = {
 // 게임 내 사용 가능한 파워업 효과
 const POWERUPS = {
     GOLD: {
-        name: '골드 부스트',
+        get name() { return t('powerupGold'); },
         cost: 100,
         duration: 30000,
         effect: () => {
@@ -697,7 +681,7 @@ const POWERUPS = {
         }
     },
     DAMAGE: {
-        name: '데미지 부스트',
+        get name() { return t('powerupDamage'); },
         cost: 150,
         duration: 30000,
         effect: () => {
@@ -712,7 +696,7 @@ const POWERUPS = {
         }
     },
     FREEZE: {
-        name: '시간 정지',
+        get name() { return t('powerupFreeze'); },
         cost: 200,
         duration: 10000,
         effect: () => {
@@ -732,47 +716,64 @@ const POWERUPS = {
 // 게임 중 발생하는 특수 이벤트
 const SPECIAL_EVENTS = {
     GOLD_RUSH: {
-        name: '골드 러시',
-        description: '모든 적 처치 시 골드 2배!',
+        get name() { return t('specialEventGoldRush'); },
+        get description() { return t('specialEventGoldRushDesc'); },
         duration: 30000,
         effect: () => {
             gameState.goldMultiplier = 2;
-            showEventNotification('골드 러시 시작!');
+            showEventNotification(t('specialEventGoldRushStart'));
             setTimeout(() => {
                 gameState.goldMultiplier = 1;
-                showEventNotification('골드 러시 종료');
+                showEventNotification(t('specialEventGoldRushEnd'));
             }, 30000);
         }
     },
     TOWER_POWER: {
-        name: '타워 강화',
-        description: '모든 타워의 공격력 50% 증가!',
-        duration: 20000,
+        get name() { return t('specialEventTowerPower'); },
+        get description() { return t('specialEventTowerPowerDesc'); },
+        duration: 25000,
         effect: () => {
             towers.forEach(tower => {
                 tower.damage *= 1.5;
             });
-            showEventNotification('타워 강화 시작!');
+            showEventNotification(t('specialEventTowerPowerStart'));
             setTimeout(() => {
                 towers.forEach(tower => {
                     tower.damage /= 1.5;
                 });
-                showEventNotification('타워 강화 종료');
+                showEventNotification(t('specialEventTowerPowerEnd'));
+            }, 25000);
+        }
+    },
+    TIME_FREEZE: {
+        get name() { return t('specialEventTimeFreeze'); },
+        get description() { return t('specialEventTimeFreezeDesc'); },
+        duration: 20000,
+        effect: () => {
+            enemies.forEach(enemy => {
+                enemy.speed *= 0.2;
+            });
+            showEventNotification(t('specialEventTimeFreezeStart'));
+            setTimeout(() => {
+                enemies.forEach(enemy => {
+                    enemy.speed = enemy.baseSpeed;
+                });
+                showEventNotification(t('specialEventTimeFreezeEnd'));
             }, 20000);
         }
     },
     ENEMY_WEAKNESS: {
-        name: '적 약화',
-        description: '모든 적의 체력 30% 감소!',
+        get name() { return t('specialEventEnemyWeakness'); },
+        get description() { return t('specialEventEnemyWeaknessDesc'); },
         duration: 25000,
         effect: () => {
             enemies.forEach(enemy => {
                 enemy.health *= 0.7;
                 enemy.maxHealth *= 0.7;
             });
-            showEventNotification('적 약화 시작!');
+            showEventNotification(t('specialEventEnemyWeaknessStart'));
             setTimeout(() => {
-                showEventNotification('적 약화 종료');
+                showEventNotification(t('specialEventEnemyWeaknessEnd'));
             }, 25000);
         }
     }
@@ -782,20 +783,20 @@ const SPECIAL_EVENTS = {
 // 게임 내 달성 가능한 업적
 const ACHIEVEMENTS = {
     FIRST_TOWER: {
-        name: '첫 타워',
-        description: '첫 타워를 설치했습니다.',
+        get name() { return t('achievementFirstTower'); },
+        get description() { return t('achievementFirstTowerDesc'); },
         condition: () => towers.length === 1,
         unlocked: false
     },
     BOSS_KILLER: {
-        name: '보스 킬러',
-        description: '첫 보스를 처치했습니다.',
+        get name() { return t('achievementBossKiller'); },
+        get description() { return t('achievementBossKillerDesc'); },
         condition: () => gameState.bossKilled,
         unlocked: false
     },
     TOWER_MASTER: {
-        name: '타워 마스터',
-        description: '모든 타워 종류를 설치했습니다.',
+        get name() { return t('achievementTowerMaster'); },
+        get description() { return t('achievementTowerMasterDesc'); },
         condition: () => {
             const towerTypes = new Set(towers.map(t => t.type));
             return towerTypes.size === Object.keys(window.TOWER_TYPES).length;
@@ -803,26 +804,26 @@ const ACHIEVEMENTS = {
         unlocked: false
     },
     WAVE_MASTER: {
-        name: '웨이브 마스터',
-        description: '10웨이브를 클리어했습니다.',
+        get name() { return t('achievementWaveMaster'); },
+        get description() { return t('achievementWaveMasterDesc'); },
         condition: () => gameState.wave >= 10,
         unlocked: false
     },
     TOWER_EXPERT: {
-        name: '타워 전문가',
-        description: '타워를 10레벨까지 업그레이드했습니다.',
+        get name() { return t('achievementTowerExpert'); },
+        get description() { return t('achievementTowerExpertDesc'); },
         condition: () => towers.some(tower => tower.level >= 10),
         unlocked: false
     },
     GOLD_COLLECTOR: {
-        name: '골드 수집가',
-        description: '총 10000 골드를 획득했습니다.',
+        get name() { return t('achievementGoldCollector'); },
+        get description() { return t('achievementGoldCollectorDesc'); },
         condition: () => gameStats.totalGold >= 10000,
         unlocked: false
     },
     EVENT_MASTER: {
-        name: '이벤트 마스터',
-        description: '모든 특수 이벤트를 경험했습니다.',
+        get name() { return t('achievementEventMaster'); },
+        get description() { return t('achievementEventMasterDesc'); },
         condition: () => Object.keys(SPECIAL_EVENTS).every(event => gameStats.eventsTriggered?.includes(event)),
         unlocked: false
     }
@@ -832,8 +833,8 @@ const ACHIEVEMENTS = {
 // 타워들 간의 특별한 조합 효과
 const TOWER_COMBOS = {
     ICE_POISON: {
-        name: '독성 얼음',
-        description: '얼음 타워와 독 타워가 함께 있을 때, 얼음 효과가 독 데미지를 증가시킵니다.',
+        get name() { return t('comboIcePoison'); },
+        get description() { return t('comboIcePoisonDesc'); },
         condition: (towers) => {
             return towers.some(t => t.type === 'ICE') &&
                 towers.some(t => t.type === 'POISON');
@@ -854,8 +855,8 @@ const TOWER_COMBOS = {
         }
     },
     SUPPORT_NETWORK: {
-        name: '지원 네트워크',
-        description: '지원 타워가 다른 타워들을 강화합니다.',
+        get name() { return t('comboSupportNetwork'); },
+        get description() { return t('comboSupportNetworkDesc'); },
         condition: (towers) => {
             return towers.some(t => t.type === 'SUPPORT');
         },
@@ -880,8 +881,8 @@ const TOWER_COMBOS = {
         }
     },
     ELEMENTAL_MASTERY: {
-        name: '원소 지배',
-        description: '모든 타워 종류가 설치되어 있을 때, 특수 효과가 100% 강화됩니다.',
+        get name() { return t('comboElementalMastery'); },
+        get description() { return t('comboElementalMasteryDesc'); },
         condition: (towers) => {
             const requiredTypes = ['BASIC', 'ICE', 'POISON', 'LASER', 'SPLASH', 'SUPPORT'];
             return requiredTypes.every(type => towers.some(t => t.type === type));
@@ -933,7 +934,7 @@ const TOWER_COMBOS = {
 // 타워나 적이 가진 특수 능력
 const ABILITIES = {
     TOWER_BOOST: {
-        name: '전체 타워 강화',
+        get name() { return t('abilityTowerBoost'); },
         cost: 300
     }
 };
@@ -941,7 +942,7 @@ const ABILITIES = {
 // 보스 패턴 정의
 const BOSS_PATTERNS = {
     SHIELD: {
-        name: '방어막',
+        get name() { return t('bossPatternShield'); },
         cooldown: 300,
         duration: 180,
         update: (boss) => {
@@ -950,7 +951,7 @@ const BOSS_PATTERNS = {
             if (boss.patternCooldown === 0) {
                 boss.isInvincible = true;
                 boss.defense = 50;
-                showBossPatternEffect(boss.x, boss.y, '방어막');
+                showBossPatternEffect(boss.x, boss.y, t('bossPatternShield'));
                 playSound('bossShield');
             }
 
@@ -963,7 +964,7 @@ const BOSS_PATTERNS = {
         }
     },
     TELEPORT: {
-        name: '순간이동',
+        get name() { return t('bossPatternTeleport'); },
         cooldown: 300, // 5초
         update: (boss) => {
             if (boss.isDead) return true;
@@ -975,24 +976,24 @@ const BOSS_PATTERNS = {
                 const target = currentMap.path[newIndex];
                 boss.x = target.x;
                 boss.y = target.y;
-                showBossPatternEffect(boss.x, boss.y, '순간이동');
+                showBossPatternEffect(boss.x, boss.y, t('bossPatternTeleport'));
                 playSound('bossTeleport');
             }
             return false;
         }
     },
     HEAL: {
-        name: '힐',
+        get name() { return t('bossPatternHeal'); },
         cooldown: 240,
         update: (boss) => {
             if (boss.isDead) return true;
             // 쿨다운 60프레임(1초) 전 예고
-            // if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, '힐');
+            // if (boss.patternCooldown === 60) showBossPatternWarning(boss.x, boss.y, t('bossPatternHeal'));
             // 체력 50% 이하일 때만 힐 사용
             if (boss.health / boss.maxHealth <= 0.5 && boss.patternCooldown === 0) {
                 const healAmount = Math.floor(boss.maxHealth * 0.4);
                 boss.health = Math.min(boss.maxHealth, boss.health + healAmount);
-                showBossPatternEffect(boss.x, boss.y, '강력한 힐!');
+                showBossPatternEffect(boss.x, boss.y, t('bossPatternHealStrong'));
                 playSound('bossHeal');
             } else if (boss.patternCooldown === 0) {
                 // 50% 초과면 소환 행동
@@ -1005,7 +1006,7 @@ const BOSS_PATTERNS = {
                     enemy.y = boss.y;
                     enemies.push(enemy);
                 }
-                showBossPatternEffect(boss.x, boss.y, '소환!');
+                showBossPatternEffect(boss.x, boss.y, t('bossPatternSummon'));
                 playSound('bossSummon');
             }
             return false;
@@ -1014,21 +1015,22 @@ const BOSS_PATTERNS = {
 };
 
 // 적 스킬 정의
+// 적의 특수 능력을 정의
 const ENEMY_SKILLS = {
     SHIELD: {
-        name: '방어막',
+        name: t('enemySkillShield'),
         cooldown: 300, // 5초
         effect: function (enemy) {
             enemy.isInvincible = true;
             enemy.shieldEffectTime = 120; // 2초(60fps 기준)
-            showSpecialEffect(enemy.x, enemy.y, '방어막');
+            showSpecialEffect(enemy.x, enemy.y, t('enemySkillShield'));
             setTimeout(() => {
                 if (!enemy.isDead) enemy.isInvincible = false;
             }, 2000);
         }
     },
     TELEPORT: {
-        name: '순간이동',
+        name: t('enemySkillTeleport'),
         cooldown: 400,
         effect: function (enemy) {
             if (enemy.pathIndex + 3 < currentMap.path.length - 1) {
@@ -1036,33 +1038,33 @@ const ENEMY_SKILLS = {
                 const target = currentMap.path[enemy.pathIndex];
                 enemy.x = target.x;
                 enemy.y = target.y;
-                showSkillEffect(enemy.x, enemy.y, '순간이동');
+                showSkillEffect(enemy.x, enemy.y, t('enemySkillTeleport'));
                 enemy.teleportEffectTime = 40; // 0.7초간 이펙트
             }
         }
     },
     HEAL_SELF: {
-        name: '자가회복',
+        name: t('enemySkillHealSelf'),
         cooldown: 350,
         effect: function (enemy) {
             const heal = Math.floor(enemy.maxHealth * 0.3);
             enemy.health = Math.min(enemy.maxHealth, enemy.health + heal);
-            showSkillEffect(enemy.x, enemy.y, '자가회복');
+            showSkillEffect(enemy.x, enemy.y, t('enemySkillHealSelf'));
             enemy.healEffectTime = 60; // 1초간 이펙트
         }
     },
     HEAL_AOE: {
-        name: '힐',
+        name: t('enemySkillHeal'),
         cooldown: 500,
         effect: function (enemy) {
             enemies.forEach(e => {
                 if (e !== enemy && Math.abs(e.x - enemy.x) < 2 && Math.abs(e.y - enemy.y) < 2) {
                     e.health = Math.min(e.maxHealth, e.health + Math.floor(e.maxHealth * 0.2));
-                    showSkillEffect(e.x, e.y, '힐');
+                    showSkillEffect(e.x, e.y, t('enemySkillHeal'));
                     e.healEffectTime = 60; // 1초간 이펙트
                 }
             });
-            showSkillEffect(enemy.x, enemy.y, '힐');
+            showSkillEffect(enemy.x, enemy.y, t('enemySkillHeal'));
             enemy.healEffectTime = 60; // 1초간 이펙트
         }
     }

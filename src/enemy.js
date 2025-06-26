@@ -7,7 +7,7 @@
 // 게임 내 등장하는 적의 종류와 각각의 특성을 정의
 const ENEMY_TYPES = {
     NORMAL: {
-        name: '일반 적',
+        name: t('normalEnemy'),
         health: 100,
         speed: 0.007,
         reward: 10,
@@ -15,7 +15,7 @@ const ENEMY_TYPES = {
         experienceValue: 10
     },
     FAST: {
-        name: '빠른 적',
+        name: t('fastEnemy'),
         health: 50,
         speed: 0.01,
         reward: 15,
@@ -23,7 +23,7 @@ const ENEMY_TYPES = {
         experienceValue: 15
     },
     TANK: {
-        name: '탱커',
+        name: t('tankEnemy'),
         health: 300,
         speed: 0.004,
         reward: 20,
@@ -31,7 +31,7 @@ const ENEMY_TYPES = {
         experienceValue: 20
     },
     HEALER: {
-        name: '치유사',
+        name: t('healerEnemy'),
         health: 80,
         speed: 0.005,
         reward: 25,
@@ -46,8 +46,8 @@ const ENEMY_TYPES = {
 // 적의 이동 패턴과 특수 행동을 정의
 const ENEMY_PATTERNS = {
     NORMAL: {
-        name: '일반',
-        description: '기본 경로를 따라 이동',
+        name: t('enemyPatternNormal'),
+        description: t('enemyPatternNormalDesc'),
         update: function (enemy) {
             if (enemy.pathIndex >= currentMap.path.length - 1) {
                 gameState.lives--;
@@ -66,8 +66,8 @@ const ENEMY_PATTERNS = {
         }
     },
     ZIGZAG: {
-        name: '지그재그',
-        description: '경로를 따라가면서 좌우로 살짝 흔들림',
+        name: t('enemyPatternZigzag'),
+        description: t('enemyPatternZigzagDesc'),
         update: function (enemy) {
             if (enemy.pathIndex >= currentMap.path.length - 1) {
                 gameState.lives--;
@@ -96,8 +96,8 @@ const ENEMY_PATTERNS = {
         }
     },
     SWARM: {
-        name: '무리',
-        description: '경로를 따라가면서 가까운 적과 뭉침',
+        name: t('enemyPatternSwarm'),
+        description: t('enemyPatternSwarmDesc'),
         update: function (enemy) {
             if (enemy.pathIndex >= currentMap.path.length - 1) {
                 gameState.lives--;
@@ -131,8 +131,8 @@ const ENEMY_PATTERNS = {
         }
     },
     AMBUSH: {
-        name: '매복',
-        description: '경로에서 잠시 멈췄다가 빠르게 돌진',
+        name: t('enemyPatternAmbush'),
+        description: t('enemyPatternAmbushDesc'),
         update: function (enemy) {
             if (enemy.pathIndex >= currentMap.path.length - 1) {
                 gameState.lives--;
@@ -171,8 +171,8 @@ const ENEMY_PATTERNS = {
         }
     },
     GROUP_RUSH: {
-        name: '집단 돌진',
-        description: '그룹 신호에 맞춰 동시에 돌진',
+        name: t('enemyPatternGroupRush'),
+        description: t('enemyPatternGroupRushDesc'),
         update: function (enemy) {
             if (enemy.pathIndex >= currentMap.path.length - 1) {
                 gameState.lives--;
@@ -204,7 +204,7 @@ const ENEMY_PATTERNS = {
 // 보스 타입별 특성과 능력을 정의
 const BOSS_TYPES = {
     TANK: {
-        name: '탱크 보스',
+        name: t('bossTank'),
         health: 1000,
         speed: 0.01,
         reward: 100,
@@ -212,7 +212,7 @@ const BOSS_TYPES = {
         ability: 'shield' // 일정 시간 무적
     },
     SPEED: {
-        name: '스피드 보스',
+        name: t('bossSpeed'),
         health: 500,
         speed: 0.03,
         reward: 150,
@@ -220,7 +220,7 @@ const BOSS_TYPES = {
         ability: 'dash' // 순간 이동
     },
     SUMMONER: {
-        name: '소환사 보스',
+        name: t('bossSummoner'),
         health: 800,
         speed: 0.015,
         reward: 200,
@@ -301,7 +301,7 @@ class Enemy {
             this.type = type || 'NORMAL';
             switch (this.type) {
                 case 'NORMAL':
-                    this.name = '일반 적';
+                    this.name = t('normalEnemy');
                     this.baseSpeed = 0.007;
                     this.speed = this.baseSpeed;
                     this.health = 100;
@@ -311,7 +311,7 @@ class Enemy {
                     this.color = 'red';
                     break;
                 case 'FAST':
-                    this.name = '빠른 적';
+                    this.name = t('fastEnemy');
                     this.baseSpeed = 0.01;
                     this.speed = this.baseSpeed;
                     this.health = 50;
@@ -321,7 +321,7 @@ class Enemy {
                     this.color = 'yellow';
                     break;
                 case 'TANK':
-                    this.name = '탱커';
+                    this.name = t('tankEnemy');
                     this.baseSpeed = 0.004;
                     this.speed = this.baseSpeed;
                     this.health = 200;
@@ -333,7 +333,7 @@ class Enemy {
                     this.skillCooldown = this.skill.cooldown;
                     break;
                 case 'HEALER':
-                    this.name = '치유사';
+                    this.name = t('healerEnemy');
                     this.baseSpeed = 0.005;
                     this.speed = this.baseSpeed;
                     this.health = 80;
@@ -811,11 +811,11 @@ class EnemyGroup {
 function enemyFromData(data) {
     // 패턴 이름을 영문으로 변환
     const patternMap = {
-        "매복": "AMBUSH",
-        "무리": "SWARM",
-        "일반": "NORMAL",
-        "지그재그": "ZIGZAG",
-        "집단 돌진": "GROUP_RUSH",
+        [t('enemyPatternAmbush')]: "AMBUSH",
+        [t('enemyPatternSwarm')]: "SWARM",
+        [t('enemyPatternNormal')]: "NORMAL",
+        [t('enemyPatternZigzag')]: "ZIGZAG",
+        [t('enemyPatternGroupRush')]: "GROUP_RUSH",
         "GROUP": "SWARM"  // 추가
     };
 

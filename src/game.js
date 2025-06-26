@@ -33,34 +33,34 @@ function drawGameOver() {
     ctx.font = 'bold 48px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('게임 오버', canvas.width / 2, canvas.height / 2 - 60);
+    ctx.fillText(t('gameOver'), canvas.width / 2, canvas.height / 2 - 60);
     
     // 최종 점수
     ctx.fillStyle = '#f39c12';
     ctx.font = '24px Arial';
-    ctx.fillText(`최종 점수: ${gameState.score}`, canvas.width / 2, canvas.height / 2);
+    ctx.fillText(`${t('finalScore')}: ${gameState.score}`, canvas.width / 2, canvas.height / 2);
     
     // 최종 웨이브
     ctx.fillStyle = '#3498db';
     ctx.font = '20px Arial';
-    ctx.fillText(`최종 웨이브: ${gameState.wave}`, canvas.width / 2, canvas.height / 2 + 30);
+    ctx.fillText(`${t('finalWave')}: ${gameState.wave}`, canvas.width / 2, canvas.height / 2 + 30);
     
     // 처치한 보스 수
     ctx.fillStyle = '#9b59b6';
     ctx.font = '18px Arial';
-    ctx.fillText(`처치한 보스: ${gameStats.bossesKilled}`, canvas.width / 2, canvas.height / 2 + 55);
+    ctx.fillText(`${t('bossesKilled')}: ${gameStats.bossesKilled}`, canvas.width / 2, canvas.height / 2 + 55);
     
     // 안내 메시지
     ctx.fillStyle = '#95a5a6';
     ctx.font = '16px Arial';
-    ctx.fillText('다시 시작하려면 페이지를 새로고침하세요', canvas.width / 2, canvas.height / 2 + 90);
+    ctx.fillText(t('gameOverMessage'), canvas.width / 2, canvas.height / 2 + 90);
 
     // '다시 시작' 버튼 동적 생성
     let restartBtn = document.getElementById('canvasRestartBtn');
     if (!restartBtn) {
         restartBtn = document.createElement('button');
         restartBtn.id = 'canvasRestartBtn';
-        restartBtn.textContent = '다시 시작';
+        restartBtn.textContent = t('restart');
         restartBtn.style.position = 'absolute';
         restartBtn.style.left = '50%';
         restartBtn.style.top = 'calc(50%)';
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!gameState.isStarted) {
                 // 게임 시작
                 gameState.isStarted = true;
-                newStartBtn.textContent = '재시작';
+                newStartBtn.textContent = t('restart');
                 document.getElementById('tutorial').style.display = 'none';
                 document.getElementById('waveStartButton').style.display = 'block';
                 
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 게임 시작 시 배경음악 재생
                 if (musicEnabled) {
                     sounds.bgm.loop = true;
-                    sounds.bgm.play().catch(error => console.log('BGM 재생 실패:', error));
+                    sounds.bgm.play().catch(error => console.log(t('bgmPlayFailed') + ':', error));
                 }
             } else {
                 // 게임 재시작
@@ -339,7 +339,7 @@ function gameLoop() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = 'white';
         ctx.font = '48px Arial';
-        ctx.fillText('일시정지', canvas.width/2 - 100, canvas.height/2);
+        ctx.fillText(t('pause'), canvas.width/2 - 100, canvas.height/2);
     }
 
     // 게임 오버 체크
@@ -376,7 +376,7 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         if (gameState.isStarted) {
             gameState.isPaused = !gameState.isPaused;
-            document.getElementById('pauseBtn').textContent = gameState.isPaused ? '계속하기' : '일시정지';
+            document.getElementById('pauseBtn').textContent = gameState.isPaused ? t('resume') : t('pause');
         }
     } else if (e.code === 'KeyH') {
         e.preventDefault();
@@ -418,7 +418,7 @@ canvas.addEventListener('click', (e) => {
 document.getElementById('pauseBtn').addEventListener('click', () => {
     if (gameState.isStarted) {
         gameState.isPaused = !gameState.isPaused;
-        document.getElementById('pauseBtn').textContent = gameState.isPaused ? '계속하기' : '일시정지';
+        document.getElementById('pauseBtn').textContent = gameState.isPaused ? t('resume') : t('pause');
     }
 });
 
@@ -792,7 +792,7 @@ function showComboEffect(comboName) {
     const effect = document.createElement('div');
     effect.className = 'combo-effect';
     effect.innerHTML = `
-        <h3>타워 조합 발견!</h3>
+        <h3>${t('comboDiscovered')}</h3>
         <p>${comboName}</p>
     `;
     document.body.appendChild(effect);
@@ -1146,13 +1146,13 @@ document.head.insertAdjacentHTML('beforeend', `
 document.getElementById('soundToggleBtn').addEventListener('click', function() {
     toggleSound();
     this.classList.toggle('muted');
-    this.textContent = soundEnabled ? '🔊 효과음' : '🔇 효과음';
+    this.textContent = soundEnabled ? `🔊 ${t('soundEffects')}` : `🔇 ${t('soundEffects')}`;
 });
 
 document.getElementById('musicToggleBtn').addEventListener('click', function() {
     toggleMusic();
     this.classList.toggle('muted');
-    this.textContent = musicEnabled ? '🎵 배경음악' : '🎵 배경음악';
+    this.textContent = musicEnabled ? `🎵 ${t('backgroundMusic')}` : `🎵 ${t('backgroundMusic')}`;
 });
 
 document.head.insertAdjacentHTML('beforeend', `
@@ -2124,7 +2124,7 @@ if (startBtn) {
             // 게임 시작
             gameState.isStarted = true;
             
-            newStartBtn.textContent = '재시작';
+            newStartBtn.textContent = t('restart');
             document.getElementById('tutorial').style.display = 'none';
             document.getElementById('waveStartButton').style.display = 'block';
             
@@ -2138,7 +2138,7 @@ if (startBtn) {
             // 게임 시작 시 배경음악 재생
             if (musicEnabled) {
                 sounds.bgm.loop = true;
-                sounds.bgm.play().catch(error => console.log('BGM 재생 실패:', error));
+                sounds.bgm.play().catch(error => console.log(t('bgmPlayFailed') + ':', error));
             }
         } else {
             // 게임 재시작
@@ -2391,7 +2391,7 @@ function updateControlVisibility() {
     const startBtn = document.getElementById('startBtn');
     if (startBtn) {
         startBtn.style.display = 'inline-block';
-        startBtn.textContent = isStarted ? '재시작' : '게임 시작';
+        startBtn.textContent = isStarted ? t('restart') : t('start');
     }
     // 난이도/맵 드롭다운
     document.getElementById('difficultySelect').style.display = isStarted ? 'none' : 'inline-block';
@@ -2452,7 +2452,7 @@ BOSS_PATTERNS.HEAL = {
         if (boss.health / boss.maxHealth <= 0.5 && boss.patternCooldown === 0) {
             const healAmount = Math.floor(boss.maxHealth * 0.4);
             boss.health = Math.min(boss.maxHealth, boss.health + healAmount);
-            showBossPatternEffect(boss.x, boss.y, '강력한 힐!');
+            showBossPatternEffect(boss.x, boss.y, t('bossPatternHealStrong'));
             playSound('bossHeal');
         } else if (boss.patternCooldown === 0) {
             // 50% 초과면 소환 행동
@@ -2465,7 +2465,7 @@ BOSS_PATTERNS.HEAL = {
                 enemy.y = boss.y;
                 enemies.push(enemy);
             }
-            showBossPatternEffect(boss.x, boss.y, '소환!');
+            showBossPatternEffect(boss.x, boss.y, t('bossPatternSummon'));
             playSound('bossSummon');
         }
         return false;
@@ -2541,7 +2541,7 @@ function drawWaveMessage() {
     if (gameState.currentWaveMessage.isBoss) {
         // 보스 웨이브 메시지
         ctx.fillText(
-            `보스 웨이브 ${gameState.currentWaveMessage.wave} 시작!`,
+            `${t('bossWave')} ${gameState.currentWaveMessage.wave} ${t('waveStart')}!`,
             canvas.width / 2,
             canvas.height / 2 - 40
         );
@@ -2552,14 +2552,14 @@ function drawWaveMessage() {
         const bossTypes = Object.keys(BOSS_TYPES);
         const randomBossType = bossTypes[Math.floor(Math.random() * bossTypes.length)];
         ctx.fillText(
-            `${BOSS_TYPES[randomBossType].name} 출현!`,
+            `${BOSS_TYPES[randomBossType].name} ${t('bossAppear')}!`,
             canvas.width / 2,
             canvas.height / 2
         );
     } else {
         // 일반 웨이브 메시지
         ctx.fillText(
-            `웨이브 ${gameState.currentWaveMessage.wave} 시작!`,
+            `${t('wave')} ${gameState.currentWaveMessage.wave} ${t('waveStart')}!`,
             canvas.width / 2,
             canvas.height / 2 - 40
         );
@@ -2568,7 +2568,7 @@ function drawWaveMessage() {
         ctx.font = '18px Arial';
         ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
         ctx.fillText(
-            `현재 레벨: ${gameState.currentWaveMessage.wave}`,
+            `${t('currentLevel')}: ${gameState.currentWaveMessage.wave}`,
             canvas.width / 2,
             canvas.height / 2
         );
@@ -2577,7 +2577,7 @@ function drawWaveMessage() {
     // 보상
     ctx.fillStyle = `rgba(255, 215, 0, ${alpha})`; // 골드 색상
     ctx.fillText(
-        `보상: ${gameState.currentWaveMessage.reward} 골드`,
+        `${t('reward')}: ${gameState.currentWaveMessage.reward} ${t('gold')}`,
         canvas.width / 2,
         canvas.height / 2 + 40
     );

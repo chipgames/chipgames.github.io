@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039" crossorigin="anonymous"></script>
-    <title>타워 디펜스 게임 - 전략과 전술의 세계</title>
+    <title data-i18n="gameTitle">타워 디펜스 게임 - 전략과 전술의 세계</title>
     <meta name="description" content="전략적인 타워 배치와 업그레이드를 통해 적을 막는 타워 디펜스 게임. 다양한 타워, 맵, 전략을 경험하세요.">
     <link rel="stylesheet" href="style.css">
     <link rel="icon" href="data:,">
+    <!-- 다국어 지원 스크립트 로드 -->
+    <script src="lang/i18n.js"></script>
     <style>
         html, body {
             height: 100%;
@@ -50,6 +52,31 @@
             z-index: 1000;
             pointer-events: none;
         }
+
+        /* 언어 선택 드롭다운 스타일 */
+        .language-selector {
+            margin-left: 20px;
+        }
+
+        .language-selector select {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .language-selector option {
+            background: var(--background-color);
+            color: var(--text-color);
+        }
     </style>
 </head>
 <body>
@@ -57,15 +84,24 @@
     <header class="main-header">
         <nav class="main-nav">
             <div class="logo">
-                <h1>타워 디펜스</h1>
+                <h1 data-i18n="gameTitle">타워 디펜스</h1>
             </div>
             <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
             <ul class="nav-links">
-                <li><a href="#game">게임하기</a></li>
-                <li><a href="#guides">가이드</a></li>
-                <li><a href="#" id="descriptionBtn">게임 설명</a></li>
-                <li><a href="#" id="howtoBtn">이용 방법</a></li>
-                <li><a href="#" id="helpBtn">도움말</a></li>
+                <li><a href="#game" data-i18n="playGame">게임하기</a></li>
+                <li><a href="#guides" data-i18n="guides">가이드</a></li>
+                <li><a href="#" id="descriptionBtn" data-i18n="gameDescriptionBtn">게임 설명</a></li>
+                <li><a href="#" id="howtoBtn" data-i18n="howToPlay">이용 방법</a></li>
+                <li><a href="#" id="helpBtn" data-i18n="help">도움말</a></li>
+                <!-- 언어 선택 드롭다운 추가 -->
+                <li class="language-selector">
+                    <select id="languageSelect" onchange="changeLanguage(this.value)">
+                        <option value="ko">한국어</option>
+                        <option value="en">English</option>
+                        <option value="zh">中文</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </li>
             </ul>
         </nav>
     </header>
@@ -77,8 +113,8 @@
             <!-- 로딩 화면 -->
             <div id="loadingScreen" class="loading-screen">
                 <div class="loading-content">
-                    <h2>게임 로딩 중...</h2>
-                    <p>잠시만 기다려주세요.</p>
+                    <h2 data-i18n="loading">게임 로딩 중...</h2>
+                    <p data-i18n="pleaseWait">잠시만 기다려주세요.</p>
                     <div class="loading-progress">
                         <div class="progress-bar"></div>
                     </div>
@@ -89,39 +125,39 @@
             <div class="info-bar">
                 <div class="info-item">
                     <span class="info-icon">💰</span>
-                    <span id="infoGold">골드: 200</span>
+                    <span id="infoGold" data-i18n="gold">골드: 200</span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon">❤️</span>
-                    <span id="infoLives">생명: 25</span>
+                    <span id="infoLives" data-i18n="lives">생명: 25</span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon">🌊</span>
-                    <span id="infoWave">웨이브: 1</span>
+                    <span id="infoWave" data-i18n="wave">웨이브: 1</span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon">⭐</span>
-                    <span id="infoScore">점수: 0</span>
+                    <span id="infoScore" data-i18n="score">점수: 0</span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon">🎯</span>
-                    <span id="infoTowerCount">타워: <span id="towerLimitCount">0</span>/<span id="towerLimitMax">12</span></span>
+                    <span id="infoTowerCount" data-i18n="towers">타워: <span id="towerLimitCount">0</span>/<span id="towerLimitMax">12</span></span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon">💀</span>
-                    <span id="enemiesKilled">처치한 적: 0</span>
+                    <span id="enemiesKilled" data-i18n="enemiesKilled">처치한 적: 0</span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon">👑</span>
-                    <span id="bossesKilled">처치한 보스: 0</span>
+                    <span id="bossesKilled" data-i18n="bossesKilled">처치한 보스: 0</span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon">💰</span>
-                    <span id="totalGold">총 획득 골드: 0</span>
+                    <span id="totalGold" data-i18n="totalGold">총 획득 골드: 0</span>
                 </div>
                 <div class="info-item">
                     <span class="info-icon">🌊</span>
-                    <span id="highestWave">최고 웨이브: 0</span>
+                    <span id="highestWave" data-i18n="highestWave">최고 웨이브: 0</span>
                 </div>
             </div>
 
@@ -144,36 +180,35 @@
             <!-- 게임 컨트롤 -->
             <div class="game-controls">
                 <select id="difficultySelect" class="control-button">
-                    <option value="EASY" selected>쉬움</option>
-                    <option value="NORMAL">보통</option>
-                    <option value="HARD">어려움</option>
+                    <option value="EASY" data-i18n="easy">쉬움</option>
+                    <option value="NORMAL" data-i18n="normal">보통</option>
+                    <option value="HARD" data-i18n="hard">어려움</option>
                 </select>
                 <select id="mapSelect" class="control-button">
-                    <option value="STRAIGHT">직선 경로</option>
-                    <option value="ZIGZAG">지그재그</option>
-                    <option value="SPIRAL">나선형</option>
-                    <option value="MAZE">미로</option>
-                    <option value="CROSS">십자형</option>
-                    <option value="SNAKE">뱀형</option>
-                    <option value="DIAMOND">다이아몬드</option>
-                    <option value="STAR">별형</option>
-                    <option value="VORTEX">소용돌이</option>
-                    <option value="TRIANGLE">삼각형</option>
-                    <option value="WAVE">파도형</option>
-                    <option value="STAIRS">계단형</option>
-                    <option value="CROSSROADS">교차로</option>
-                    <option value="INFINITY">무한형</option>
-                    <option value="BUTTERFLY">나비형</option>
-                    <option value="HOURGLASS">모래시계</option>
+                    <option value="STRAIGHT" data-i18n="straight">직선 경로</option>
+                    <option value="ZIGZAG" data-i18n="zigzag">지그재그</option>
+                    <option value="SPIRAL" data-i18n="spiral">나선형</option>
+                    <option value="MAZE" data-i18n="maze">미로</option>
+                    <option value="CROSS" data-i18n="cross">십자형</option>
+                    <option value="SNAKE" data-i18n="snake">뱀형</option>
+                    <option value="DIAMOND" data-i18n="diamond">다이아몬드</option>
+                    <option value="STAR" data-i18n="star">별형</option>
+                    <option value="VORTEX" data-i18n="vortex">소용돌이</option>
+                    <option value="TRIANGLE" data-i18n="triangle">삼각형</option>
+                    <option value="WAVE" data-i18n="wave">파도형</option>
+                    <option value="STAIRS" data-i18n="stairs">계단형</option>
+                    <option value="CROSSROADS" data-i18n="crossroads">교차로</option>
+                    <option value="INFINITY" data-i18n="infinity">무한형</option>
+                    <option value="BUTTERFLY" data-i18n="butterfly">나비형</option>
+                    <option value="HOURGLASS" data-i18n="hourglass">모래시계</option>
                 </select>
-                <button id="waveStartButton" class="wave-start-button">다음 웨이브</button>
-                <button id="pauseBtn" class="control-button">일시정지</button>
-                <button id="startBtn" class="control-button">게임 시작</button>
-                <button id="saveBtn" class="control-button">저장</button>
-                <button id="loadBtn" class="control-button">불러오기</button>
-                <button id="soundToggleBtn">🔊 효과음</button>
-                <button id="musicToggleBtn">🎵 배경음악</button>
-
+                <button id="waveStartButton" class="wave-start-button" data-i18n="nextWave">다음 웨이브</button>
+                <button id="pauseBtn" class="control-button" data-i18n="pause">일시정지</button>
+                <button id="startBtn" class="control-button" data-i18n="start">게임 시작</button>
+                <button id="saveBtn" class="control-button" data-i18n="save">저장</button>
+                <button id="loadBtn" class="control-button" data-i18n="load">불러오기</button>
+                <button id="soundToggleBtn" data-i18n="soundEffects">🔊 효과음</button>
+                <button id="musicToggleBtn" data-i18n="backgroundMusic">🎵 배경음악</button>
             </div>
             <div id="saveLoadNotification" style="display:none; position:fixed; top:60px; left:50%; transform:translateX(-50%); min-width:200px; max-width:90vw; padding:12px 24px; border-radius:8px; color:#fff; font-size:1.1em; z-index:2000; text-align:center;"></div>
 
@@ -453,10 +488,17 @@
     <!-- 푸터 -->
     <footer class="main-footer">
         <div class="footer-links">
-            <a href="privacy.html">개인정보처리방침</a>
-            <a href="contact.html">문의하기</a>
+            <a href="privacy.html" data-i18n="privacyPolicy">개인정보처리방침</a>
+            <a href="contact.html" data-i18n="contact">문의하기</a>
+            <!-- 언어 선택 드롭다운 추가 -->
+            <select id="footerLanguageSelect" onchange="changeLanguage(this.value)" style="background: transparent; color: inherit; border: none; margin-left: 10px;">
+                <option value="ko">한국어</option>
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+            </select>
         </div>
-        <p>&copy; 2025 ChipGames. All rights reserved.</p>
+        <p data-i18n="copyright">&copy; 2025 ChipGames. All rights reserved.</p>
     </footer>
 
     <!-- 퀵 가이드 플로팅 버튼 -->
@@ -464,7 +506,7 @@
 
     <!-- 우측 하단 저사양 모드 토글 -->
     <div class="low-spec-toggle">
-        <label for="lowSpecToggle" class="low-spec-label">저사양 모드</label>
+        <label for="lowSpecToggle" class="low-spec-label" data-i18n="lowSpecMode">저사양 모드</label>
         <input type="checkbox" id="lowSpecToggle" />
     </div>
 

@@ -43,11 +43,11 @@ function loadSoundSettings() {
         const musicBtn = document.getElementById('musicToggleBtn');
         soundBtn.classList.toggle('muted', !soundEnabled);
         musicBtn.classList.toggle('muted', !musicEnabled);
-        soundBtn.setAttribute('data-status', soundEnabled ? '켜짐' : '꺼짐');
-        musicBtn.setAttribute('data-status', musicEnabled ? '켜짐' : '꺼짐');
+        soundBtn.setAttribute('data-status', soundEnabled ? t('on') : t('off'));
+        musicBtn.setAttribute('data-status', musicEnabled ? t('on') : t('off'));
         if (musicEnabled && gameState.isStarted) {
             sounds.bgm.loop = true;
-            sounds.bgm.play().catch(error => console.log('BGM 재생 실패:', error));
+            sounds.bgm.play().catch(error => console.log(t('bgmPlayFailed') + ':', error));
         } else {
             sounds.bgm.pause();
         }
@@ -61,7 +61,7 @@ function playSound(soundName) {
     const sound = sounds[soundName];
     if (sound) {
         sound.currentTime = 0;
-        sound.play().catch(error => console.log('사운드 재생 실패:', error));
+        sound.play().catch(error => console.log(t('soundPlayFailed') + ':', error));
     }
 }
 
@@ -71,7 +71,7 @@ function toggleSound() {
     soundEnabled = !soundEnabled;
     const soundBtn = document.getElementById('soundToggleBtn');
     soundBtn.classList.toggle('muted', !soundEnabled);
-    soundBtn.setAttribute('data-status', soundEnabled ? '켜짐' : '꺼짐');
+    soundBtn.setAttribute('data-status', soundEnabled ? t('on') : t('off'));
     saveSoundSettings(); // 설정 저장
 }
 
@@ -84,7 +84,7 @@ function toggleMusic() {
     
     if (musicEnabled) {
         sounds.bgm.loop = true;
-        sounds.bgm.play().catch(error => console.log('BGM 재생 실패:', error));
+        sounds.bgm.play().catch(error => console.log(t('bgmPlayFailed') + ':', error));
     } else {
         sounds.bgm.pause();
     }

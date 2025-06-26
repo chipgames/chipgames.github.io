@@ -85,32 +85,32 @@ function saveGame() {
 
         // 저장 데이터 검증
         if (!validateSaveData(saveData)) {
-            throw new Error('저장할 데이터가 유효하지 않습니다.');
+            throw new Error(t('saveDataInvalid'));
         }
 
         // 저장 데이터 크기 확인 (5MB 제한)
         const saveString = JSON.stringify(saveData);
         if (saveString.length > 5 * 1024 * 1024) {
-            throw new Error('저장 데이터가 너무 큽니다.');
+            throw new Error(t('saveDataTooLarge'));
         }
 
         // localStorage 저장 시도
         try {
             localStorage.setItem('towerDefenseSave', saveString);
-            showSaveLoadNotification('게임이 저장되었습니다.');
+            showSaveLoadNotification(t('gameSaved'));
         } catch (storageError) {
             // localStorage 용량 초과 시 이전 저장 데이터 삭제 후 재시도
             if (storageError.name === 'QuotaExceededError') {
                 localStorage.removeItem('towerDefenseSave');
                 localStorage.setItem('towerDefenseSave', saveString);
-                showSaveLoadNotification('이전 저장 데이터를 삭제하고 게임을 저장했습니다.');
+                showSaveLoadNotification(t('gameSavedWithCleanup'));
             } else {
                 throw storageError;
             }
         }
     } catch (error) {
-        console.error('게임 저장 실패:', error);
-        showSaveLoadNotification(`저장 실패: ${error.message}`, true);
+        console.error(t('saveFailedPrefix'), error);
+        showSaveLoadNotification(`${t('saveFailed')}: ${error.message}`, true);
     }
 }
 
@@ -120,26 +120,26 @@ function loadGame() {
     try {
         const saveData = localStorage.getItem('towerDefenseSave');
         if (!saveData) {
-            showSaveLoadNotification('저장된 게임이 없습니다.', true);
+            showSaveLoadNotification(t('noSavedGame'), true);
             return;
         }
 
         const data = JSON.parse(saveData);
         // 저장 데이터 버전 확인
         if (!data.version || data.version < 3) {
-            showSaveLoadNotification('저장 데이터 버전이 호환되지 않습니다.', true);
+            showSaveLoadNotification(t('saveDataVersionIncompatible'), true);
             return;
         }
         // 저장 데이터 검증
         if (!validateSaveData(data)) {
-            throw new Error('저장된 데이터가 손상되었습니다.');
+            throw new Error(t('saveDataCorrupted'));
         }
         // 저장 시간 확인 (24시간 제한)
         const saveTime = new Date(data.timestamp);
         const currentTime = new Date();
         const hoursDiff = (currentTime - saveTime) / (1000 * 60 * 60);
         if (hoursDiff > 24) {
-            showSaveLoadNotification('저장된 게임이 만료되었습니다.', true);
+            showSaveLoadNotification(t('saveDataExpired'), true);
             return;
         }
         // 게임 상태 복원
@@ -199,7 +199,7 @@ function loadGame() {
         updateTowerLimit();
         updateInfoBar();
         updateStats();
-        showSaveLoadNotification('게임을 불러왔습니다.');
+        showSaveLoadNotification(t('gameLoaded'));
         // 웨이브 진행 중이었다면 적 스폰 재개
         if (gameState.waveInProgress) {
             // 이미 복원된 적이 있으면 spawnNextEnemy를 호출하지 않음
@@ -215,8 +215,8 @@ function loadGame() {
         // 불러오기 후 일시정지 해제
         gameState.isPaused = false;
     } catch (error) {
-        console.error('게임 불러오기 실패:', error);
-        showSaveLoadNotification(`불러오기 실패: ${error.message}`, true);
+        console.error(t('loadFailedPrefix'), error);
+        showSaveLoadNotification(`${t('loadFailed')}: ${error.message}`, true);
     }
 }
 
@@ -225,7 +225,7 @@ function loadGame() {
 function showSaveLoadNotification(message, isError = false) {
     const notification = document.getElementById('saveLoadNotification');
     if (!notification) {
-        console.error('알림 요소를 찾을 수 없습니다.');
+        console.error(t('notificationElementNotFound'));
         return;
     }
 

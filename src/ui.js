@@ -240,15 +240,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 적 툴팁 데이터
     const enemyTooltipData = {
-        TANK: '탱커\n- 높은 체력과 방어력\n- 느린 이동 속도\n- 단일 공격 타워에 취약',
-        SWARM: '무리 적\n- 낮은 체력, 빠른 이동\n- 다수 등장\n- 범위 공격 타워에 취약'
+        TANK: t('enemyTooltipTank'),
+        SWARM: t('enemyTooltipSwarm')
     };
 
     // 스킬 툴팁 데이터
     const skillTooltipData = {
-        SHIELD: '방어막\n- 일시적으로 데미지 감소\n- 지속 시간 동안 무적',
-        TELEPORT: '순간이동\n- 짧은 거리 순간 이동\n- 타워 공격 회피',
-        SUMMON: '소환\n- 추가 적 소환\n- 전투력 증가'
+        SHIELD: t('skillTooltipShield'),
+        TELEPORT: t('skillTooltipTeleport'),
+        SUMMON: t('skillTooltipSummon')
     };
 
     // 적 툴팁 기능
@@ -415,7 +415,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="upgrade-particles">
                 ${Array(8).fill().map(() => '<div class="particle"></div>').join('')}
             </div>
-            <div class="upgrade-text">업그레이드!</div>
+            <div class="upgrade-text">${t('upgradeComplete')}</div>
         `;
         
         document.querySelector('.game-area').appendChild(effect);
@@ -434,14 +434,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const effect = document.createElement('div');
         effect.className = 'wave-start-effect';
         effect.innerHTML = `
-            <h2>웨이브 ${gameState.wave} 시작!</h2>
-            <p>적의 수: ${gameState.enemiesRemaining}</p>
+            <h2>${t('waveStart', {wave: gameState.wave})}</h2>
+            <p>${t('enemiesCount', {count: gameState.enemiesRemaining})}</p>
         `;
         
         // .game-area에 추가
         const parent = document.querySelector('.game-area');
         if (!parent) {
-            console.error('게임 영역을 찾을 수 없습니다.');
+            console.error(t('gameAreaNotFound'));
             return;
         }
         parent.appendChild(effect);
@@ -480,8 +480,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // 팝업 내용 설정
         popup.innerHTML = `
             <div class="reward-content">
-                <h3>웨이브 완료!</h3>
-                <p>보상: <span class="gold-amount">${amount}</span> 골드</p>
+                <h3>${t('waveComplete')}</h3>
+                <p>${t('reward')}: <span class="gold-amount">${amount}</span> ${t('gold')}</p>
             </div>
         `;
         
@@ -508,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function showAchievement(name) {
         const achievement = document.getElementById('achievement');
         if (achievement) {
-            achievement.textContent = `업적 달성: ${name}!`;
+            achievement.textContent = `${t('achievementUnlocked')}: ${name}!`;
             achievement.style.display = 'block';
             setTimeout(() => {
                 achievement.style.display = 'none';
@@ -529,18 +529,18 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillStyle = '#FF4444';
         ctx.font = 'bold 48px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('게임 오버', canvas.width / 2, canvas.height / 2 - 50);
+        ctx.fillText(t('gameOver'), canvas.width / 2, canvas.height / 2 - 50);
         
         // 점수와 웨이브 정보 그리기
         ctx.fillStyle = '#FFFFFF';
         ctx.font = '24px Arial';
-        ctx.fillText(`최종 점수: ${gameState.score}`, canvas.width / 2, canvas.height / 2);
-        ctx.fillText(`도달한 웨이브: ${gameState.wave}`, canvas.width / 2, canvas.height / 2 + 40);
+        ctx.fillText(`${t('finalScore')}: ${gameState.score}`, canvas.width / 2, canvas.height / 2);
+        ctx.fillText(`${t('reachedWave')}: ${gameState.wave}`, canvas.width / 2, canvas.height / 2 + 40);
         
         // 다시 시작 안내
         ctx.fillStyle = '#4CAF50';
         ctx.font = '20px Arial';
-        ctx.fillText('R 키를 눌러 다시 시작', canvas.width / 2, canvas.height / 2 + 100);
+        ctx.fillText(t('pressRToRestart'), canvas.width / 2, canvas.height / 2 + 100);
     }
 
     // 게임 재시작
@@ -573,7 +573,7 @@ document.addEventListener('DOMContentLoaded', function() {
         isCountdownActive = true;
         const countdown = document.getElementById('countdown');
         if (!countdown) {
-            console.error('카운트다운 요소를 찾을 수 없습니다.');
+            console.error(t('countdownElementNotFound'));
             isCountdownActive = false;
             startWave();
             return;

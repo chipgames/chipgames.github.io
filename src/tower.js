@@ -6,15 +6,15 @@
 // 타워 관련 상수
 const TOWER_TYPES = {
     BASIC: {
-        name: '기본 타워',
+        name: t('basicTower'),
         cost: 30,
         damage: 5,
         range: 2,
         cooldown: 100,
         color: 'blue',
         special: {
-            name: '강화 사격',
-            description: '10초 동안 공격력이 50% 증가합니다.',
+            name: t('towerSpecialEnhancedShot'),
+            description: t('towerSpecialEnhancedShotDesc'),
             cooldown: 30,
             duration: 10,
             effect: (tower) => {
@@ -26,7 +26,7 @@ const TOWER_TYPES = {
         }
     },
     ICE: {
-        name: '얼음 타워',
+        name: t('iceTower'),
         cost: 100,
         damage: 5,
         range: 2,
@@ -34,8 +34,8 @@ const TOWER_TYPES = {
         color: 'lightblue',
         freezeDuration: 2,
         special: {
-            name: '빙결 폭발',
-            description: '범위 내 모든 적을 5초 동안 얼립니다.',
+            name: t('towerSpecialFrostExplosion'),
+            description: t('towerSpecialFrostExplosionDesc'),
             cooldown: 45,
             effect: (tower) => {
                 enemies.forEach(enemy => {
@@ -52,7 +52,7 @@ const TOWER_TYPES = {
         }
     },
     POISON: {
-        name: '독 타워',
+        name: t('poisonTower'),
         cost: 200,
         damage: 3,
         range: 2,
@@ -61,8 +61,8 @@ const TOWER_TYPES = {
         poisonDamage: 2,
         poisonDuration: 5,
         special: {
-            name: '독 구름',
-            description: '범위 내 적들에게 강력한 독 데미지를 줍니다.',
+            name: t('towerSpecialPoisonCloud'),
+            description: t('towerSpecialPoisonCloudDesc'),
             cooldown: 40,
             effect: (tower) => {
                 enemies.forEach(enemy => {
@@ -78,7 +78,7 @@ const TOWER_TYPES = {
         }
     },
     LASER: {
-        name: '레이저 타워',
+        name: t('laserTower'),
         cost: 300,
         damage: 8,
         range: 2.5,
@@ -86,8 +86,8 @@ const TOWER_TYPES = {
         color: 'red',
         continuousDamage: 5,
         special: {
-            name: '과열 레이저',
-            description: '10초 동안 연속 데미지가 3배로 증가합니다.',
+            name: t('towerSpecialOverheatLaser'),
+            description: t('towerSpecialOverheatLaserDesc'),
             cooldown: 60,
             duration: 10,
             effect: (tower) => {
@@ -99,7 +99,7 @@ const TOWER_TYPES = {
         }
     },
     SPLASH: {
-        name: '스플래시 타워',
+        name: t('splashTower'),
         cost: 400,
         damage: 7,
         range: 2,
@@ -108,8 +108,8 @@ const TOWER_TYPES = {
         splashRadius: 1.5,
         slowEffect: 0.3,
         special: {
-            name: '대규모 폭발',
-            description: '범위가 2배로 증가하고 데미지가 50% 증가합니다.',
+            name: t('towerSpecialMassiveExplosion'),
+            description: t('towerSpecialMassiveExplosionDesc'),
             cooldown: 50,
             duration: 8,
             effect: (tower) => {
@@ -123,7 +123,7 @@ const TOWER_TYPES = {
         }
     },
     SUPPORT: {
-        name: '지원 타워',
+        name: t('supportTower'),
         cost: 500,
         damage: 0,
         range: 3,
@@ -132,8 +132,8 @@ const TOWER_TYPES = {
         buffRange: 3,
         buffMultiplier: 1.2,
         special: {
-            name: '전체 강화',
-            description: '모든 타워의 공격력이 30% 증가합니다.',
+            name: t('towerSpecialFullEnhancement'),
+            description: t('towerSpecialFullEnhancementDesc'),
             cooldown: 60,
             duration: 15,
             effect: (tower) => {
@@ -901,7 +901,7 @@ function checkTowerCombos() {
 
 function showLevelUpEffect(tower) {
     if (!tower || typeof tower !== 'object' || tower.x === undefined || tower.y === undefined) {
-        console.error('showLevelUpEffect는 반드시 타워 객체로 호출해야 합니다!', tower);
+        console.error(t('showLevelUpEffectTowerOnly'), tower);
         return;
     }
     // 이펙트 풀에서 이펙트 가져오기
@@ -1029,12 +1029,12 @@ function handleTowerHover(tower) {
 
 // 타워 툴팁 데이터
 const towerTooltipData = {
-    BASIC: '기본 타워\n- 저렴한 비용, 빠른 공격 속도\n- 범용적으로 사용 가능\n- 초반 방어선 구축에 적합',
-    ICE: '얼음 타워\n- 적을 느리게 만드는 빙결 효과\n- 빠른 적/보스 이동을 늦춤\n- 업그레이드 시 빙결 지속 증가',
-    POISON: '독 타워\n- 지속적인 독 데미지 부여\n- 체력이 높은 적/보스에 효과적\n- 업그레이드 시 독 데미지/지속 증가',
-    LASER: '레이저 타워\n- 강력한 단일 공격, 연속 데미지\n- 업그레이드 시 보스 처치에 매우 유용',
-    SPLASH: '스플래시 타워\n- 범위 공격 및 감속 효과\n- 적이 몰려올 때 효율적',
-    SUPPORT: '지원 타워\n- 주변 타워의 공격력을 강화\n- 여러 타워와 조합 시 전체 방어력 상승'
+    BASIC: `${t('basicTower')}\n- ${t('towerTooltipBasic1')}\n- ${t('towerTooltipBasic2')}\n- ${t('towerTooltipBasic3')}`,
+    ICE: `${t('iceTower')}\n- ${t('towerTooltipIce1')}\n- ${t('towerTooltipIce2')}\n- ${t('towerTooltipIce3')}`,
+    POISON: `${t('poisonTower')}\n- ${t('towerTooltipPoison1')}\n- ${t('towerTooltipPoison2')}\n- ${t('towerTooltipPoison3')}`,
+    LASER: `${t('laserTower')}\n- ${t('towerTooltipLaser1')}\n- ${t('towerTooltipLaser2')}`,
+    SPLASH: `${t('splashTower')}\n- ${t('towerTooltipSplash1')}\n- ${t('towerTooltipSplash2')}`,
+    SUPPORT: `${t('supportTower')}\n- ${t('towerTooltipSupport1')}\n- ${t('towerTooltipSupport2')}`
 };
 
 // 타워 툴팁 관련 변수
@@ -1084,7 +1084,7 @@ document.querySelectorAll('.tower-tooltip').forEach(el => {
 // 타워 건설 메뉴 표시 함수
 function showTowerBuildMenu(x, y, clientX, clientY) {
     if (gameState.towerCount >= gameState.maxTowers) {
-        showSaveLoadNotification('타워 설치 한도에 도달했습니다!');
+        showSaveLoadNotification(t('towerLimitReached'));
         return;
     }
 
@@ -1107,8 +1107,8 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
     const header = document.createElement('div');
     header.className = 'tower-build-header';
     header.innerHTML = `
-        <h2>타워 설치</h2>
-        <p>골드: ${gameState.gold}</p>
+        <h2>${t('towerInstallation')}</h2>
+        <p>${t('gold')}: ${gameState.gold}</p>
     `;
     menu.appendChild(header);
 
@@ -1124,13 +1124,13 @@ function showTowerBuildMenu(x, y, clientX, clientY) {
             <div class="tower-card-header">
                 <div class="tower-icon" tabindex="0" style="background: ${tower.color}">${type[0]}</div>
                 <div class="tower-name">${tower.name}</div>
-                <div class="tower-cost">${tower.cost} 골드</div>
+                <div class="tower-cost">${tower.cost} ${t('gold')}</div>
             </div>
             <div class="tower-details">
                 <div class="tower-stats">
-                    <span class="tower-stat-label">공격력</span> ${tower.damage} /
-                    <span class="tower-stat-label">범위</span> ${tower.range} /
-                    <span class="tower-stat-label">쿨다운</span> ${(tower.cooldown / 60).toFixed(2)}초
+                    <span class="tower-stat-label">${t('attackPower')}</span> ${tower.damage} /
+                    <span class="tower-stat-label">${t('range')}</span> ${tower.range} /
+                    <span class="tower-stat-label">${t('cooldown')}</span> ${(tower.cooldown / 60).toFixed(2)}${t('seconds')}
                 </div>
                 <div class="tower-description">${getSpecialDescription(type)}</div>
             </div>
@@ -1214,7 +1214,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     // 업그레이드 옵션들
     const upgradeTypes = ['damage', 'range', 'speed'];
     const upgradeIcons = ['⚔️', '🎯', '⚡'];
-    const upgradeNames = ['공격력', '사거리', '공격속도'];
+    const upgradeNames = [t('upgradeDamage'), t('upgradeRange'), t('upgradeSpeed')];
 
     upgradeTypes.forEach((type, index) => {
         const isSupport = tower.type === 'SUPPORT';
@@ -1257,7 +1257,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     // 판매 버튼
     const sellButton = document.createElement('button');
     sellButton.className = 'sell-button';
-    sellButton.innerHTML = `💎 판매 +${tower.getSellValue()}`;
+    sellButton.innerHTML = `💎 ${t('sell')} +${tower.getSellValue()}`;
     sellButton.addEventListener('click', () => {
         gameState.gold += tower.getSellValue();
         const index = towers.indexOf(tower);
@@ -1281,21 +1281,21 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
 function getSpecialDescription(type) {
     switch (type) {
         case 'ICE':
-            return '범위 내 모든 적을 5초 동안 얼립니다.';
+            return t('specialDescIce');
         case 'POISON':
-            return '적에게 지속적인 독 데미지를 줍니다.';
+            return t('specialDescPoison');
         case 'SUPPORT':
-            return '주변 타워의 공격력을 20% 증가시킵니다.';
+            return t('specialDescSupport');
         case 'BASIC':
-            return '기본적인 공격력과 범위를 가진 타워입니다.';
+            return t('specialDescBasic');
         case 'SNIPER':
-            return '관통 공격이 가능한 타워입니다.';
+            return t('specialDescSniper');
         case 'SPLASH':
-            return '범위 공격과 감속 효과를 가진 타워입니다.';
+            return t('specialDescSplash');
         case 'LASER':
-            return '지속적인 데미지를 주는 타워입니다.';
+            return t('specialDescLaser');
         default:
-            return '특수 능력이 없습니다.';
+            return t('specialDescNone');
     }
 }
 

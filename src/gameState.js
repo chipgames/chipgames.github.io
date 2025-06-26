@@ -104,10 +104,10 @@ function initializeGame() {
 // 화면 상단의 게임 정보(골드, 생명, 웨이브, 점수)를 갱신
 function updateInfoBar() {
     const elements = {
-        'infoGold': `골드: ${gameState.gold}`,
-        'infoLives': `생명: ${gameState.lives}`,
-        'infoWave': `웨이브: ${gameState.wave}`,
-        'infoScore': `점수: ${gameState.score}`
+        'infoGold': `${t('gold')}: ${gameState.gold}`,
+        'infoLives': `${t('lives')}: ${gameState.lives}`,
+        'infoWave': `${t('wave')}: ${gameState.wave}`,
+        'infoScore': `${t('score')}: ${gameState.score}`
     };
 
     for (const [id, text] of Object.entries(elements)) {
@@ -122,10 +122,23 @@ function updateInfoBar() {
 // 게임 통계(처치한 적, 보스, 획득 골드 등)와 업적을 갱신
 function updateStats() {
     // 통계 요소 업데이트
-    document.getElementById('enemiesKilled').textContent = `처치한 적: ${gameStats.enemiesKilled}`;
-    document.getElementById('bossesKilled').textContent = `처치한 보스: ${gameStats.bossesKilled}`;
-    document.getElementById('totalGold').textContent = `총 획득 골드: ${gameStats.totalGold}`;
-    document.getElementById('highestWave').textContent = `최고 웨이브: ${gameStats.highestWave}`;
+    const enemiesKilledElement = document.getElementById('enemiesKilled');
+    const bossesKilledElement = document.getElementById('bossesKilled');
+    const totalGoldElement = document.getElementById('totalGold');
+    const highestWaveElement = document.getElementById('highestWave');
+    
+    if (enemiesKilledElement) {
+        enemiesKilledElement.textContent = `${t('enemiesKilled')}: ${gameStats.enemiesKilled}`;
+    }
+    if (bossesKilledElement) {
+        bossesKilledElement.textContent = `${t('bossesKilled')}: ${gameStats.bossesKilled}`;
+    }
+    if (totalGoldElement) {
+        totalGoldElement.textContent = `${t('totalGold')}: ${gameStats.totalGold}`;
+    }
+    if (highestWaveElement) {
+        highestWaveElement.textContent = `${t('highestWave')}: ${gameStats.highestWave}`;
+    }
 
     // 업적 업데이트
     Object.entries(ACHIEVEMENTS).forEach(([key, achievement]) => {
@@ -145,10 +158,17 @@ function updateStats() {
 }
 
 // 타워 제한 업데이트
-// 현재 설치된 타워 수와 최대 타워 수를 화면에 표시
+// 현재 설치된 타워 수와 최대 타워 수를 프로그레스 바로 표시
 function updateTowerLimit() {
-    document.getElementById('towerLimitCount').textContent = gameState.towerCount;
-    document.getElementById('towerLimitMax').textContent = gameState.maxTowers;
+    const towerCountElement = document.getElementById('towerLimitCount');
+    const towerMaxElement = document.getElementById('towerLimitMax');
+    
+    if (towerCountElement) {
+        towerCountElement.textContent = gameState.towerCount;
+    }
+    if (towerMaxElement) {
+        towerMaxElement.textContent = gameState.maxTowers;
+    }
 }
 
 // 웨이브 종료 체크
@@ -170,7 +190,11 @@ function checkWaveEnd() {
 // 현재 웨이브의 진행률을 프로그레스 바로 표시
 function updateWaveProgress() {
     const progress = document.getElementById('waveProgress');
+    if (!progress) return;
+    
     const fill = progress.querySelector('.fill');
+    if (!fill) return;
+    
     let text = progress.querySelector('.progress-text');
 
     // 전체 적의 수 대비 현재 진행률 계산
