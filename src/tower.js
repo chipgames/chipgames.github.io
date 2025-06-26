@@ -649,7 +649,7 @@ class Tower {
 
         // 타워 이름 텍스트
         ctx.fillStyle = '#ffd700'; // 골드 색상
-        ctx.fillText(towerName, nameX, nameY);
+        ctx.fillText(t(towerName), nameX, nameY);
 
         // 레벨 표시 (배경과 테두리 추가)
         const levelText = `Lv.${this.level}`;

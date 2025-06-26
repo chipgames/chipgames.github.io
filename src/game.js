@@ -686,7 +686,7 @@ function selectMap(mapKey) {
     ctx.font = 'bold 24px Arial';
             ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(currentMap.name, canvas.width/2, 10);
+    ctx.fillText(t(currentMap.name), canvas.width/2, 10);
     
     // 게임 재시작
     restartGame();

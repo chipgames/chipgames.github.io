@@ -91,7 +91,7 @@ function initializeGame() {
     ctx.font = 'bold 24px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'top';
-    ctx.fillText(defaultMap.name, canvas.width/2, 10);
+    ctx.fillText(t(defaultMap.name), canvas.width/2, 10);
 
     // 미니맵 초기화
     drawMinimap();

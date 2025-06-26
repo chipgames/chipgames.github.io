@@ -629,9 +629,9 @@ class Enemy {
         ctx.textBaseline = 'bottom';
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 3;
-        ctx.strokeText(`${this.name}${this.pattern?.name ? ' [' + this.pattern.name + ']' : ''}`, barX + barW / 2, barY - 6); // -4 → -6
+        ctx.strokeText(`${t(this.name)}${this.pattern?.name ? ' [' + t(this.pattern.name) + ']' : ''}`, barX + barW / 2, barY - 6); // -4 → -6
         ctx.fillStyle = '#fff';
-        ctx.fillText(`${this.name}${this.pattern?.name ? ' [' + this.pattern.name + ']' : ''}`, barX + barW / 2, barY - 6);
+        ctx.fillText(`${t(this.name)}${this.pattern?.name ? ' [' + t(this.pattern.name) + ']' : ''}`, barX + barW / 2, barY - 6);
 
         // 4. 레벨 (적 본체 중앙, 테두리 추가)
         ctx.font = 'bold 12px Arial';
