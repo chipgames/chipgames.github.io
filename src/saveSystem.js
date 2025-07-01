@@ -145,9 +145,13 @@ function loadGame() {
         // 게임 상태 복원
         Object.assign(gameState, data.gameState);
         if (data.gameStats) Object.assign(gameStats, data.gameStats);
+        
+        // 맵 복원 (수정된 부분)
         gameState.currentMap = data.currentMap;
-        // selectMap(data.currentMap); // gameState 값이 덮어써지지 않도록 제거
-        // 맵 UI만 갱신
+        currentMap = MAPS[data.currentMap]; // currentMap 변수 직접 업데이트
+        path = [...currentMap.path]; // 경로 배열 복사
+        
+        // 맵 UI 갱신
         if (typeof drawMinimap === 'function') {
             drawMinimap();
         }
