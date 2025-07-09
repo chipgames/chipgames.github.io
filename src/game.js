@@ -1552,6 +1552,7 @@ document.head.insertAdjacentHTML('beforeend', `
         }
         @media (max-width: 768px) {
             .info-bar {
+                margin-top: 50px;
                 gap: 4px;
                 padding: 4px;
             }
