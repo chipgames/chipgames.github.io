@@ -492,6 +492,19 @@ window.addEventListener('load', () => {
     if (loadingScreen) {
         loadingScreen.style.display = 'none';
     }
+    
+    // 모바일에서 스크롤 힌트 자동 숨김
+    const canvasContainer = document.querySelector('.canvas-container');
+    if (canvasContainer && window.innerWidth <= 768) {
+        setTimeout(() => {
+            canvasContainer.classList.add('hide-hint');
+        }, 10000); // 10초 후 힌트 숨김
+        
+        // 스크롤 이벤트로 힌트 숨김
+        canvasContainer.addEventListener('scroll', () => {
+            canvasContainer.classList.add('hide-hint');
+        }, { passive: true });
+    }
 });
 
 /**

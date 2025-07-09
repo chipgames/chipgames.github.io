@@ -181,9 +181,159 @@ body {
     min-height: 700px;
 }
 
+/* 캔버스 컨테이너 스타일 */
+.canvas-container {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    background: #232526;
+    border-radius: 8px;
+    margin: 0 auto;
+    position: relative;
+}
+
 #gameCanvas {
     display: block;
     margin: 0 auto;
+    max-width: none;
+    min-width: 800px;
+}
+
+/* 모바일에서 캔버스 컨테이너 최적화 */
+@media (max-width: 768px) {
+    .canvas-container {
+        border-radius: 4px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        /* 터치 스크롤 최적화 */
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+        /* 스크롤 힌트 표시 */
+        position: relative;
+    }
+    
+    .canvas-container::before {
+        content: "← 좌우로 스크롤하여 전체 게임 영역을 보세요 →";
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: #4CAF50;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+        z-index: 10;
+        white-space: nowrap;
+        animation: scrollHint 3s ease-in-out infinite;
+        /* 10초 후 힌트 숨김 */
+        animation-delay: 0s;
+        animation-fill-mode: forwards;
+    }
+    
+    /* 스크롤 힌트 숨김 클래스 */
+    .canvas-container.hide-hint::before {
+        display: none;
+    }
+    
+    @keyframes scrollHint {
+        0%, 100% { opacity: 0.7; }
+        50% { opacity: 1; }
+    }
+    
+    #gameCanvas {
+        min-width: 800px;
+        height: auto;
+    }
+    
+    /* 스크롤바 스타일링 */
+    .canvas-container::-webkit-scrollbar {
+        height: 8px;
+    }
+    
+    .canvas-container::-webkit-scrollbar-track {
+        background: #333;
+        border-radius: 4px;
+    }
+    
+    .canvas-container::-webkit-scrollbar-thumb {
+        background: #4CAF50;
+        border-radius: 4px;
+    }
+    
+    .canvas-container::-webkit-scrollbar-thumb:hover {
+        background: #45a049;
+    }
+    
+    /* 게임 영역 전체 최적화 */
+    .game-area {
+        padding: 10px;
+        min-height: auto;
+    }
+    
+    /* 정보 바 모바일 최적화 */
+    .info-bar {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 8px;
+        padding: 8px;
+        margin-top: 10px;
+    }
+    
+    .info-item {
+        padding: 6px;
+        font-size: 0.9em;
+    }
+    
+    /* 게임 컨트롤 모바일 최적화 */
+    .game-controls {
+        gap: 8px;
+        margin: 10px 0 0 0;
+        flex-wrap: wrap;
+    }
+    
+    .control-button, #soundToggleBtn, #musicToggleBtn {
+        min-width: 40px;
+        min-height: 40px;
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+}
+
+/* 더 작은 화면에서 추가 최적화 */
+@media (max-width: 480px) {
+    .canvas-container::before {
+        font-size: 11px;
+        padding: 6px 12px;
+        top: 5px;
+    }
+    
+    .info-bar {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 6px;
+        padding: 6px;
+    }
+    
+    .info-item {
+        padding: 4px;
+        font-size: 0.8em;
+    }
+    
+    .game-controls {
+        gap: 6px;
+    }
+    
+    .control-button, #soundToggleBtn, #musicToggleBtn {
+        min-width: 36px;
+        min-height: 36px;
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+    
+    .wave-start-button {
+        min-width: 100px;
+        font-size: 0.9em;
+        padding: 6px 0;
+    }
 }
 
 .game-controls {
