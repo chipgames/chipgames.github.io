@@ -1198,7 +1198,7 @@ function showTowerUpgradeMenu(tower, clientX, clientY) {
     const headerRow = document.createElement('div');
     headerRow.className = 'tower-upgrade-header-row';
     headerRow.innerHTML = `
-        <span class="tower-upgrade-header-title">${TOWER_TYPES[tower.type].name} Lv.${tower.level}</span>
+        <span class="tower-upgrade-header-title">${t(TOWER_TYPES[tower.type].name)} Lv.${tower.level}</span>
         <span class="tower-upgrade-header-stats">
             <span>⚔️ ${Math.floor(tower.damage)}</span>
             <span>🎯 ${tower.range}</span>
