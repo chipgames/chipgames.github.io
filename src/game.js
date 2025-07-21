@@ -304,6 +304,96 @@ function gameLoop() {
         return !shouldRemove;
     });
 
+    // === 타워 설치 미리보기 그리기 (canvas 직접) ===
+    if (towerPreview) {
+        const { x, y, range, type } = towerPreview;
+        const centerX = x * TILE_SIZE + TILE_SIZE / 2;
+        const centerY = y * TILE_SIZE + TILE_SIZE / 2;
+        // 사거리 원
+        ctx.save();
+        ctx.globalAlpha = 0.18;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, range * TILE_SIZE, 0, Math.PI * 2);
+        ctx.fillStyle = TOWER_TYPES[type]?.color || 'rgba(0,0,0,0.18)';
+        ctx.fill();
+        ctx.restore();
+        // 사거리 테두리
+        ctx.save();
+        ctx.globalAlpha = 0.7;
+        ctx.strokeStyle = TOWER_TYPES[type]?.color || '#888';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, range * TILE_SIZE, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        // 타워 본체(반투명)
+        ctx.save();
+        ctx.globalAlpha = 0.5;
+        const radius = TILE_SIZE / 2 - 4;
+        switch (type) {
+            case 'BASIC':
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fillStyle = TOWER_TYPES[type]?.color || '#888';
+                ctx.fill();
+                break;
+            case 'ICE':
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i * Math.PI * 2) / 6;
+                    const px = centerX + radius * Math.cos(angle);
+                    const py = centerY + radius * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fillStyle = TOWER_TYPES[type]?.color || '#888';
+                ctx.fill();
+                break;
+            case 'POISON':
+                ctx.beginPath();
+                for (let i = 0; i < 5; i++) {
+                    const angle = (i * Math.PI * 2) / 5 - Math.PI / 2;
+                    const px = centerX + radius * Math.cos(angle);
+                    const py = centerY + radius * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fillStyle = TOWER_TYPES[type]?.color || '#888';
+                ctx.fill();
+                break;
+            case 'LASER':
+                ctx.beginPath();
+                for (let i = 0; i < 3; i++) {
+                    const angle = (i * Math.PI * 2) / 3;
+                    const px = centerX + radius * Math.cos(angle);
+                    const py = centerY + radius * Math.sin(angle);
+                    if (i === 0) ctx.moveTo(px, py);
+                    else ctx.lineTo(px, py);
+                }
+                ctx.closePath();
+                ctx.fillStyle = TOWER_TYPES[type]?.color || '#888';
+                ctx.fill();
+                break;
+            case 'SPLASH':
+                ctx.beginPath();
+                ctx.rect(centerX - radius, centerY - radius, radius * 2, radius * 2);
+                ctx.fillStyle = TOWER_TYPES[type]?.color || '#888';
+                ctx.fill();
+                break;
+            case 'SUPPORT':
+                ctx.beginPath();
+                ctx.rect(centerX - radius / 2, centerY - radius, radius, radius * 2);
+                ctx.rect(centerX - radius, centerY - radius / 2, radius * 2, radius);
+                ctx.fillStyle = TOWER_TYPES[type]?.color || '#888';
+                ctx.fill();
+                break;
+        }
+        ctx.restore();
+    }
+    // === 타워 설치 미리보기 그리기 끝 ===
+
     // 웨이브 종료 체크
     checkWaveEnd();
 
