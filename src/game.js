@@ -312,6 +312,10 @@ function gameLoop() {
     drawSkillEffects();
     // === 적 스킬 이펙트 그리기 끝 ===
 
+    // === 특수 이펙트 그리기 ===
+    drawSpecialEffects();
+    // === 특수 이펙트 그리기 끝 ===
+
     // === 타워 설치 미리보기 그리기 (canvas 직접) ===
     if (towerPreview) {
         const { x, y, range, type } = towerPreview;
@@ -2354,25 +2358,12 @@ document.head.insertAdjacentHTML('beforeend', `
  */
 function showSpecialEffect(x, y, name) {
     if (lowSpecMode) return;
-    const effect = EffectPool.get('special');
-    const parent = document.querySelector('.game-area');
-    if (parent && !effect.parentNode) {
-        parent.appendChild(effect);
-    }
-    const centerX = x * TILE_SIZE + TILE_SIZE/2;
-    const centerY = y * TILE_SIZE + TILE_SIZE * 3.2; // 본체 중심에 오도록 조정
-    effect.style.cssText = `
-        display: block;
-        left: ${centerX}px;
-        top: ${centerY}px;
-    `;
-    effect.innerHTML = `
-        <div class="special-text">${t(name)}</div>
-    `;
+    specialEffects.push({
+        x, y, name,
+        startTime: performance.now(),
+        duration: 1200 // ms
+    });
     playSound('special');
-    effect.addEventListener('animationend', () => {
-        EffectPool.release(effect);
-    }, { once: true });
 }
 
 window.addEventListener('DOMContentLoaded', function() {
@@ -2723,6 +2714,37 @@ function drawSkillEffects() {
         const drawX = eff.x * TILE_SIZE + TILE_SIZE / 2;
         const drawY = eff.y * TILE_SIZE + 6 + floatY;
         ctx.fillText(eff.name, drawX, drawY);
+        ctx.restore();
+    }
+}
+
+function drawSpecialEffects() {
+    const now = performance.now();
+    for (let i = specialEffects.length - 1; i >= 0; i--) {
+        const eff = specialEffects[i];
+        const elapsed = now - eff.startTime;
+        if (elapsed > eff.duration) {
+            specialEffects.splice(i, 1);
+            continue;
+        }
+        // 애니메이션 계산 (확대, 투명도 변화)
+        const progress = elapsed / eff.duration;
+        const opacity = 0.1 - progress;
+        const scale = 0.2 + 0.3 * progress; // 1 → 1.5로 커짐
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        ctx.font = 'bold 32px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'gold';
+        ctx.shadowColor = '#fff';
+        ctx.shadowBlur = 16;
+        // 타워/적 중앙에 표시
+        const drawX = eff.x * TILE_SIZE + TILE_SIZE / 2;
+        const drawY = eff.y * TILE_SIZE + TILE_SIZE / 2;
+        ctx.translate(drawX, drawY);
+        ctx.scale(scale, scale);
+        ctx.fillText(eff.name, 0, 0);
         ctx.restore();
     }
 }
