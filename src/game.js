@@ -2319,7 +2319,7 @@ function showDamageNumber(x, y, damage, isCritical = false) {
         x, y, value: damage, isCritical,
         startTime: performance.now(),
         offsetX: (Math.random() - 0.5) * 16,
-        velocity: -3.5,
+        velocity: -5.5,
         currentY: y * TILE_SIZE + TILE_SIZE / 2,
         finished: false
     });
