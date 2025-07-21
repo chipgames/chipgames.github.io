@@ -77,6 +77,9 @@ let lowSpecMode = false; // 저사양 모드 상태
 let damageEffects = []; // 데미지 이펙트 정보 배열 (canvas 직접 그리기용)
 let skillEffects = []; // 적 스킬 이펙트 정보 배열 (canvas 직접 그리기용)
 let specialEffects = []; // 특수 이펙트 정보 배열 (canvas 직접 그리기용)
+let countdownActive = false;      // 카운트다운 진행 중 여부
+let countdownStartTime = 0;       // 카운트다운 시작 시각
+let countdownDuration = 3000;     // 카운트다운 전체 시간(ms)
 
 // UI 요소
 // 게임의 UI 요소 참조

@@ -463,6 +463,10 @@ function gameLoop() {
     // 웨이브 메시지 그리기
     drawWaveMessage();
     
+    // === 다음 웨이브 카운트다운 그리기 ===
+    drawCountdown();
+    // === 다음 웨이브 카운트다운 그리기 끝 ===
+    
     // 다음 프레임 요청
     requestAnimationFrame(gameLoop);
 }
@@ -471,7 +475,7 @@ function gameLoop() {
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         e.preventDefault();
-        if (!gameState.waveInProgress && !gameState.isGameOver && !isCountdownActive && gameState.isStarted) {
+        if (!gameState.waveInProgress && !gameState.isGameOver && !countdownActive && gameState.isStarted) {
             showCountdown();
         }
     } else if (e.code === 'KeyP') {
@@ -2746,6 +2750,33 @@ function drawSpecialEffects() {
         ctx.scale(scale, scale);
         ctx.fillText(eff.name, 0, 0);
         ctx.restore();
+    }
+}
+
+function showCountdown() {
+    countdownActive = true;
+    countdownStartTime = performance.now();
+}
+
+function drawCountdown() {
+    if (!countdownActive) return;
+    const now = performance.now();
+    const elapsed = now - countdownStartTime;
+    const totalSeconds = Math.ceil((countdownDuration - elapsed) / 1000);
+    if (totalSeconds > 0) {
+        ctx.save();
+        ctx.font = 'bold 80px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#FFD600';
+        ctx.shadowColor = '#000';
+        ctx.shadowBlur = 16;
+        ctx.globalAlpha = 0.9;
+        ctx.fillText(totalSeconds, canvas.width / 2, canvas.height / 2);
+        ctx.restore();
+    } else {
+        countdownActive = false;
+        startWave();
     }
 }
 

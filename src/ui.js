@@ -563,40 +563,6 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('tutorial').style.display = 'block';
     }
 
-    // 카운트다운 상태 변수 추가
-    let isCountdownActive = false;
-
-    // 카운트다운 표시
-    function showCountdown() {
-        if (isCountdownActive) return; // 이미 카운트다운이 진행 중이면 중단
-        
-        isCountdownActive = true;
-        const countdown = document.getElementById('countdown');
-        if (!countdown) {
-            console.error(t('countdownElementNotFound'));
-            isCountdownActive = false;
-            startWave();
-            return;
-        }
-        
-        countdown.style.display = 'block';
-        countdown.textContent = ''; // 카운트다운 시작 시 텍스트 초기화
-        let count = 3;
-        
-        const interval = setInterval(() => {
-            if (count > 0) {
-                countdown.textContent = count;
-                count--;
-            } else {
-                countdown.style.display = 'none';
-                countdown.textContent = ''; // 카운트다운 종료 시 텍스트 초기화
-                clearInterval(interval);
-                isCountdownActive = false;
-                startWave();
-            }
-        }, 1000);
-    }
-
     // 저사양 모드 적용
     function applyLowSpecMode(enabled) {
         lowSpecMode = enabled;
@@ -615,7 +581,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.showGameOver = showGameOver;
     window.restartGame = restartGame;
     window.showTutorial = showTutorial;
-    window.showCountdown = showCountdown;
     window.applyLowSpecMode = applyLowSpecMode;
 
 }); 
