@@ -308,6 +308,10 @@ function gameLoop() {
     drawDamageEffects();
     // === 데미지 이펙트 그리기 끝 ===
 
+    // === 적 스킬 이펙트 그리기 ===
+    drawSkillEffects();
+    // === 적 스킬 이펙트 그리기 끝 ===
+
     // === 타워 설치 미리보기 그리기 (canvas 직접) ===
     if (towerPreview) {
         const { x, y, range, type } = towerPreview;
@@ -2128,41 +2132,11 @@ function showAmbushEffect(x, y) {
  * 적의 스킬 사용 시 시각 효과를 표시
  */
 function showSkillEffect(x, y, name) {
-    const parent = document.querySelector('.game-area');
-    if (!parent) return;
-    // 이미 같은 위치+이름에 이펙트가 있으면 새로 만들지 않음
-    let effect = parent.querySelector(`.enemy-skill-effect[data-x='${x}'][data-y='${y}'][data-name='${name}']`);
-    if (!effect) {
-        effect = EffectPool.get('special');
-        effect.className = 'enemy-skill-effect';
-        effect.setAttribute('data-x', x);
-        effect.setAttribute('data-y', y);
-        effect.setAttribute('data-name', name);
-        // DOM에 없을 때만 append
-        if (!effect.parentNode) {
-            parent.appendChild(effect);
-        }
-    }
-    effect.textContent = name;
-    effect.style.display = 'block';
-    effect.style.position = 'absolute';
-    effect.style.left = `${x * TILE_SIZE + TILE_SIZE / 2}px`;
-    // HP바 바로 위에 표시
-    //effect.style.top = `${y * TILE_SIZE + 8}px`;
-    effect.style.top = `${y * TILE_SIZE + (TILE_SIZE * 2) }px`;
-    effect.style.transform = 'translate(-50%, -100%)';
-    effect.style.color = '#00eaff';
-    effect.style.fontWeight = 'bold';
-    effect.style.fontSize = '14px';
-    effect.style.pointerEvents = 'none';
-    effect.style.zIndex = 1200;
-    effect.style.animation = 'skillEffectFade 1.2s ease-out forwards';
-    effect.addEventListener('animationend', () => {
-        EffectPool.release(effect);
-    }, { once: true });
-    setTimeout(() => {
-        EffectPool.release(effect);
-    }, 1200);
+    skillEffects.push({
+        x, y, name,
+        startTime: performance.now(),
+        duration: 1200 // ms
+    });
 }
 
 /**
@@ -2720,6 +2694,35 @@ function drawDamageEffects() {
         ctx.strokeText(Math.round(eff.value), 0, 0);
         ctx.fillText(Math.round(eff.value), 0, 0);
         ctx.restore();
+        ctx.restore();
+    }
+}
+
+function drawSkillEffects() {
+    const now = performance.now();
+    for (let i = skillEffects.length - 1; i >= 0; i--) {
+        const eff = skillEffects[i];
+        const elapsed = now - eff.startTime;
+        if (elapsed > eff.duration) {
+            skillEffects.splice(i, 1);
+            continue;
+        }
+        // 애니메이션 계산 (위로 떠오르며 사라짐)
+        const progress = elapsed / eff.duration;
+        const opacity = 1 - progress;
+        const floatY = -40 * progress; // 위로 20px 이동
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        ctx.font = 'bold 16px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillStyle = '#00eaff';
+        ctx.shadowColor = '#00eaff';
+        ctx.shadowBlur = 8;
+        // 적의 중앙 위, HP바 위 등
+        const drawX = eff.x * TILE_SIZE + TILE_SIZE / 2;
+        const drawY = eff.y * TILE_SIZE + 6 + floatY;
+        ctx.fillText(eff.name, drawX, drawY);
         ctx.restore();
     }
 }
