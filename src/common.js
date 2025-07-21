@@ -74,6 +74,7 @@ let shownCombos = [];    // 표시된 타워 조합
 let currentWaveMessage = null; // 현재 웨이브 메시지
 let waveMessageStartTime = 0;  // 웨이브 메시지 시작 시간
 let lowSpecMode = false; // 저사양 모드 상태
+let damageEffects = []; // 데미지 이펙트 정보 배열 (canvas 직접 그리기용)
 
 // UI 요소
 // 게임의 UI 요소 참조

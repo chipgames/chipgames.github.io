@@ -304,6 +304,10 @@ function gameLoop() {
         return !shouldRemove;
     });
 
+    // === 데미지 이펙트 그리기 ===
+    drawDamageEffects();
+    // === 데미지 이펙트 그리기 끝 ===
+
     // === 타워 설치 미리보기 그리기 (canvas 직접) ===
     if (towerPreview) {
         const { x, y, range, type } = towerPreview;
@@ -2311,85 +2315,14 @@ function showAttackEffect(x, y, targetX, targetY, isCritical = false) {
  */
 function showDamageNumber(x, y, damage, isCritical = false) {
     if (lowSpecMode) return;
-
-    const damageText = EffectPool.get('damage');
-    const parent = document.querySelector('.game-area');
-    if (parent && damageText.parentNode !== parent) {
-        if (damageText.parentNode) damageText.parentNode.removeChild(damageText);
-        parent.appendChild(damageText);
-    }
-
-    // 데미지 크기에 따른 스타일 변화
-    const damageSize = Math.min(Math.max(damage / 100, 1.2), 2);
-    const fontSize = Math.floor(16 * damageSize);
-    const color = isCritical ? '#ff4444' : '#ffffff';
-    const textShadow = isCritical 
-        ? '0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000' 
-        : '0 0 5px #000000, 0 0 10px #000000';
-
-    // 초기 위치 설정
-    const startX = x * TILE_SIZE + TILE_SIZE/2;
-    const startY = y * TILE_SIZE + TILE_SIZE*2;
-    const offsetX = (Math.random() - 0.5) * 16;
-
-    // 애니메이션 상태
-    let startTime = null;
-    const duration = 1100; // 1.5초
-    const initialVelocity = -3.5; // 초기 상승 속도
-    const gravity = 0.2; // 중력
-    let currentY = startY;
-    let currentVelocity = initialVelocity;
-    const maxFallDistance = TILE_SIZE * 1.5; // 최대 낙하 거리 (타일 2개 높이)
-
-    // 애니메이션 함수
-    function animate(currentTime) {
-        if (!startTime) startTime = currentTime;
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-
-        // 물리 기반 움직임 계산
-        currentVelocity += gravity;
-        currentY += currentVelocity;
-
-        // 최대 낙하 높이 제한
-        const maxY = startY + maxFallDistance;
-        if (currentY > maxY) {
-            currentY = maxY;
-            currentVelocity = 0;
-        }
-
-        // scale 변화 (0.3 ~ 1.3)
-        const scale = 0.5 + Math.sin(progress * Math.PI * 2) * 1;
-        const opacity = 1 - progress;
-
-        // 위치와 스타일 업데이트
-        damageText.style.cssText = `
-            display: block;
-            position: absolute;
-            left: ${startX + offsetX}px;
-            top: ${currentY}px;
-            transform: translate(-50%, -50%) scale(${scale});
-            font-size: ${fontSize}px;
-            color: ${color};
-            text-shadow: ${textShadow};
-            font-weight: ${isCritical ? '900' : 'bold'};
-            opacity: ${opacity};
-            z-index: 1000;
-            pointer-events: none;
-        `;
-
-        damageText.textContent = Math.round(damage).toLocaleString();
-
-        // 애니메이션 계속
-        if (progress < 1) {
-            requestAnimationFrame(animate);
-        } else {
-            EffectPool.release(damageText);
-        }
-    }
-
-    // 애니메이션 시작
-    requestAnimationFrame(animate);
+    damageEffects.push({
+        x, y, value: damage, isCritical,
+        startTime: performance.now(),
+        offsetX: (Math.random() - 0.5) * 16,
+        velocity: -3.5,
+        currentY: y * TILE_SIZE + TILE_SIZE / 2,
+        finished: false
+    });
 }
 
 // 데미지 숫자 점프 애니메이션 스타일 추가
@@ -2754,4 +2687,40 @@ window.restartGame = function() {
     if (btn) btn.remove();
     origRestartGame();
 };
+
+function drawDamageEffects() {
+    const now = performance.now();
+    for (let i = damageEffects.length - 1; i >= 0; i--) {
+        const eff = damageEffects[i];
+        const elapsed = now - eff.startTime;
+        const duration = 1100;
+        if (elapsed > duration) {
+            damageEffects.splice(i, 1);
+            continue;
+        }
+        // 애니메이션 계산
+        eff.velocity += 0.2; // gravity
+        eff.currentY += eff.velocity;
+        const progress = elapsed / duration;
+        const scale = 0.5 + Math.sin(progress * Math.PI * 2) * 1;
+        const opacity = 1 - progress;
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        ctx.font = `bold ${eff.isCritical ? 28 : 20}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = eff.isCritical ? '#ff4444' : '#fff';
+        ctx.strokeStyle = eff.isCritical ? '#ff0000' : '#000';
+        ctx.lineWidth = eff.isCritical ? 4 : 2;
+        ctx.shadowColor = eff.isCritical ? '#ff0000' : '#000';
+        ctx.shadowBlur = eff.isCritical ? 12 : 6;
+        ctx.save();
+        ctx.translate(eff.x * TILE_SIZE + TILE_SIZE / 2 + eff.offsetX, eff.currentY);
+        ctx.scale(scale, scale);
+        ctx.strokeText(Math.round(eff.value), 0, 0);
+        ctx.fillText(Math.round(eff.value), 0, 0);
+        ctx.restore();
+        ctx.restore();
+    }
+}
 
