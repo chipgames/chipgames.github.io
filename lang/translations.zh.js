@@ -127,10 +127,10 @@ TRANSLATIONS = {
     // 游戏消息
     gameOver: "游戏结束",
     finalScore: "最终分数",
-    finalWave: "最终波数",
+    finalWave: "最终波",
     restart: "重新开始",
-    waveStart: "第{wave}波开始!",
-    bossWave: "Boss波数",
+    waveStart: "开始!",
+    bossWave: "Boss波",
     currentLevel: "当前等级",
     reward: "奖励",
     loading: "游戏加载中...",

@@ -429,41 +429,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 웨이브 시작 이펙트
-    function showWaveStartEffect() {
-        const effect = document.createElement('div');
-        effect.className = 'wave-start-effect';
-        effect.innerHTML = `
-            <h2>${t('waveStart', {wave: gameState.wave})}</h2>
-            <p>${t('enemiesCount', {count: gameState.enemiesRemaining})}</p>
-        `;
-        
-        // .game-area에 추가
-        const parent = document.querySelector('.game-area');
-        if (!parent) {
-            console.error(t('gameAreaNotFound'));
-            return;
-        }
-        parent.appendChild(effect);
-
-        // 중앙 배치 스타일
-        effect.style.position = 'absolute';
-        effect.style.left = '50%';
-        effect.style.top = '50%';
-        effect.style.transform = 'translate(-50%, -50%)';
-        effect.style.zIndex = '2000';
-        effect.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        effect.style.padding = '20px';
-        effect.style.borderRadius = '10px';
-        effect.style.color = '#fff';
-        effect.style.textAlign = 'center';
-        effect.style.animation = 'fadeInOut 2s ease-in-out';
-        
-        setTimeout(() => {
-            effect.remove();
-        }, 2000);
-    }
-
     // 보상 팝업 표시
     function showRewardPopup(amount) {
         // 기존 팝업이 있다면 제거
@@ -574,7 +539,6 @@ document.addEventListener('DOMContentLoaded', function() {
     window.showEventNotification = showEventNotification;
     window.showTowerEffect = showTowerEffect;
     window.showUpgradeEffect = showUpgradeEffect;
-    window.showWaveStartEffect = showWaveStartEffect;
     window.showRewardPopup = showRewardPopup;
     window.showInsufficientGold = showInsufficientGold;
     window.showAchievement = showAchievement;

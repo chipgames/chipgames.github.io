@@ -129,7 +129,7 @@ TRANSLATIONS = {
     finalScore: "Final Score",
     finalWave: "Final Wave",
     restart: "Restart",
-    waveStart: "Wave {wave} Start!",
+    waveStart: "Start!",
     bossWave: "Boss Wave",
     currentLevel: "Current Level",
     reward: "Reward",

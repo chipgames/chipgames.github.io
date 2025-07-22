@@ -148,7 +148,7 @@ function startWave() {
         //}
         gameState.enemiesRemaining = 1 + normalCount;
         gameState.totalEnemies = 1 + normalCount;
-        showWaveStartEffect();
+        showWaveStartMessage(gameState.wave);
         playSound('wave_start');
         return; // 반드시 함수 종료
     }
@@ -169,7 +169,7 @@ function startWave() {
     enemyGroups = [];
     
     spawnNextEnemy();
-    showWaveStartEffect();
+    showWaveStartMessage(gameState.wave);
     playSound('wave_start');
 }
 

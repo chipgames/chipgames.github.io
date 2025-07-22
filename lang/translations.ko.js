@@ -129,7 +129,7 @@ TRANSLATIONS = {
     finalScore: "최종 점수",
     finalWave: "최종 웨이브",
     restart: "다시 시작",
-    waveStart: "웨이브 {wave} 시작!",
+    waveStart: "시작!",
     bossWave: "보스 웨이브",
     currentLevel: "현재 레벨",
     reward: "보상",

@@ -129,7 +129,7 @@ TRANSLATIONS = {
     finalScore: "最終スコア",
     finalWave: "最終ウェーブ",
     restart: "リスタート",
-    waveStart: "ウェーブ{wave}開始!",
+    waveStart: "開始!",
     bossWave: "ボスウェーブ",
     currentLevel: "現在レベル",
     reward: "報酬",
@@ -282,7 +282,7 @@ TRANSLATIONS = {
     
     // UIメッセージ
     upgradeComplete: "アップグレード！",
-    waveStart: "ウェーブ{wave}開始!",
+    waveStart: "開始!",
     enemiesCount: "敵の数: {count}",
     waveComplete: "ウェーブ完了！",
     achievementUnlocked: "実績解除",
