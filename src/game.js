@@ -2558,7 +2558,7 @@ function drawWaveMessage() {
         const bossTypes = Object.keys(BOSS_TYPES);
         const randomBossType = bossTypes[Math.floor(Math.random() * bossTypes.length)];
         ctx.fillText(
-            `${BOSS_TYPES[randomBossType].name} ${t('bossAppear')}!`,
+            `${t(BOSS_TYPES[randomBossType].name)} ${t('bossAppear')}!`,
             canvas.width / 2,
             canvas.height / 2
         );
