@@ -76,14 +76,18 @@ function initializeGame() {
     }
     ctx.stroke();
     
+    // 시작점과 끝점을 동적으로 가져오기
+    const startPoint = defaultMap.path[0];
+    const endPoint = defaultMap.path[defaultMap.path.length - 1];
+    
     // 시작점과 끝점 표시
-    ctx.fillStyle = '#4CAF50';
+    ctx.fillStyle = '#4169E1';
     ctx.beginPath();
-    ctx.arc(defaultMap.path[0].x * TILE_SIZE + TILE_SIZE/2, defaultMap.path[0].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
+    ctx.arc(startPoint.x * TILE_SIZE + TILE_SIZE/2, startPoint.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = '#e74c3c';
     ctx.beginPath();
-    ctx.arc(defaultMap.path[defaultMap.path.length-1].x * TILE_SIZE + TILE_SIZE/2, defaultMap.path[defaultMap.path.length-1].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
+    ctx.arc(endPoint.x * TILE_SIZE + TILE_SIZE/2, endPoint.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
     ctx.fill();
     
     // 맵 이름 표시

@@ -136,9 +136,10 @@ function startWave() {
         // 보스 타입 순환
         const bossTypes = Object.keys(BOSS_TYPES);
         const bossType = bossTypes[Math.floor((gameState.wave / gameState.bossWave - 1) % bossTypes.length)];
-        const startX = currentMap.path[0].x;
-        const startY = currentMap.path[0].y;
-        const boss = new Enemy(gameState.wave, true, null, startX, startY, bossType);
+        // 맵의 시작점과 끝점을 동적으로 가져오기
+        const startPoint = currentMap.path[0];
+        const endPoint = currentMap.path[currentMap.path.length - 1];
+        const boss = new Enemy(gameState.wave, true, null, startPoint.x, startPoint.y, bossType);
         enemies.push(boss);
         // 일반 적 5기
         const normalCount = 10;
@@ -208,12 +209,14 @@ function spawnNextEnemy() {
     const patterns = patternCandidates[randomType] || [null];
     const randomPattern = patterns[Math.floor(Math.random() * patterns.length)];
 
+    // 맵의 시작점을 동적으로 가져오기
+    const startPoint = currentMap.path[0];
     const enemy = new Enemy(
         gameState.wave,
         false,
         randomPattern,
-        currentMap.path[0].x,
-        currentMap.path[0].y,
+        startPoint.x,
+        startPoint.y,
         randomType
     );
     enemyGroups[gameState.currentGroup - 1].add(enemy);
@@ -790,15 +793,19 @@ function selectMap(mapKey) {
     }
     ctx.stroke();
     
+    // 시작점과 끝점을 동적으로 가져오기
+    const startPoint = currentMap.path[0];
+    const endPoint = currentMap.path[currentMap.path.length - 1];
+    
     // 시작점과 끝점 표시
-    ctx.fillStyle = '#4CAF50';
+    ctx.fillStyle = '#4169E1';
     ctx.beginPath();
-    ctx.arc(currentMap.path[0].x * TILE_SIZE + TILE_SIZE/2, currentMap.path[0].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
-            ctx.fill();
+    ctx.arc(startPoint.x * TILE_SIZE + TILE_SIZE/2, startPoint.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
+    ctx.fill();
     ctx.fillStyle = '#e74c3c';
-            ctx.beginPath();
-    ctx.arc(currentMap.path[currentMap.path.length-1].x * TILE_SIZE + TILE_SIZE/2, currentMap.path[currentMap.path.length-1].y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
-            ctx.fill();
+    ctx.beginPath();
+    ctx.arc(endPoint.x * TILE_SIZE + TILE_SIZE/2, endPoint.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
+    ctx.fill();
     
     // 맵 이름 표시
     ctx.fillStyle = 'white';
@@ -887,7 +894,7 @@ function drawMinimap() {
         if (currentMap.path.length > 0) {
             // 시작점
             const start = currentMap.path[0];
-            minimapCtx.fillStyle = '#4CAF50';
+            minimapCtx.fillStyle = '#4169E1';
             minimapCtx.beginPath();
             minimapCtx.arc(start.x * scaleX, start.y * scaleY, 4, 0, Math.PI * 2);
             minimapCtx.fill();
