@@ -261,18 +261,42 @@ function gameLoop() {
     // 게임 화면 초기화
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // 그리드와 경로 그리기
-    ctx.strokeStyle = '#ccc';
+    // 그리드 그리기
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
     for (let i = 0; i < GRID_WIDTH; i++) {
         for (let j = 0; j < GRID_HEIGHT; j++) {
             ctx.strokeRect(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE);
         }
     }
 
-    ctx.fillStyle = '#eee';
+    // 경로 그리기 (맵 선택 미리보기와 동일한 스타일)
+    ctx.strokeStyle = '#4CAF50';
+    ctx.lineWidth = TILE_SIZE;
+    ctx.beginPath();
+    ctx.moveTo(currentMap.path[0].x * TILE_SIZE + TILE_SIZE/2, currentMap.path[0].y * TILE_SIZE + TILE_SIZE/2);
+    for (let i = 1; i < currentMap.path.length; i++) {
+        ctx.lineTo(currentMap.path[i].x * TILE_SIZE + TILE_SIZE/2, currentMap.path[i].y * TILE_SIZE + TILE_SIZE/2);
+    }
+    ctx.stroke();
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     for (let point of currentMap.path) {
         ctx.fillRect(point.x * TILE_SIZE, point.y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
+
+    // 시작점과 끝점 표시 (맵 선택 미리보기와 동일한 스타일)
+    const startPoint = currentMap.path[0];
+    const endPoint = currentMap.path[currentMap.path.length - 1];
+    
+    ctx.fillStyle = '#4169E1';
+    ctx.beginPath();
+    ctx.arc(startPoint.x * TILE_SIZE + TILE_SIZE/2, startPoint.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#e74c3c';
+    ctx.beginPath();
+    ctx.arc(endPoint.x * TILE_SIZE + TILE_SIZE/2, endPoint.y * TILE_SIZE + TILE_SIZE/2, TILE_SIZE/4, 0, Math.PI * 2);
+    ctx.fill();
 
     // 타워 설치 가능한 위치 표시
     if (!gameState.waveInProgress && gameState.isStarted) {
