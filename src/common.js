@@ -2450,3 +2450,8 @@ const EffectPool = {
         return this.pools.get(type) || [];
     }
 };
+
+// 타일 하이라이트 관련 변수들
+let clickedTile = null;  // 클릭한 타일 { x, y, timestamp }
+let hoveredTile = null;  // 호버한 타일 { x, y }
+let clickHighlightDuration = 3000; // 클릭 하이라이트 지속 시간 (ms)

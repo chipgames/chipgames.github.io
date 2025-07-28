@@ -433,6 +433,10 @@ function gameLoop() {
     }
     // === 타워 설치 미리보기 그리기 끝 ===
 
+    // === 타일 하이라이트 그리기 ===
+    drawTileHighlights();
+    // === 타일 하이라이트 그리기 끝 ===
+
     // 웨이브 종료 체크
     checkWaveEnd();
 
@@ -543,8 +547,47 @@ canvas.addEventListener('click', (e) => {
     const towerExists = towers.some(tower => tower.x === x && tower.y === y);
     if (towerExists) return;
 
+    // 클릭한 타일 하이라이트 설정
+    clickedTile = { x, y, timestamp: Date.now() };
+
     showTowerBuildMenu(x, y, e.clientX, e.clientY);
     showTowerEffect(x, y);
+});
+
+// 캔버스 마우스 호버 이벤트 추가
+canvas.addEventListener('mousemove', (e) => {
+    if (gameState.isGameOver || !gameState.isStarted || gameState.isPaused) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    const x = Math.floor(((e.clientX - rect.left) * scaleX) / TILE_SIZE);
+    const y = Math.floor(((e.clientY - rect.top) * scaleY) / TILE_SIZE);
+    
+    // 유효한 범위 내에 있는지 확인
+    if (x >= 0 && x < GRID_WIDTH && y >= 0 && y < GRID_HEIGHT) {
+        // 경로 위인지 확인
+        const isOnPath = currentMap.path.some(point => point.x === x && point.y === y);
+        // 타워가 이미 있는지 확인
+        const hasTower = towers.some(tower => tower.x === x && tower.y === y);
+        
+        if (!isOnPath && !hasTower) {
+            // 설치 가능한 위치인 경우 호버 하이라이트 표시
+            hoveredTile = { x, y };
+        } else {
+            // 설치 불가능한 위치인 경우 호버 하이라이트 제거
+            hoveredTile = null;
+        }
+    } else {
+        // 캔버스 밖으로 나간 경우 호버 하이라이트 제거
+        hoveredTile = null;
+    }
+});
+
+// 캔버스에서 마우스가 나갈 때 호버 하이라이트 제거
+canvas.addEventListener('mouseleave', () => {
+    hoveredTile = null;
 });
 
 // 게임 컨트롤 이벤트
@@ -2685,6 +2728,11 @@ const origRestartGame = window.restartGame;
 window.restartGame = function() {
     const btn = document.getElementById('canvasRestartBtn');
     if (btn) btn.remove();
+    
+    // 타일 하이라이트 초기화
+    clickedTile = null;
+    hoveredTile = null;
+    
     origRestartGame();
 };
 
@@ -2810,4 +2858,77 @@ function drawCountdown() {
         startWave();
     }
 }
+
+/**
+ * 타일 하이라이트 그리기 함수
+ * 클릭한 타일과 호버한 타일을 Canvas에 직접 그림
+ */
+function drawTileHighlights() {
+    // 클릭한 타일 하이라이트
+    if (clickedTile) {
+        const elapsed = Date.now() - clickedTile.timestamp;
+        if (elapsed < clickHighlightDuration) {
+            ctx.save();
+            
+            // 펄스 애니메이션 효과
+            const pulseProgress = (elapsed % 1000) / 1000;
+            const pulseScale = 1 + Math.sin(pulseProgress * Math.PI * 2) * 0.05;
+            const alpha = 0.8 - (elapsed / clickHighlightDuration) * 0.3;
+            
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = '#FF5722';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([]);
+            
+            const x = clickedTile.x * TILE_SIZE;
+            const y = clickedTile.y * TILE_SIZE;
+            const centerX = x + TILE_SIZE / 2;
+            const centerY = y + TILE_SIZE / 2;
+            
+            ctx.save();
+            ctx.translate(centerX, centerY);
+            ctx.scale(pulseScale, pulseScale);
+            ctx.translate(-centerX, -centerY);
+            
+            ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+            
+            // 내부 채우기
+            ctx.fillStyle = 'rgba(255, 87, 34, 0.2)';
+            ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+            
+            ctx.restore();
+            ctx.restore();
+        } else {
+            // 시간이 지나면 클릭 하이라이트 제거
+            clickedTile = null;
+        }
+    }
+    
+    // 호버한 타일 하이라이트
+    if (hoveredTile) {
+        ctx.save();
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.globalAlpha = 0.8;
+        
+        const x = hoveredTile.x * TILE_SIZE;
+        const y = hoveredTile.y * TILE_SIZE;
+        
+        ctx.strokeRect(x, y, TILE_SIZE, TILE_SIZE);
+        
+        // 내부 채우기
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
+        ctx.fillRect(x, y, TILE_SIZE, TILE_SIZE);
+        
+        ctx.restore();
+    }
+}
+
+// 미니맵 초기화
+drawMinimap();
+
+// 타일 하이라이트 초기화
+clickedTile = null;
+hoveredTile = null;
 
