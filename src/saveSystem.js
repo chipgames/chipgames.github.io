@@ -134,11 +134,12 @@ function loadGame() {
         if (!validateSaveData(data)) {
             throw new Error(t('saveDataCorrupted'));
         }
-        // 저장 시간 확인 (24시간 제한)
+        // 저장 시간 확인 (7일 제한)
+        const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
         const saveTime = new Date(data.timestamp);
         const currentTime = new Date();
-        const hoursDiff = (currentTime - saveTime) / (1000 * 60 * 60);
-        if (hoursDiff > 24) {
+        const daysDiff = (currentTime - saveTime) / MILLISECONDS_PER_DAY;
+        if (daysDiff > 7) {
             showSaveLoadNotification(t('saveDataExpired'), true);
             return;
         }
