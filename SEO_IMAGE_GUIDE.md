@@ -9,7 +9,7 @@
 - **내용**: 게임 로고 + "타워 디펜스 게임" 텍스트
 
 ### 2. Twitter Card 이미지 (twitter-card.png)
-- **위치**: `images/twitter-card.png`
+- **위치**: `images/ChipGames_Logo.png`
 - **크기**: 1200x600px (권장)
 - **용도**: Twitter에서 링크 공유 시 표시
 - **내용**: 게임 로고 + "타워 디펜스 게임" 텍스트
@@ -29,8 +29,8 @@
 - 투명 배경 (PNG 권장)
 
 ## 현재 설정된 경로
-- Open Graph: `https://chipgames.github.io/ChipTowerGame/images/og-image.png`
-- Twitter Card: `https://chipgames.github.io/ChipTowerGame/images/twitter-card.png`
+- Open Graph: `https://chipgames.github.io/images/ChipGames_Logo.png`
+- Twitter Card: `https://chipgames.github.io/images/ChipGames_Logo.png`
 
 ## 이미지 생성 후 할 일
 1. `images/` 폴더에 파일 저장
