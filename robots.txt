@@ -6,3 +6,13 @@ Sitemap: https://chipgames.github.io/sitemap.xml
 
 # 크롤링 지연 (선택사항)
 Crawl-delay: 1
+
+# 특정 검색 엔진 허용
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
