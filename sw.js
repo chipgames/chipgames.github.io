@@ -3,17 +3,19 @@
  * GitHub Pages 환경에서 오프라인 지원 및 캐싱 최적화
  */
 
-const CACHE_NAME = 'chipgames-td-v1.0.0';
-const STATIC_CACHE = 'chipgames-static-v1.0.0';
-const DYNAMIC_CACHE = 'chipgames-dynamic-v1.0.0';
+const CACHE_NAME = 'chipgames-td-v1.0.1';
+const STATIC_CACHE = 'chipgames-static-v1.0.1';
+const DYNAMIC_CACHE = 'chipgames-dynamic-v1.0.1';
 
-// 캐시할 정적 리소스
+// 캐시할 정적 리소스 (존재하는 파일만)
 const STATIC_ASSETS = [
     '/',
     '/index.html',
     '/style.css',
     '/images/ChipGames_Logo.webp',
     '/images/ChipGames_favicon.ico',
+    '/images/ChipGames_favicon-192x192.png',
+    '/images/ChipGames_favicon-512x512.png',
     '/lang/i18n.js',
     '/lang/translations.ko.js',
     '/lang/translations.en.js',
@@ -46,11 +48,22 @@ self.addEventListener('install', function(event) {
         caches.open(STATIC_CACHE)
             .then(function(cache) {
                 console.log('정적 리소스 캐싱 중...');
-                return cache.addAll(STATIC_ASSETS);
+                // addAll 대신 개별적으로 캐시하여 실패한 파일이 전체를 막지 않도록 함
+                return Promise.allSettled(
+                    STATIC_ASSETS.map(function(url) {
+                        return cache.add(url).catch(function(error) {
+                            console.warn('캐시 실패:', url, error);
+                            return null; // 실패해도 계속 진행
+                        });
+                    })
+                );
             })
             .then(function() {
                 console.log('Service Worker 설치 완료');
                 return self.skipWaiting();
+            })
+            .catch(function(error) {
+                console.error('Service Worker 설치 실패:', error);
             })
     );
 });
