@@ -32,7 +32,10 @@
     <!-- Open Graph 태그 -->
     <meta property="og:title" content="타워 디펜스 게임 - 전략과 전술의 세계">
     <meta property="og:description" content="전략적인 타워 배치와 업그레이드를 통해 적을 막는 타워 디펜스 게임. 다양한 타워, 맵, 전략을 경험하세요.">
-    <meta property="og:image" content="https://chipgames.github.io/images/ChipGames_Logo.png">
+    <meta property="og:image" content="https://chipgames.github.io/images/ChipGames_Logo.webp">
+    <meta property="og:image:type" content="image/webp">
+    <meta property="og:image:width" content="200">
+    <meta property="og:image:height" content="100">
     <meta property="og:url" content="https://chipgames.github.io">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="ChipGames">
@@ -42,7 +45,8 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="타워 디펜스 게임 - 전략과 전술의 세계">
     <meta name="twitter:description" content="전략적인 타워 배치와 업그레이드를 통해 적을 막는 타워 디펜스 게임">
-    <meta name="twitter:image" content="https://chipgames.github.io/images/ChipGames_Logo.png">
+    <meta name="twitter:image" content="https://chipgames.github.io/images/ChipGames_Logo.webp">
+    <meta name="twitter:image:alt" content="ChipGames Tower Defense Logo">
     
     <!-- 구조화된 데이터 (Schema.org) -->
     <script type="application/ld+json">
@@ -97,8 +101,10 @@
     
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="images/ChipGames_favicon.ico">
-    <link rel="icon" type="image/png" sizes="32x32" href="images/ChipGames_favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="images/ChipGames_favicon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/ChipGames_favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/ChipGames_favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/ChipGames_favicon-180x180.png">
+    <link rel="manifest" href="site.webmanifest">
     <!-- 다국어 지원 스크립트 로드 -->
     <script src="lang/i18n.js"></script>
     <style>
@@ -161,12 +167,15 @@
     <header class="main-header">
         <nav class="main-nav">
             <div class="logo">
-                <img src="images/ChipGames_Logo.png" 
-                     alt="ChipGames Logo" 
-                     class="logo-image"
-                     width="200" 
-                     height="100"
-                     loading="eager">
+                <picture>
+                    <source srcset="images/ChipGames_Logo.webp" type="image/webp">
+                    <img src="images/ChipGames_Logo.png" 
+                         alt="ChipGames Logo" 
+                         class="logo-image"
+                         width="200" 
+                         height="100"
+                         loading="eager">
+                </picture>
                 <h1 data-i18n="gameTitle">타워 디펜스</h1>
             </div>
             <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
