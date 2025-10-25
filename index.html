@@ -3,13 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039&v=20250127" crossorigin="anonymous"></script>
     <script>
-        // AdSense 페이지 레벨 광고 설정 (페이지당 하나만)
-        (adsbygoogle = window.adsbygoogle || []).push({
-            google_ad_client: "ca-pub-2533613198240039",
-            enable_page_level_ads: true
-        });
+        // AdSense 안전한 초기화
+        function initializeAdSense() {
+            // AdSense가 완전히 로드될 때까지 대기
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            function tryInitialize() {
+                attempts++;
+                
+                if (typeof adsbygoogle !== 'undefined' && Array.isArray(adsbygoogle)) {
+                    // 이미 enable_page_level_ads가 설정되었는지 확인
+                    const hasPageLevelAds = adsbygoogle.some(ad => ad.enable_page_level_ads);
+                    
+                    if (!hasPageLevelAds) {
+                        try {
+                            (adsbygoogle = window.adsbygoogle || []).push({
+                                google_ad_client: "ca-pub-2533613198240039",
+                                enable_page_level_ads: true
+                            });
+                            console.log('AdSense 페이지 레벨 광고 설정 완료');
+                        } catch (error) {
+                            console.log('AdSense 설정 오류:', error);
+                        }
+                    } else {
+                        console.log('AdSense 페이지 레벨 광고가 이미 설정됨');
+                    }
+                } else if (attempts < maxAttempts) {
+                    console.log(`AdSense 초기화 대기 중... (${attempts}/${maxAttempts})`);
+                    setTimeout(tryInitialize, 500);
+                } else {
+                    console.log('AdSense 초기화 실패: 최대 시도 횟수 초과');
+                }
+            }
+            
+            tryInitialize();
+        }
+        
+        // 페이지 로드 완료 후 AdSense 초기화
+        window.addEventListener('load', initializeAdSense);
     </script>
     <title data-i18n="gameTitle">타워 디펜스 게임 - 전략과 전술의 세계</title>
     <meta name="description" content="전략적인 타워 배치와 업그레이드를 통해 적을 막는 타워 디펜스 게임. 다양한 타워, 맵, 전략을 경험하세요.">
@@ -710,8 +744,30 @@
             console.log('AdSense 초기화 완료');
         }
         
+        // AdSense 중복 설정 방지
+        function preventDuplicateAdSense() {
+            // 안전한 배열 확인
+            if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
+                // 이미 enable_page_level_ads가 설정되었는지 확인
+                if (window.adsbygoogle.some(ad => ad.enable_page_level_ads)) {
+                    console.log('AdSense 페이지 레벨 광고가 이미 설정됨');
+                    return false;
+                }
+            }
+            return true;
+        }
+        
         // DOM 로드 후 접근성 개선 실행
         document.addEventListener('DOMContentLoaded', function() {
+            // AdSense 디버깅
+            console.log('AdSense 상태 확인:', {
+                adsbygoogle: typeof window.adsbygoogle,
+                isArray: Array.isArray(window.adsbygoogle),
+                length: window.adsbygoogle ? window.adsbygoogle.length : 0,
+                hasPageLevelAds: (window.adsbygoogle && Array.isArray(window.adsbygoogle)) ? 
+                    window.adsbygoogle.some(ad => ad.enable_page_level_ads) : false
+            });
+            
             // AdSense 오류 방지
             preventAdSenseErrors();
             
