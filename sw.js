@@ -49,22 +49,22 @@ const SOUND_ASSETS = [
 
 // Service Worker 설치
 self.addEventListener('install', function(event) {
-    console.log('Service Worker 설치 중...');
+    //console.log('Service Worker 설치 중...');
     
     event.waitUntil(
         caches.open(STATIC_CACHE)
             .then(function(cache) {
-                console.log('정적 리소스 캐싱 중...');
+                //console.log('정적 리소스 캐싱 중...');
                 return cache.addAll(STATIC_ASSETS);
             })
             .then(function() {
-                console.log('정적 리소스 캐싱 완료');
+                //console.log('정적 리소스 캐싱 완료');
                 // 파비콘 파일들은 선택적으로 캐싱 (실패해도 계속 진행)
                 return caches.open(STATIC_CACHE).then(function(cache) {
                     return Promise.allSettled(
                         FAVICON_ASSETS.map(function(url) {
                             return cache.add(url).catch(function(error) {
-                                console.log('파비콘 캐싱 실패 (무시):', url, error);
+                                //console.log('파비콘 캐싱 실패 (무시):', url, error);
                                 return null;
                             });
                         })
@@ -72,7 +72,7 @@ self.addEventListener('install', function(event) {
                 });
             })
             .then(function() {
-                console.log('Service Worker 설치 완료');
+                //console.log('Service Worker 설치 완료');
                 return self.skipWaiting();
             })
     );
@@ -80,7 +80,7 @@ self.addEventListener('install', function(event) {
 
 // Service Worker 활성화
 self.addEventListener('activate', function(event) {
-    console.log('Service Worker 활성화 중...');
+    //console.log('Service Worker 활성화 중...');
     
     event.waitUntil(
         caches.keys()
@@ -88,14 +88,14 @@ self.addEventListener('activate', function(event) {
                 return Promise.all(
                     cacheNames.map(function(cacheName) {
                         if (cacheName !== STATIC_CACHE && cacheName !== DYNAMIC_CACHE) {
-                            console.log('오래된 캐시 삭제:', cacheName);
+                            //console.log('오래된 캐시 삭제:', cacheName);
                             return caches.delete(cacheName);
                         }
                     })
                 );
             })
             .then(function() {
-                console.log('Service Worker 활성화 완료');
+                //console.log('Service Worker 활성화 완료');
                 return self.clients.claim();
             })
     );
@@ -187,7 +187,7 @@ self.addEventListener('sync', function(event) {
     if (event.tag === 'game-save') {
         event.waitUntil(
             // 게임 저장 데이터 동기화 로직
-            console.log('게임 데이터 동기화 중...')
+            //console.log('게임 데이터 동기화 중...')
         );
     }
 });

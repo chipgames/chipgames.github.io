@@ -24,18 +24,18 @@
                                 google_ad_client: "ca-pub-2533613198240039",
                                 enable_page_level_ads: true
                             });
-                            console.log('AdSense 페이지 레벨 광고 설정 완료');
+                            //console.log('AdSense 페이지 레벨 광고 설정 완료');
                         } catch (error) {
-                            console.log('AdSense 설정 오류:', error);
+                            //console.log('AdSense 설정 오류:', error);
                         }
                     } else {
-                        console.log('AdSense 페이지 레벨 광고가 이미 설정됨');
+                        //console.log('AdSense 페이지 레벨 광고가 이미 설정됨');
                     }
                 } else if (attempts < maxAttempts) {
-                    console.log(`AdSense 초기화 대기 중... (${attempts}/${maxAttempts})`);
+                    //console.log(`AdSense 초기화 대기 중... (${attempts}/${maxAttempts})`);
                     setTimeout(tryInitialize, 500);
                 } else {
-                    console.log('AdSense 초기화 실패: 최대 시도 횟수 초과');
+                    //console.log('AdSense 초기화 실패: 최대 시도 횟수 초과');
                 }
             }
             
@@ -711,10 +711,10 @@
         }
         
         // 개발 환경 로그
-        if (isDevelopment) {
-            console.log('🔧 개발 환경에서 실행 중');
-            console.log('ServiceWorker는 HTTPS 또는 localhost에서만 지원됩니다.');
-        }
+        //if (isDevelopment) {
+        //    console.log('🔧 개발 환경에서 실행 중');
+        //    console.log('ServiceWorker는 HTTPS 또는 localhost에서만 지원됩니다.');
+        //}
         
         // 광고 iframe 접근성 개선
         function improveAdAccessibility() {
@@ -725,7 +725,7 @@
                     const body = iframe.contentDocument.body;
                     if (body && body.getAttribute('aria-hidden') === 'true') {
                         body.removeAttribute('aria-hidden');
-                        console.log('광고 iframe 접근성 개선 완료');
+                        //console.log('광고 iframe 접근성 개선 완료');
                     }
                 }
             });
@@ -735,13 +735,13 @@
         function preventAdSenseErrors() {
             // adsbygoogle 배열이 이미 존재하는지 확인
             if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
-                console.log('AdSense 이미 초기화됨');
+                //console.log('AdSense 이미 초기화됨');
                 return;
             }
             
             // adsbygoogle 배열 초기화
             window.adsbygoogle = window.adsbygoogle || [];
-            console.log('AdSense 초기화 완료');
+            //console.log('AdSense 초기화 완료');
         }
         
         // AdSense 중복 설정 방지
@@ -750,7 +750,7 @@
             if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
                 // 이미 enable_page_level_ads가 설정되었는지 확인
                 if (window.adsbygoogle.some(ad => ad.enable_page_level_ads)) {
-                    console.log('AdSense 페이지 레벨 광고가 이미 설정됨');
+                    //console.log('AdSense 페이지 레벨 광고가 이미 설정됨');
                     return false;
                 }
             }
@@ -760,13 +760,13 @@
         // DOM 로드 후 접근성 개선 실행
         document.addEventListener('DOMContentLoaded', function() {
             // AdSense 디버깅
-            console.log('AdSense 상태 확인:', {
-                adsbygoogle: typeof window.adsbygoogle,
-                isArray: Array.isArray(window.adsbygoogle),
-                length: window.adsbygoogle ? window.adsbygoogle.length : 0,
-                hasPageLevelAds: (window.adsbygoogle && Array.isArray(window.adsbygoogle)) ? 
-                    window.adsbygoogle.some(ad => ad.enable_page_level_ads) : false
-            });
+            //console.log('AdSense 상태 확인:', {
+            //    adsbygoogle: typeof window.adsbygoogle,
+            //    isArray: Array.isArray(window.adsbygoogle),
+            //    length: window.adsbygoogle ? window.adsbygoogle.length : 0,
+            //    hasPageLevelAds: (window.adsbygoogle && Array.isArray(window.adsbygoogle)) ? 
+            //        window.adsbygoogle.some(ad => ad.enable_page_level_ads) : false
+            //});
             
             // AdSense 오류 방지
             preventAdSenseErrors();
@@ -796,7 +796,7 @@
         // GitHub Pages 최적화: 리소스 로딩 완료 후 게임 초기화
         window.addEventListener('load', function() {
             // 모든 리소스 로딩 완료 후 실행
-            console.log('🚀 ChipGames Tower Defense 로딩 완료');
+            //console.log('🚀 ChipGames Tower Defense 로딩 완료');
             
             // 사운드 프리로딩 (사용자 상호작용 후)
             document.addEventListener('click', function() {
@@ -812,14 +812,14 @@
         if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                    console.log('✅ ServiceWorker 등록 성공:', registration.scope);
+                    //console.log('✅ ServiceWorker 등록 성공:', registration.scope);
                 }).catch(function(error) {
-                    console.log('❌ ServiceWorker 등록 실패:', error);
+                    //console.log('❌ ServiceWorker 등록 실패:', error);
                 });
             });
         } else {
-            console.log('ℹ️ ServiceWorker는 HTTPS 또는 localhost에서만 지원됩니다.');
-            console.log('현재 프로토콜:', location.protocol, '호스트:', location.hostname);
+            //console.log('ℹ️ ServiceWorker는 HTTPS 또는 localhost에서만 지원됩니다.');
+            //console.log('현재 프로토콜:', location.protocol, '호스트:', location.hostname);
         }
     </script>
 </body>
