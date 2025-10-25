@@ -5,15 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039" crossorigin="anonymous"></script>
     <script>
-        // AdSense 접근성 개선
+        // AdSense 페이지 레벨 광고 설정 (페이지당 하나만)
         (adsbygoogle = window.adsbygoogle || []).push({
             google_ad_client: "ca-pub-2533613198240039",
-            enable_page_level_ads: true,
-            // 접근성 개선 옵션
-            accessibility: {
-                skip_ad: true,
-                announce_ad: true
-            }
+            enable_page_level_ads: true
         });
     </script>
     <title data-i18n="gameTitle">타워 디펜스 게임 - 전략과 전술의 세계</title>
@@ -702,8 +697,24 @@
             });
         }
         
+        // AdSense 오류 방지
+        function preventAdSenseErrors() {
+            // adsbygoogle 배열이 이미 존재하는지 확인
+            if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
+                console.log('AdSense 이미 초기화됨');
+                return;
+            }
+            
+            // adsbygoogle 배열 초기화
+            window.adsbygoogle = window.adsbygoogle || [];
+            console.log('AdSense 초기화 완료');
+        }
+        
         // DOM 로드 후 접근성 개선 실행
         document.addEventListener('DOMContentLoaded', function() {
+            // AdSense 오류 방지
+            preventAdSenseErrors();
+            
             // 광고 로드 후 접근성 개선
             setTimeout(improveAdAccessibility, 2000);
             
