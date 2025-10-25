@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039" crossorigin="anonymous"></script>
+    <script>
+        // AdSense 접근성 개선
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-2533613198240039",
+            enable_page_level_ads: true,
+            // 접근성 개선 옵션
+            accessibility: {
+                skip_ad: true,
+                announce_ad: true
+            }
+        });
+    </script>
     <title data-i18n="gameTitle">타워 디펜스 게임 - 전략과 전술의 세계</title>
     <meta name="description" content="전략적인 타워 배치와 업그레이드를 통해 적을 막는 타워 디펜스 게임. 다양한 타워, 맵, 전략을 경험하세요.">
     
@@ -171,7 +183,7 @@
         }
     </style>
 </head>
-<body>
+<body role="main" aria-label="타워 디펜스 게임">
     <!-- 헤더 영역 -->
     <header class="main-header">
         <nav class="main-nav">
@@ -674,6 +686,45 @@
             console.log('🔧 개발 환경에서 실행 중');
             console.log('ServiceWorker는 HTTPS 또는 localhost에서만 지원됩니다.');
         }
+        
+        // 광고 iframe 접근성 개선
+        function improveAdAccessibility() {
+            // Google AdSense iframe들의 aria-hidden 속성 제거
+            const adIframes = document.querySelectorAll('iframe[src*="googlesyndication.com"], iframe[src*="doubleclick.net"]');
+            adIframes.forEach(iframe => {
+                if (iframe.contentDocument) {
+                    const body = iframe.contentDocument.body;
+                    if (body && body.getAttribute('aria-hidden') === 'true') {
+                        body.removeAttribute('aria-hidden');
+                        console.log('광고 iframe 접근성 개선 완료');
+                    }
+                }
+            });
+        }
+        
+        // DOM 로드 후 접근성 개선 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            // 광고 로드 후 접근성 개선
+            setTimeout(improveAdAccessibility, 2000);
+            
+            // 광고 동적 로드 감지
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.nodeType === 1 && node.tagName === 'IFRAME') {
+                                setTimeout(improveAdAccessibility, 1000);
+                            }
+                        });
+                    }
+                });
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
         
         // GitHub Pages 최적화: 리소스 로딩 완료 후 게임 초기화
         window.addEventListener('load', function() {
