@@ -99,6 +99,15 @@
     }
     </script>
     
+    <!-- 리소스 우선순위 설정 -->
+    <link rel="preload" href="style.css" as="style">
+    <link rel="preload" href="images/ChipGames_Logo.webp" as="image">
+    <link rel="preload" href="src/common.js" as="script">
+    
+    <!-- DNS 프리페치 (외부 리소스) -->
+    <link rel="dns-prefetch" href="//pagead2.googlesyndication.com">
+    <link rel="dns-prefetch" href="//unpkg.com">
+    
     <link rel="stylesheet" href="style.css">
     <link rel="icon" type="image/x-icon" href="images/ChipGames_favicon.ico">
     <link rel="icon" type="image/png" sizes="16x16" href="images/ChipGames_favicon-16x16.png">
@@ -627,13 +636,73 @@
         <input type="checkbox" id="lowSpecToggle" />
     </div>
 
-    <script src="src/common.js"></script>
-    <script src="src/ui.js"></script>
-    <script src="src/tower.js"></script>
-    <script src="src/enemy.js"></script>
-    <script src="src/gameState.js"></script>
-    <script src="src/sound.js"></script>
-    <script src="src/saveSystem.js"></script>
-    <script src="src/game.js"></script>
+    <!-- 핵심 게임 로직 (우선 로드) -->
+    <script src="src/common.js" defer></script>
+    <script src="src/gameState.js" defer></script>
+    <script src="src/ui.js" defer></script>
+    
+    <!-- 게임 시스템 (지연 로드) -->
+    <script src="src/tower.js" defer></script>
+    <script src="src/enemy.js" defer></script>
+    <script src="src/saveSystem.js" defer></script>
+    
+    <!-- 사운드 시스템 (지연 로드) -->
+    <script src="src/sound.js" defer></script>
+    
+    <!-- 메인 게임 로직 (마지막 로드) -->
+    <script src="src/game.js" defer></script>
+    
+    <!-- 성능 모니터링 및 최적화 -->
+    <script>
+        // 개발/프로덕션 환경 감지
+        const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
+        const isProduction = location.hostname === 'chipgames.github.io';
+        
+        // Core Web Vitals 모니터링 (프로덕션에서만)
+        if (isProduction && 'web-vital' in window) {
+            import('https://unpkg.com/web-vitals@3/dist/web-vitals.attribution.js').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+                getCLS(console.log);
+                getFID(console.log);
+                getFCP(console.log);
+                getLCP(console.log);
+                getTTFB(console.log);
+            });
+        }
+        
+        // 개발 환경 로그
+        if (isDevelopment) {
+            console.log('🔧 개발 환경에서 실행 중');
+            console.log('ServiceWorker는 HTTPS 또는 localhost에서만 지원됩니다.');
+        }
+        
+        // GitHub Pages 최적화: 리소스 로딩 완료 후 게임 초기화
+        window.addEventListener('load', function() {
+            // 모든 리소스 로딩 완료 후 실행
+            console.log('🚀 ChipGames Tower Defense 로딩 완료');
+            
+            // 사운드 프리로딩 (사용자 상호작용 후)
+            document.addEventListener('click', function() {
+                if (typeof loadSound === 'function') {
+                    // 중요한 사운드만 미리 로드
+                    loadSound('ui_click');
+                    loadSound('game_start');
+                }
+            }, { once: true });
+        });
+        
+        // 오프라인 지원 (HTTPS 또는 localhost에서만)
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('✅ ServiceWorker 등록 성공:', registration.scope);
+                }).catch(function(error) {
+                    console.log('❌ ServiceWorker 등록 실패:', error);
+                });
+            });
+        } else {
+            console.log('ℹ️ ServiceWorker는 HTTPS 또는 localhost에서만 지원됩니다.');
+            console.log('현재 프로토콜:', location.protocol, '호스트:', location.hostname);
+        }
+    </script>
 </body>
 </html> 

@@ -8,17 +8,41 @@
 let soundEnabled = true;
 let musicEnabled = true;
 
-// 사운드 객체
-// 게임에서 사용되는 모든 사운드 파일을 로드
+// 사운드 캐시 객체 (지연 로딩)
+// 사운드 파일을 필요할 때만 로드하여 초기 로딩 속도 향상
+let soundCache = {};
+
+// 사운드 파일 경로 정의
+const SOUND_PATHS = {
+    bgm: 'sounds/bgm.mp3',
+    enemy_death: 'sounds/enemy_death.mp3',
+    game_over: 'sounds/game_over.mp3',
+    game_start: 'sounds/game_start.mp3',
+    tower_attack: 'sounds/tower_attack.mp3',
+    tower_critical: 'sounds/tower_critical.mp3',
+    tower_place: 'sounds/tower_place.mp3',
+    ui_click: 'sounds/ui_click.mp3'
+};
+
+// 사운드 지연 로딩 함수
+function loadSound(soundName) {
+    if (!soundCache[soundName] && SOUND_PATHS[soundName]) {
+        soundCache[soundName] = new Audio(SOUND_PATHS[soundName]);
+        soundCache[soundName].preload = 'metadata'; // 메타데이터만 미리 로드
+    }
+    return soundCache[soundName];
+}
+
+// 기존 sounds 객체 (호환성 유지)
 let sounds = {
-    bgm: new Audio('sounds/bgm.mp3'),
-    enemy_death: new Audio('sounds/enemy_death.mp3'),
-    game_over: new Audio('sounds/game_over.mp3'),
-    game_start: new Audio('sounds/game_start.mp3'),
-    tower_attack: new Audio('sounds/tower_attack.mp3'),
-    tower_critical: new Audio('sounds/tower_critical.mp3'),
-    tower_place: new Audio('sounds/tower_place.mp3'),
-    ui_click: new Audio('sounds/ui_click.mp3')
+    get bgm() { return loadSound('bgm'); },
+    get enemy_death() { return loadSound('enemy_death'); },
+    get game_over() { return loadSound('game_over'); },
+    get game_start() { return loadSound('game_start'); },
+    get tower_attack() { return loadSound('tower_attack'); },
+    get tower_critical() { return loadSound('tower_critical'); },
+    get tower_place() { return loadSound('tower_place'); },
+    get ui_click() { return loadSound('ui_click'); }
 };
 
 // 사운드 설정 저장
