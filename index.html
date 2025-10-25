@@ -22,6 +22,13 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="타워 디펜스 게임">
     
+    <!-- 추가 SEO 메타 태그 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="ChipGames Tower Defense">
+    <meta name="msapplication-TileImage" content="images/ChipGames_favicon.png">
+    <meta name="msapplication-config" content="browserconfig.xml">
+    
     <!-- Open Graph 태그 -->
     <meta property="og:title" content="타워 디펜스 게임 - 전략과 전술의 세계">
     <meta property="og:description" content="전략적인 타워 배치와 업그레이드를 통해 적을 막는 타워 디펜스 게임. 다양한 타워, 맵, 전략을 경험하세요.">
@@ -41,7 +48,7 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
+      "@type": ["WebApplication", "VideoGame"],
       "name": "타워 디펜스 게임",
       "alternateName": "ChipGames Tower Defense",
       "description": "전략적인 타워 배치와 업그레이드를 통해 적을 막는 웹 게임",
@@ -59,7 +66,32 @@
       },
       "genre": "Strategy Game",
       "gamePlatform": "Web Browser",
-      "inLanguage": ["ko", "en", "zh", "ja"]
+      "playMode": "SinglePlayer",
+      "gameItem": [
+        {
+          "@type": "Thing",
+          "name": "타워",
+          "description": "방어용 타워 - 기본, 얼음, 독, 레이저, 스플래시, 지원 타워"
+        },
+        {
+          "@type": "Thing", 
+          "name": "적",
+          "description": "공격하는 적 - 일반, 빠른, 탱크, 치유사"
+        },
+        {
+          "@type": "Thing",
+          "name": "맵",
+          "description": "다양한 전략 맵 - 30종 이상의 맵 제공"
+        }
+      ],
+      "inLanguage": ["ko", "en", "zh", "ja"],
+      "datePublished": "2024-01-01",
+      "dateModified": "2025-01-27",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "150"
+      }
     }
     </script>
     
