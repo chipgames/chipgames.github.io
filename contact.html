@@ -3,216 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039" crossorigin="anonymous"></script>
-    <title data-i18n="contact">문의하기 - ChipTowerGame</title>
+    <script>var t=localStorage.getItem('chipgamesTheme');if(t)document.documentElement.setAttribute('data-theme',t);</script>
+    <title data-i18n="contactTitle">문의 - ChipGames</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="images/ChipGames_favicon.png">
-    <link rel="shortcut icon" type="image/png" href="images/ChipGames_favicon.png">
-    <link rel="apple-touch-icon" href="images/ChipGames_favicon.png">
-    <!-- 다국어 지원 스크립트 로드 -->
-    <script src="lang/i18n.js"></script>
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .main-container {
-            flex: 1 0 auto;
-        }
-
-        footer, .main-footer, .game-footer {
-            flex-shrink: 0;
-        }
-
-        .contact-container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 30px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            border: 2px solid #4CAF50;
-            box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
-            color: #fff;
-        }
-
-        .contact-container h1 {
-            color: #4CAF50;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2em;
-        }
-
-        .contact-info {
-            margin: 30px 0;
-            padding: 20px;
-            background: rgba(76, 175, 80, 0.1);
-            border-radius: 10px;
-        }
-
-        .contact-info h2 {
-            color: #4CAF50;
-            margin-bottom: 15px;
-            font-size: 1.5em;
-        }
-
-        .contact-info p {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .contact-info a {
-            color: #4CAF50;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .contact-info a:hover {
-            color: #45a049;
-            text-decoration: underline;
-        }
-
-        .back-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-        }
-
-        /* 언어 선택 드롭다운 스타일 */
-        .language-selector {
-            margin-left: 20px;
-        }
-
-        .language-selector select {
-            background: transparent;
-            color: var(--text-color);
-            border: 1px solid var(--primary-color);
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .language-selector select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .language-selector option {
-            background: var(--background-color);
-            color: var(--text-color);
-        }
-
-        @media (max-width: 768px) {
-            .contact-container {
-                margin: 20px;
-                padding: 20px;
-            }
-        }
+        .page-container { max-width: 720px; margin: 2rem auto; padding: 2rem; }
+        .page-container h1 { margin-bottom: 1rem; color: var(--accent); }
+        .page-container p { margin: 0.75rem 0; line-height: 1.7; }
+        .contact-box { margin: 1.5rem 0; padding: 1.25rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; }
+        .contact-box a { color: var(--accent); }
+        .back-link { display: inline-block; margin-top: 1.5rem; color: var(--accent); text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <!-- 헤더 영역 -->
-    <header class="main-header">
-        <nav class="main-nav">
-            <div class="logo">
-                <img src="images/ChipGames_Logo.png" alt="ChipGames Logo" class="logo-image">
-                <h1 data-i18n="gameTitle">타워 디펜스</h1>
-            </div>
-            <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
-            <ul class="nav-links">
-                <li><a href="index.html#game" data-i18n="playGame">게임하기</a></li>
-                <li><a href="index.html#guides" data-i18n="guides">가이드</a></li>
-                <li><a href="index.html#" id="descriptionBtn" data-i18n="gameDescriptionBtn">게임 설명</a></li>
-                <li><a href="index.html#" id="howtoBtn" data-i18n="howToPlay">이용 방법</a></li>
-                <li><a href="index.html#" id="helpBtn" data-i18n="help">도움말</a></li>
-                <!-- 언어 선택 드롭다운 추가 -->
-                <li class="language-selector">
-                    <select id="languageSelect" onchange="changeLanguage(this.value)">
-                        <option value="ko">한국어</option>
-                        <option value="en">English</option>
-                        <option value="zh">中文</option>
-                        <option value="ja">日本語</option>
-                    </select>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
-    <div class="main-container">
-        <main class="game-area contact-container">
-            <h1 style="color:#4CAF50; text-align:center; margin-bottom:30px; font-size:2em;" data-i18n="contact">문의하기</h1>
-            <p data-i18n="contactDescription">게임, 광고, 개인정보, 기타 문의사항이 있으시면 아래 이메일로 연락해 주세요.</p>
-            <ul style="margin-bottom:30px;">
-                <li><strong data-i18n="email">이메일:</strong> chipwebgames@gmail.com</li>
-            </ul>
-            <a href="index.html" class="back-button" data-i18n="backToGame">게임으로 돌아가기</a>
-        </main>
-    </div>
-
-    <!-- 푸터 -->
-    <footer class="main-footer">
-        <div class="footer-links">
-            <a href="privacy.html" data-i18n="privacyPolicy">개인정보처리방침</a>
-            <a href="contact.html" data-i18n="contact">문의하기</a>
-            <!-- 언어 선택 드롭다운 추가 -->
-            <select id="footerLanguageSelect" onchange="changeLanguage(this.value)" style="background: transparent; color: inherit; border: none; margin-left: 10px;">
-                <option value="ko">한국어</option>
-                <option value="en">English</option>
-                <option value="zh">中文</option>
-                <option value="ja">日本語</option>
-            </select>
+    <header class="header">
+        <div class="header-inner">
+            <a href="index.html" class="logo">
+                <picture>
+                    <source srcset="images/ChipGames_Logo.webp" type="image/webp">
+                    <img src="images/ChipGames_Logo.png" alt="ChipGames" class="logo-image" width="200" height="100" loading="eager">
+                </picture>
+            </a>
+            <nav class="nav">
+                <div class="nav-menu">
+                    <button class="nav-menu-btn" aria-expanded="false" aria-haspopup="true" id="gameMenuBtn"><span data-i18n="menuGames">게임</span><span class="nav-menu-arrow">▼</span></button>
+                    <ul class="nav-submenu" id="gameSubmenu" role="menu">
+                        <li role="none"><a href="https://chipgames.github.io/ChipGemSort/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gameGemSort">색상 정렬 퍼즐</a></li>
+                        <li role="none"><a href="https://chipgames.github.io/ChipBlockCrush/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gameBlockCrush">블록 퍼즐 게임</a></li>
+                        <li role="none"><a href="https://chipgames.github.io/ChipPuzzleGame/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gamePuzzle">매칭 퍼즐 게임</a></li>
+                        <li role="none"><a href="https://chipgames.github.io/ChipTowerGame/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gameTower">타워 디펜스 게임</a></li>
+                    </ul>
+                </div>
+                <button id="themeToggle" class="icon-btn" aria-label="테마 전환"><span class="icon-sun">☀</span><span class="icon-moon">🌙</span></button>
+                <div class="lang-selector">
+                    <select id="langSelect" onchange="changeLanguage(this.value)"><option value="ko">한국어</option><option value="en">English</option><option value="zh">中文</option><option value="ja">日本語</option></select>
+                </div>
+            </nav>
         </div>
-        <p data-i18n="copyright">&copy; 2025 ChipGames. All rights reserved.</p>
+    </header>
+    <main class="main">
+        <article class="page-container">
+            <h1 data-i18n="contactTitle">문의</h1>
+            <p data-i18n="contactDesc">ChipGames 관련 문의사항은 GitHub Issues를 통해 남겨 주세요.</p>
+            <div class="contact-box">
+                <p><strong data-i18n="contactGitHub">GitHub Issues</strong>: <a href="https://github.com/chipgames/chipgames.github.io/issues" target="_blank" rel="noopener">https://github.com/chipgames/chipgames.github.io/issues</a></p>
+            </div>
+            <a href="index.html" class="back-link" data-i18n="backToHome">홈으로</a>
+        </article>
+    </main>
+    <footer class="footer">
+        <nav class="footer-nav">
+            <a href="privacy.html" data-i18n="privacy">개인정보처리방침</a>
+            <a href="terms.html" data-i18n="terms">이용약관</a>
+            <a href="contact.html" data-i18n="contact">문의</a>
+        </nav>
+        <p class="copyright">&copy; ChipGames.</p>
     </footer>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 햄버거 메뉴 토글 (index.html과 동일하게)
-        const navToggle = document.querySelector('.nav-toggle');
-        const navLinks = document.querySelector('.nav-links');
-        if (navToggle && navLinks) {
-            navToggle.addEventListener('click', function() {
-                navLinks.classList.toggle('open');
-            });
-        }
-
-        // 언어 선택 드롭다운 값 설정
-        const languageSelect = document.getElementById('languageSelect');
-        const footerLanguageSelect = document.getElementById('footerLanguageSelect');
-        
-        if (languageSelect) {
-            languageSelect.value = currentLanguage;
-        }
-        if (footerLanguageSelect) {
-            footerLanguageSelect.value = currentLanguage;
-        }
-        
-        // 언어 변경 시 드롭다운 값 동기화
-        const originalChangeLanguage = window.changeLanguage;
-        window.changeLanguage = function(langCode) {
-            originalChangeLanguage(langCode);
-            if (languageSelect) languageSelect.value = langCode;
-            if (footerLanguageSelect) footerLanguageSelect.value = langCode;
-        };
-    });
-    </script>
+    <script src="lang/i18n.js"></script>
+    <script src="src/app.js"></script>
 </body>
-</html> 
+</html>

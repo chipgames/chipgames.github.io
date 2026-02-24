@@ -3,286 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039" crossorigin="anonymous"></script>
-    <title data-i18n="privacyPolicy">개인정보 처리방침 - ChipTowerGame</title>
+    <script>var t=localStorage.getItem('chipgamesTheme');if(t)document.documentElement.setAttribute('data-theme',t);</script>
+    <title data-i18n="privacyPolicy">개인정보처리방침 - ChipGames</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="images/ChipGames_favicon.png">
-    <link rel="shortcut icon" type="image/png" href="images/ChipGames_favicon.png">
-    <link rel="apple-touch-icon" href="images/ChipGames_favicon.png">
-    <!-- 다국어 지원 스크립트 로드 -->
-    <script src="lang/i18n.js"></script>
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .main-container {
-            flex: 1 0 auto;
-        }
-
-        footer, .main-footer, .game-footer {
-            flex-shrink: 0;
-        }
-
-        .privacy-container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 30px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            border: 2px solid #4CAF50;
-            box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
-            color: #fff;
-        }
-
-        .privacy-container h1 {
-            color: #4CAF50;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2em;
-        }
-
-        .privacy-container h2 {
-            color: #4CAF50;
-            margin: 25px 0 15px;
-            font-size: 1.5em;
-        }
-
-        .privacy-container p {
-            margin: 15px 0;
-            line-height: 1.6;
-        }
-
-        .privacy-container ul {
-            margin: 15px 0;
-            padding-left: 20px;
-        }
-
-        .privacy-container li {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .back-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-        }
-
-        /* 언어 선택 드롭다운 스타일 */
-        .language-selector {
-            margin-left: 20px;
-        }
-
-        .language-selector select {
-            background: transparent;
-            color: var(--text-color);
-            border: 1px solid var(--primary-color);
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .language-selector select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .language-selector option {
-            background: var(--background-color);
-            color: var(--text-color);
-        }
-
-        @media (max-width: 768px) {
-            .privacy-container {
-                margin: 20px;
-                padding: 20px;
-            }
-        }
+        .page-container { max-width: 720px; margin: 2rem auto; padding: 2rem; }
+        .page-container h1 { margin-bottom: 1rem; color: var(--accent); }
+        .page-container h2 { margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .page-container p, .page-container ul { margin: 0.75rem 0; line-height: 1.7; }
+        .page-container ul { padding-left: 1.5rem; }
+        .back-link { display: inline-block; margin-top: 1.5rem; color: var(--accent); text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <!-- 헤더 영역 -->
-    <header class="main-header">
-        <nav class="main-nav">
-            <div class="logo">
-                <img src="images/ChipGames_Logo.png" alt="ChipGames Logo" class="logo-image">
-                <h1 data-i18n="gameTitle">타워 디펜스</h1>
-            </div>
-            <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
-            <ul class="nav-links">
-                <li><a href="index.html#game" data-i18n="playGame">게임하기</a></li>
-                <li><a href="index.html#guides" data-i18n="guides">가이드</a></li>
-                <li><a href="index.html#" id="descriptionBtn" data-i18n="gameDescriptionBtn">게임 설명</a></li>
-                <li><a href="index.html#" id="howtoBtn" data-i18n="howToPlay">이용 방법</a></li>
-                <li><a href="index.html#" id="helpBtn" data-i18n="help">도움말</a></li>
-                <!-- 언어 선택 드롭다운 추가 -->
-                <li class="language-selector">
-                    <select id="languageSelect" onchange="changeLanguage(this.value)">
-                        <option value="ko">한국어</option>
-                        <option value="en">English</option>
-                        <option value="zh">中文</option>
-                        <option value="ja">日本語</option>
-                    </select>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
-    <div class="main-container">
-        <main class="game-area privacy-container">
-            <h1 style="color:#4CAF50; text-align:center; margin-bottom:30px; font-size:2em;" data-i18n="privacyPolicy">개인정보 처리방침</h1>
-            <p data-i18n="privacyIntro">본 개인정보 처리방침은 「개인정보 보호법」 제30조에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같은 처리방침을 두고 있습니다.</p>
-            <h2 data-i18n="privacySection1">1. 수집하는 개인정보 항목</h2>
-            <p data-i18n="privacySection1Desc">당사는 서비스 제공을 위해 다음과 같은 개인정보를 수집합니다:</p>
-            <ul>
-                <li data-i18n="privacyData1">게임 플레이 데이터 (점수, 진행 상황)</li>
-                <li data-i18n="privacyData2">기기 정보 (IP 주소, 브라우저 정보)</li>
-                <li data-i18n="privacyData3">쿠키 정보 (게임 설정 저장)</li>
-                <li data-i18n="privacyData4">광고 식별자 (광고 성과 측정)</li>
-            </ul>
-            <h2 data-i18n="privacySection2">2. 개인정보의 수집 및 이용목적</h2>
-            <p data-i18n="privacySection2Desc">수집된 개인정보는 다음의 목적을 위해 이용됩니다:</p>
-            <ul>
-                <li data-i18n="privacyPurpose1">게임 서비스 제공 및 운영</li>
-                <li data-i18n="privacyPurpose2">게임 플레이 통계 및 분석</li>
-                <li data-i18n="privacyPurpose3">서비스 개선 및 사용자 경험 향상</li>
-                <li data-i18n="privacyPurpose4">맞춤형 광고 제공</li>
-            </ul>
-            <h2 data-i18n="privacySection3">3. 개인정보의 수집 방법</h2>
-            <p data-i18n="privacySection3Desc">당사는 다음과 같은 방법으로 개인정보를 수집합니다:</p>
-            <ul>
-                <li data-i18n="privacyMethod1">게임 이용 시 자동 수집</li>
-                <li data-i18n="privacyMethod2">쿠키를 통한 수집</li>
-                <li data-i18n="privacyMethod3">광고 서비스 제공자의 자동 수집</li>
-            </ul>
-            <h2 data-i18n="privacySection4">4. 개인정보의 보유 및 이용기간</h2>
-            <p data-i18n="privacySection4Desc">개인정보는 원칙적으로 개인정보의 수집 및 이용목적이 달성되면 지체 없이 파기합니다. 단, 다음의 경우 일정 기간 보관됩니다:</p>
-            <ul>
-                <li data-i18n="privacyRetention1">게임 플레이 데이터: 서비스 이용 종료 후 1년</li>
-                <li data-i18n="privacyRetention2">광고 관련 데이터: 광고 캠페인 종료 후 6개월</li>
-            </ul>
-            <h2 data-i18n="privacySection5">5. 개인정보의 파기절차 및 방법</h2>
-            <p data-i18n="privacySection5Desc">당사는 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체없이 해당 개인정보를 파기합니다. 파기절차 및 방법은 다음과 같습니다:</p>
-            <ul>
-                <li data-i18n="privacyDestruction1">전자적 파일 형태로 저장된 개인정보는 복구할 수 없는 방법으로 영구 삭제</li>
-                <li data-i18n="privacyDestruction2">종이에 출력된 개인정보는 분쇄기로 분쇄하거나 소각</li>
-            </ul>
-            <h2 data-i18n="privacySection6">6. 개인정보의 제3자 제공</h2>
-            <p data-i18n="privacySection6Desc">당사는 이용자의 개인정보를 제3자에게 제공하지 않습니다. 다만, 다음의 경우는 예외로 합니다:</p>
-            <ul>
-                <li data-i18n="privacyThirdParty1">법령에 근거하여 수사 목적으로 법령에 정해진 절차와 방법에 따라 수사기관의 요구가 있는 경우</li>
-                <li data-i18n="privacyThirdParty2">통계작성 및 학술연구 등의 목적을 위해 필요한 경우로서 특정 개인을 알아볼 수 없는 형태로 가공하여 제공하는 경우</li>
-            </ul>
-            <h2 data-i18n="privacySection7">7. 개인정보 처리 위탁</h2>
-            <p data-i18n="privacySection7Desc">당사는 서비스 제공을 위해 다음과 같이 개인정보 처리 업무를 위탁하고 있습니다:</p>
-            <ul>
-                <li data-i18n="privacyTrust1">위탁업체: Google LLC</li>
-                <li data-i18n="privacyTrust2">위탁업무 내용: 광고 서비스 제공</li>
-                <li data-i18n="privacyTrust3">위탁기간: 서비스 이용 기간</li>
-            </ul>
-            <h2 data-i18n="privacySection8">8. 이용자의 권리와 행사방법</h2>
-            <p data-i18n="privacySection8Desc">이용자는 다음과 같은 권리를 행사할 수 있습니다:</p>
-            <ul>
-                <li data-i18n="privacyRights1">개인정보 열람요구</li>
-                <li data-i18n="privacyRights2">오류 정정 요구</li>
-                <li data-i18n="privacyRights3">삭제 요구</li>
-                <li data-i18n="privacyRights4">처리정지 요구</li>
-            </ul>
-            <p data-i18n="privacyRightsDesc">권리 행사는 개인정보 보호책임자에게 서면, 전화, 전자우편 등을 통하여 하실 수 있으며, 당사는 이에 대해 지체 없이 조치하겠습니다.</p>
-            <h2 data-i18n="privacySection9">9. 개인정보 보호책임자</h2>
-            <p data-i18n="privacySection9Desc">개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보 처리와 관련한 정보주체의 불만처리 및 피해구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.</p>
-            <ul>
-                <li data-i18n="privacyOfficer1">이름: ChipTowerGame 관리자</li>
-                <li data-i18n="privacyOfficer2">이메일: chipwebgames@gmail.com</li>
-            </ul>
-            <h2 data-i18n="privacySection10">10. 개인정보 침해 구제방법</h2>
-            <p data-i18n="privacySection10Desc">정보주체는 개인정보 침해로 인한 구제를 받기 위하여 개인정보 분쟁조정위원회, 한국인터넷진흥원 개인정보 침해신고센터 등에 분쟁해결이나 상담 등을 신청할 수 있습니다.</p>
-            <ul>
-                <li data-i18n="privacyRemedy1">개인정보 분쟁조정위원회: 1833-6972 (www.kopico.go.kr)</li>
-                <li data-i18n="privacyRemedy2">개인정보 침해신고센터: 118 (privacy.kisa.or.kr)</li>
-                <li data-i18n="privacyRemedy3">대검찰청 사이버수사과: 1301 (www.spo.go.kr)</li>
-                <li data-i18n="privacyRemedy4">경찰청 사이버안전국: 182 (cyberbureau.police.go.kr)</li>
-            </ul>
-            <h2 data-i18n="privacySection11">11. 광고 및 쿠키 정책</h2>
-            <p data-i18n="privacySection11Desc">당사는 다음과 같은 목적으로 쿠키를 사용합니다:</p>
-            <ul>
-                <li data-i18n="privacyCookie1">게임 설정 저장</li>
-                <li data-i18n="privacyCookie2">사용자 경험 개선</li>
-                <li data-i18n="privacyCookie3">광고 성과 측정 및 최적화</li>
-            </ul>
-            <p data-i18n="privacyCookieDesc">이용자는 웹 브라우저의 설정을 통해 쿠키 사용을 거부할 수 있습니다.</p>
-            <h2 data-i18n="privacySection12">12. 개인정보 처리방침 변경</h2>
-            <p data-i18n="privacySection12Desc">이 개인정보 처리방침은 2025년 1월 1일부터 적용됩니다. 개인정보 처리방침이 변경되는 경우, 변경 사항을 게임 내 공지사항을 통해 공지합니다.</p>
-            <a href="index.html" class="back-button" data-i18n="backToGame">게임으로 돌아가기</a>
-        </main>
-    </div>
-
-    <!-- 푸터 -->
-    <footer class="main-footer">
-        <div class="footer-links">
-            <a href="privacy.html" data-i18n="privacyPolicy">개인정보처리방침</a>
-            <a href="contact.html" data-i18n="contact">문의하기</a>
-            <!-- 언어 선택 드롭다운 추가 -->
-            <select id="footerLanguageSelect" onchange="changeLanguage(this.value)" style="background: transparent; color: inherit; border: none; margin-left: 10px;">
-                <option value="ko">한국어</option>
-                <option value="en">English</option>
-                <option value="zh">中文</option>
-                <option value="ja">日本語</option>
-            </select>
+    <header class="header">
+        <div class="header-inner">
+            <a href="index.html" class="logo">
+                <picture>
+                    <source srcset="images/ChipGames_Logo.webp" type="image/webp">
+                    <img src="images/ChipGames_Logo.png" alt="ChipGames" class="logo-image" width="200" height="100" loading="eager">
+                </picture>
+            </a>
+            <nav class="nav">
+                <div class="nav-menu">
+                    <button class="nav-menu-btn" aria-expanded="false" aria-haspopup="true" id="gameMenuBtn"><span data-i18n="menuGames">게임</span><span class="nav-menu-arrow">▼</span></button>
+                    <ul class="nav-submenu" id="gameSubmenu" role="menu">
+                        <li role="none"><a href="https://chipgames.github.io/ChipGemSort/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gameGemSort">색상 정렬 퍼즐</a></li>
+                        <li role="none"><a href="https://chipgames.github.io/ChipBlockCrush/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gameBlockCrush">블록 퍼즐 게임</a></li>
+                        <li role="none"><a href="https://chipgames.github.io/ChipPuzzleGame/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gamePuzzle">매칭 퍼즐 게임</a></li>
+                        <li role="none"><a href="https://chipgames.github.io/ChipTowerGame/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gameTower">타워 디펜스 게임</a></li>
+                    </ul>
+                </div>
+                <button id="themeToggle" class="icon-btn" aria-label="테마 전환"><span class="icon-sun">☀</span><span class="icon-moon">🌙</span></button>
+                <div class="lang-selector">
+                    <select id="langSelect" onchange="changeLanguage(this.value)"><option value="ko">한국어</option><option value="en">English</option><option value="zh">中文</option><option value="ja">日本語</option></select>
+                </div>
+            </nav>
         </div>
-        <p data-i18n="copyright">&copy; 2025 ChipGames. All rights reserved.</p>
+    </header>
+    <main class="main">
+        <article class="page-container">
+            <h1 data-i18n="privacyPolicy">개인정보처리방침</h1>
+            <p data-i18n="privacyIntro">ChipGames는 사용자 개인정보를 소중히 합니다. 본 페이지는 개인정보 처리에 관한 안내입니다.</p>
+            <h2 data-i18n="privacyCollect">수집 항목</h2>
+            <p data-i18n="privacyCollectDesc">저장소(로컬 스토리지)를 통해 언어 설정, 테마 설정 등 선택적 정보가 저장될 수 있습니다. Google AdSense를 사용하며, 해당 서비스의 쿠키 정책이 적용됩니다.</p>
+            <h2 data-i18n="privacyUse">이용 목적</h2>
+            <p data-i18n="privacyUseDesc">사용자 경험 개선, 서비스 제공, 광고 표시에 활용됩니다.</p>
+            <h2 data-i18n="privacyContact">문의</h2>
+            <p><a href="contact.html" data-i18n="contact">문의</a> <span data-i18n="privacyContactDesc">페이지를 통해 문의해 주세요.</span></p>
+            <a href="index.html" class="back-link" data-i18n="backToHome">홈으로</a>
+        </article>
+    </main>
+    <footer class="footer">
+        <nav class="footer-nav">
+            <a href="privacy.html" data-i18n="privacy">개인정보처리방침</a>
+            <a href="terms.html" data-i18n="terms">이용약관</a>
+            <a href="contact.html" data-i18n="contact">문의</a>
+        </nav>
+        <p class="copyright">&copy; ChipGames.</p>
     </footer>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 햄버거 메뉴 토글 (index.html과 동일하게)
-        const navToggle = document.querySelector('.nav-toggle');
-        const navLinks = document.querySelector('.nav-links');
-        if (navToggle && navLinks) {
-            navToggle.addEventListener('click', function() {
-                navLinks.classList.toggle('open');
-            });
-        }
-
-        // 언어 선택 드롭다운 값 설정
-        const languageSelect = document.getElementById('languageSelect');
-        const footerLanguageSelect = document.getElementById('footerLanguageSelect');
-        
-        if (languageSelect) {
-            languageSelect.value = currentLanguage;
-        }
-        if (footerLanguageSelect) {
-            footerLanguageSelect.value = currentLanguage;
-        }
-        
-        // 언어 변경 시 드롭다운 값 동기화
-        const originalChangeLanguage = window.changeLanguage;
-        window.changeLanguage = function(langCode) {
-            originalChangeLanguage(langCode);
-            if (languageSelect) languageSelect.value = langCode;
-            if (footerLanguageSelect) footerLanguageSelect.value = langCode;
-        };
-    });
-    </script>
+    <script src="lang/i18n.js"></script>
+    <script src="src/app.js"></script>
 </body>
-</html> 
+</html>

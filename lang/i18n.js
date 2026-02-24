@@ -1,63 +1,50 @@
+/* ChipGames 게임 목록 페이지 - 다국어 */
 let TRANSLATIONS = {};
 let currentLanguage = 'ko';
 
 function detectLanguage() {
-    const savedLang = localStorage.getItem('towerDefenseLanguage');
-    if (savedLang) return savedLang;
-    const browserLang = navigator.language || navigator.userLanguage;
-    const langCode = browserLang.split('-')[0].toLowerCase();
-    if (['ko', 'en', 'zh', 'ja'].includes(langCode)) return langCode;
-    return 'en';
+    const saved = localStorage.getItem('chipgamesLanguage');
+    if (saved) return saved;
+    const browser = (navigator.language || navigator.userLanguage || '').split('-')[0].toLowerCase();
+    if (['ko','en','zh','ja'].includes(browser)) return browser;
+    return 'ko';
 }
 
 function t(key, params) {
-    let str = TRANSLATIONS && TRANSLATIONS[key] ? TRANSLATIONS[key] : key;
+    let str = (TRANSLATIONS && TRANSLATIONS[key]) ? TRANSLATIONS[key] : key;
     if (params) {
         for (const [k, v] of Object.entries(params)) {
-            str = str.replace(new RegExp(`{${k}}`, 'g'), v);
+            str = str.replace(new RegExp('\\{' + k + '\\}', 'g'), v);
         }
     }
     return str;
 }
 
 function updatePageLanguage() {
-    const elements = document.querySelectorAll('[data-i18n]');
-    elements.forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        if (key) {
-            element.textContent = t(key);
-        }
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (key) el.textContent = t(key);
     });
-    // placeholder
-    const placeholders = document.querySelectorAll('[data-i18n-placeholder]');
-    placeholders.forEach(element => {
-        const key = element.getAttribute('data-i18n-placeholder');
-        if (key) {
-            element.placeholder = t(key);
-        }
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n-placeholder');
+        if (key) el.placeholder = t(key);
     });
-    // title
-    const titles = document.querySelectorAll('[data-i18n-title]');
-    titles.forEach(element => {
-        const key = element.getAttribute('data-i18n-title');
-        if (key) {
-            element.title = t(key);
-        }
-    });
+    var titleEl = document.querySelector('title[data-i18n]');
+    if (titleEl) document.title = t(titleEl.getAttribute('data-i18n'));
+    var langSel = document.getElementById('langSelect');
+    if (langSel) langSel.value = currentLanguage;
+    document.documentElement.setAttribute('lang', currentLanguage === 'zh' ? 'zh-CN' : currentLanguage);
 }
 
 function loadLanguage(langCode, callback) {
-    const scriptId = 'lang-script';
-    const oldScript = document.getElementById(scriptId);
-    if (oldScript) {
-        oldScript.remove();
-    }
+    const old = document.getElementById('lang-script');
+    if (old) old.remove();
     const script = document.createElement('script');
-    script.id = scriptId;
-    script.src = `lang/translations.${langCode}.js`;
+    script.id = 'lang-script';
+    script.src = 'lang/translations.' + langCode + '.js';
     script.onload = function() {
         currentLanguage = langCode;
-        localStorage.setItem('towerDefenseLanguage', langCode);
+        localStorage.setItem('chipgamesLanguage', langCode);
         if (typeof callback === 'function') callback();
     };
     document.head.appendChild(script);
@@ -68,40 +55,9 @@ function changeLanguage(langCode) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const lang = detectLanguage();
-    loadLanguage(lang, updatePageLanguage);
-}); 
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    const lang = detectLanguage();
-    // ���� ���� ����ȭ
-    window.currentLanguage = lang;
-
-    // ��� ��ũ��Ʈ �ε�
-    loadLanguage(lang, function () {
-        updatePageLanguage();
-
-        // ��Ӵٿ� ����ȭ
-        const languageSelect = document.getElementById('languageSelect');
-        const footerLanguageSelect = document.getElementById('footerLanguageSelect');
-        if (languageSelect) languageSelect.value = lang;
-        if (footerLanguageSelect) footerLanguageSelect.value = lang;
-    });
-
-    // ��� ���� �� ��Ӵٿ� �� ����ȭ
-    const originalChangeLanguage = window.changeLanguage;
-    window.changeLanguage = function (langCode) {
-        originalChangeLanguage(langCode);
-        if (languageSelect) languageSelect.value = langCode;
-        if (footerLanguageSelect) footerLanguageSelect.value = langCode;
-    };
+    loadLanguage(detectLanguage(), updatePageLanguage);
 });
-
 
 window.t = t;
 window.changeLanguage = changeLanguage;
-window.updatePageLanguage = updatePageLanguage;
 window.currentLanguage = currentLanguage;
-window.loadLanguage = loadLanguage;
-window.detectLanguage = detectLanguage;

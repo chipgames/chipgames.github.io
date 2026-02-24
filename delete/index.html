@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039&v=20250127" crossorigin="anonymous"></script>
+    <script>
+        // AdSense 안전한 초기화
+        function initializeAdSense() {
+            // AdSense가 완전히 로드될 때까지 대기
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            function tryInitialize() {
+                attempts++;
+                
+                if (typeof adsbygoogle !== 'undefined' && Array.isArray(adsbygoogle)) {
+                    // 이미 enable_page_level_ads가 설정되었는지 확인
+                    const hasPageLevelAds = adsbygoogle.some(ad => ad.enable_page_level_ads);
+                    
+                    if (!hasPageLevelAds) {
+                        try {
+                            (adsbygoogle = window.adsbygoogle || []).push({
+                                google_ad_client: "ca-pub-2533613198240039",
+                                enable_page_level_ads: true
+                            });
+                            //console.log('AdSense 페이지 레벨 광고 설정 완료');
+                        } catch (error) {
+                            //console.log('AdSense 설정 오류:', error);
+                        }
+                    } else {
+                        //console.log('AdSense 페이지 레벨 광고가 이미 설정됨');
+                    }
+                } else if (attempts < maxAttempts) {
+                    //console.log(`AdSense 초기화 대기 중... (${attempts}/${maxAttempts})`);
+                    setTimeout(tryInitialize, 500);
+                } else {
+                    //console.log('AdSense 초기화 실패: 최대 시도 횟수 초과');
+                }
+            }
+            
+            tryInitialize();
+        }
+        
+        // 페이지 로드 완료 후 AdSense 초기화
+        window.addEventListener('load', initializeAdSense);
+    </script>
+    <title data-i18n="gameTitle">타워 디펜스 게임 - 전략과 전술의 세계</title>
+    <meta name="description" content="전략적인 타워 배치와 업그레이드를 통해 적을 막는 타워 디펜스 게임. 다양한 타워, 맵, 전략을 경험하세요.">
+    
+    <!-- SEO 메타 태그 -->
+    <meta name="keywords" content="타워디펜스, 게임, 전략게임, 웹게임, 무료게임, ChipGames, Tower Defense, Strategy Game, HTML5 게임, 캔버스 게임, 브라우저 게임">
+    <meta name="author" content="ChipGames">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="naver-site-verification" content="65d3da64f889ef71d174dc8257b162e13b8f03c0">
+    <link rel="canonical" href="https://chipgames.github.io">
+    
+    <!-- 추가 SEO 메타 태그 -->
+    <meta name="theme-color" content="#2c3e50">
+    <meta name="msapplication-TileColor" content="#2c3e50">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="타워 디펜스 게임">
+    
+    <!-- 추가 SEO 메타 태그 -->
+    <meta name="format-detection" content="telephone=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="ChipGames Tower Defense">
+    <meta name="msapplication-TileImage" content="images/ChipGames_favicon.png">
+    <meta name="msapplication-config" content="browserconfig.xml">
+    
+    <!-- Open Graph 태그 -->
+    <meta property="og:title" content="타워 디펜스 게임 - 전략과 전술의 세계">
+    <meta property="og:description" content="전략적인 타워 배치와 업그레이드를 통해 적을 막는 타워 디펜스 게임. 다양한 타워, 맵, 전략을 경험하세요.">
+    <meta property="og:image" content="https://chipgames.github.io/images/ChipGames_Logo.webp">
+    <meta property="og:image:type" content="image/webp">
+    <meta property="og:image:width" content="200">
+    <meta property="og:image:height" content="100">
+    <meta property="og:url" content="https://chipgames.github.io">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="ChipGames">
+    <meta property="og:locale" content="ko_KR">
+    
+    <!-- Twitter Card 태그 -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="타워 디펜스 게임 - 전략과 전술의 세계">
+    <meta name="twitter:description" content="전략적인 타워 배치와 업그레이드를 통해 적을 막는 타워 디펜스 게임">
+    <meta name="twitter:image" content="https://chipgames.github.io/images/ChipGames_Logo.webp">
+    <meta name="twitter:image:alt" content="ChipGames Tower Defense Logo">
+    
+    <!-- 구조화된 데이터 (Schema.org) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": ["WebApplication", "VideoGame"],
+      "name": "타워 디펜스 게임",
+      "alternateName": "ChipGames Tower Defense",
+      "description": "전략적인 타워 배치와 업그레이드를 통해 적을 막는 웹 게임",
+      "applicationCategory": "Game",
+      "operatingSystem": "Web Browser",
+      "url": "https://chipgames.github.io",
+      "author": {
+        "@type": "Organization",
+        "name": "ChipGames"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "KRW"
+      },
+      "genre": "Strategy Game",
+      "gamePlatform": "Web Browser",
+      "playMode": "SinglePlayer",
+      "gameItem": [
+        {
+          "@type": "Thing",
+          "name": "타워",
+          "description": "방어용 타워 - 기본, 얼음, 독, 레이저, 스플래시, 지원 타워"
+        },
+        {
+          "@type": "Thing", 
+          "name": "적",
+          "description": "공격하는 적 - 일반, 빠른, 탱크, 치유사"
+        },
+        {
+          "@type": "Thing",
+          "name": "맵",
+          "description": "다양한 전략 맵 - 30종 이상의 맵 제공"
+        }
+      ],
+      "inLanguage": ["ko", "en", "zh", "ja"],
+      "datePublished": "2024-01-01",
+      "dateModified": "2025-01-27",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "150"
+      }
+    }
+    </script>
+    
+    <!-- 리소스 우선순위 설정 -->
+    <link rel="preload" href="style.css" as="style">
+    <link rel="preload" href="images/ChipGames_Logo.webp" as="image">
+    <link rel="preload" href="src/common.js" as="script">
+    
+    <!-- DNS 프리페치 (외부 리소스) -->
+    <link rel="dns-prefetch" href="//pagead2.googlesyndication.com">
+    <link rel="dns-prefetch" href="//unpkg.com">
+    
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="images/ChipGames_favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/ChipGames_favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/ChipGames_favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="images/ChipGames_favicon-180x180.png">
+    <link rel="manifest" href="site.webmanifest">
+    <!-- 다국어 지원 스크립트 로드 -->
+    <script src="lang/i18n.js"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-container {
+            flex: 1 0 auto;
+        }
+
+        footer, .main-footer, .game-footer {
+            flex-shrink: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .game-area {
+            position: relative;
+        }
+
+        /* 언어 선택 드롭다운 스타일 */
+        .language-selector {
+            margin-left: 20px;
+        }
+
+        .language-selector select {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .language-selector option {
+            background: var(--background-color);
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body role="main" aria-label="타워 디펜스 게임">
+    <!-- 헤더 영역 -->
+    <header class="main-header">
+        <nav class="main-nav">
+            <div class="logo">
+                <picture>
+                    <source srcset="images/ChipGames_Logo.webp" type="image/webp">
+                    <img src="images/ChipGames_Logo.png" 
+                         alt="ChipGames Logo" 
+                         class="logo-image"
+                         width="200" 
+                         height="100"
+                         loading="eager">
+                </picture>
+                <h1 data-i18n="gameTitle">타워 디펜스</h1>
+            </div>
+            <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
+            <ul class="nav-links">
+                <li><a href="#game" data-i18n="playGame">게임하기</a></li>
+                <li><a href="#guides" data-i18n="guides">가이드</a></li>
+                <li><a href="#" id="descriptionBtn" data-i18n="gameDescriptionBtn">게임 설명</a></li>
+                <li><a href="#" id="howtoBtn" data-i18n="howToPlay">이용 방법</a></li>
+                <li><a href="#" id="helpBtn" data-i18n="help">도움말</a></li>
+                <!-- 언어 선택 드롭다운 추가 -->
+                <li class="language-selector">
+                    <select id="languageSelect" onchange="changeLanguage(this.value)">
+                        <option value="ko">한국어</option>
+                        <option value="en">English</option>
+                        <option value="zh">中文</option>
+                        <option value="ja">日本語</option>
+                    </select>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <!-- 중앙 게임 영역 -->
+        <main class="game-area" id="game">
+            <!-- 로딩 화면 -->
+            <div id="loadingScreen" class="loading-screen">
+                <div class="loading-content">
+                    <h2 data-i18n="loading">게임 로딩 중...</h2>
+                    <p data-i18n="pleaseWait">잠시만 기다려주세요.</p>
+                    <div class="loading-progress">
+                        <div class="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 게임 정보 -->
+            <div class="info-bar">
+                <div class="info-item">
+                    <span class="info-icon">💰</span>
+                    <span id="infoGold" data-i18n="gold">골드: 200</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">❤️</span>
+                    <span id="infoLives" data-i18n="lives">생명: 25</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🌊</span>
+                    <span id="infoWave" data-i18n="wave">웨이브: 1</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">⭐</span>
+                    <span id="infoScore" data-i18n="score">점수: 0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🎯</span>
+                    <span id="infoTowerCount" data-i18n="towers">타워: <span id="towerLimitCount">0</span>/<span id="towerLimitMax">12</span></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">💀</span>
+                    <span id="enemiesKilled" data-i18n="enemiesKilled">처치한 적: 0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">👑</span>
+                    <span id="bossesKilled" data-i18n="bossesKilled">처치한 보스: 0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">💰</span>
+                    <span id="totalGold" data-i18n="totalGold">총 획득 골드: 0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-icon">🌊</span>
+                    <span id="highestWave" data-i18n="highestWave">최고 웨이브: 0</span>
+                </div>
+            </div>
+
+            <!-- 게임 캔버스 컨테이너 -->
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="800" height="600"></canvas>
+            </div>
+
+            <!-- 웨이브 진행률 바 -->
+            <div id="waveProgress" class="wave-progress" style="display:none;">
+                <div class="fill"></div>
+            </div>
+
+            <!-- 타워 설치/업그레이드 -->
+            <div id="towerMenu" class="tower-menu-container" style="display: none;">
+                
+            </div>
+
+            <!-- 게임 컨트롤 -->
+            <div class="game-controls">
+                <select id="difficultySelect" class="control-button">
+                    <option value="EASY" data-i18n="easy">쉬움</option>
+                    <option value="NORMAL" data-i18n="normal">보통</option>
+                    <option value="HARD" data-i18n="hard">어려움</option>
+                </select>
+                <select id="mapSelect" class="control-button">
+                    <option value="STRAIGHT" data-i18n="straight">직선 경로</option>
+                    <option value="ZIGZAG" data-i18n="zigzag">지그재그</option>
+                    <option value="SPIRAL" data-i18n="spiral">나선형</option>
+                    <option value="MAZE" data-i18n="maze">미로</option>
+                    <option value="CROSS" data-i18n="cross">십자형</option>
+                    <option value="SNAKE" data-i18n="snake">뱀형</option>
+                    <option value="DIAMOND" data-i18n="diamond">다이아몬드</option>
+                    <option value="STAR" data-i18n="star">별형</option>
+                    <option value="VORTEX" data-i18n="vortex">소용돌이</option>
+                    <option value="TRIANGLE" data-i18n="triangle">삼각형</option>
+                    <option value="WAVE" data-i18n="wave">파도형</option>
+                    <option value="STAIRS" data-i18n="stairs">계단형</option>
+                    <option value="CROSSROADS" data-i18n="crossroads">교차로</option>
+                    <option value="INFINITY" data-i18n="infinity">무한형</option>
+                    <option value="BUTTERFLY" data-i18n="butterfly">나비형</option>
+                    <option value="HOURGLASS" data-i18n="hourglass">모래시계</option>
+                    <!-- === 1단계: 기본 기하학적 맵 추가 === -->
+                    <option value="HEXAGON" data-i18n="hexagon">육각형</option>
+                    <option value="OCTAGON" data-i18n="octagon">팔각형</option>
+                    <option value="PENTAGON" data-i18n="pentagon">오각형</option>
+                    <option value="SQUARE" data-i18n="square">정사각형</option>
+                    <option value="RECTANGLE" data-i18n="rectangle">직사각형</option>
+                    <option value="CIRCLE" data-i18n="circle">원형</option>
+                    <option value="ELLIPSE" data-i18n="ellipse">타원형</option>
+                    <option value="RHOMBUS" data-i18n="rhombus">마름모</option>
+                    <option value="TRAPEZOID" data-i18n="trapezoid">사다리꼴</option>
+                    <option value="PARALLELOGRAM" data-i18n="parallelogram">평행사변형</option>
+                    <!-- === 2단계: 자연/유기적 맵 추가 === -->
+                    <option value="LEAF" data-i18n="leaf">잎사귀</option>
+                    <option value="FLOWER" data-i18n="flower">꽃</option>
+                    <option value="TREE" data-i18n="tree">나무</option>
+                    <option value="CLOUD" data-i18n="cloud">구름</option>
+                    <option value="RIVER" data-i18n="river">강</option>
+                    <option value="MOUNTAIN" data-i18n="mountain">산</option>
+                    <option value="WIND" data-i18n="wind">바람</option>
+                    <option value="FIRE" data-i18n="fire">불</option>
+                    <option value="WATER" data-i18n="water">물</option>
+                    <option value="EARTH" data-i18n="earth">땅</option>
+                    <!-- === 3단계: 고급/복합 맵 추가 === -->
+                    <option value="LABYRINTH" data-i18n="labyrinth">미궁</option>
+                    <option value="MAZE_COMPLEX" data-i18n="mazeComplex">복합 미로</option>
+                    <option value="SPIRAL_DOUBLE" data-i18n="spiralDouble">이중 나선</option>
+                    <option value="CROSS_DOUBLE" data-i18n="crossDouble">이중 십자</option>
+                    <option value="SNAKE_ADVANCED" data-i18n="snakeAdvanced">고급 뱀형</option>
+                    <option value="VORTEX_DOUBLE" data-i18n="vortexDouble">이중 소용돌이</option>
+                    <option value="INFINITY_DOUBLE" data-i18n="infinityDouble">이중 무한</option>
+                    <option value="BUTTERFLY_DOUBLE" data-i18n="butterflyDouble">이중 나비</option>
+                    <option value="HOURGLASS_DOUBLE" data-i18n="hourglassDouble">이중 모래시계</option>
+                    <option value="CHALLENGE_ULTIMATE" data-i18n="challengeUltimate">궁극의 도전</option>
+                    <!-- === 4단계: 다양한 시작/끝점을 가진 새로운 맵들 === -->
+                    <option value="TOP_TO_BOTTOM" data-i18n="topToBottom">상하 이동</option>
+                    <option value="DIAGONAL_CROSS" data-i18n="diagonalCross">대각선 십자</option>
+                    <option value="CENTER_SPIRAL" data-i18n="centerSpiral">중앙 나선</option>
+                    <option value="BOTTOM_TO_TOP" data-i18n="bottomToTop">하상 이동</option>
+                    <option value="CORNER_TO_CORNER" data-i18n="cornerToCorner">모서리 이동</option>
+                </select>
+                <button id="waveStartButton" class="wave-start-button" data-i18n="nextWave">다음 웨이브</button>
+                <button id="pauseBtn" class="control-button" data-i18n="pause">일시정지</button>
+                <button id="startBtn" class="control-button" data-i18n="start">게임 시작</button>
+                <button id="saveBtn" class="control-button" data-i18n="save">저장</button>
+                <button id="loadBtn" class="control-button" data-i18n="load">불러오기</button>
+                <button id="soundToggleBtn" data-i18n="soundEffects">🔊 효과음</button>
+                <button id="musicToggleBtn" data-i18n="backgroundMusic">🎵 배경음악</button>
+            </div>
+            <div id="saveLoadNotification" style="display:none; position:fixed; top:60px; left:50%; transform:translateX(-50%); min-width:200px; max-width:90vw; padding:12px 24px; border-radius:8px; color:#fff; font-size:1.1em; z-index:2000; text-align:center;"></div>
+
+        </main>
+    </div>
+
+    <!-- 게임 설명 모달 -->
+    <div id="descriptionModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="닫기" data-i18n-title="close">×</button>
+            <h2 data-i18n="descTitle">게임 설명</h2>
+            <p>
+                <b data-i18n="descGameName">타워 디펜스 게임</b>
+                <span data-i18n="descSummary1">은 다양한 타워와 맵, 전략적 업그레이드, 특수 이벤트가 어우러진 전략 시뮬레이션 게임입니다.</span><br>
+                <span data-i18n="descSummary2">플레이어는 각기 다른 특성을 가진 타워를 설치하고 업그레이드하여, 웨이브마다 몰려오는 적과 강력한 보스를 막아내야 합니다.</span><br>
+                <span data-i18n="descSummary3">게임 중 무작위로 발생하는 특수 이벤트와 파워업, 다양한 업적 시스템, 그리고 저장/불러오기 기능까지!</span><br>
+                <span data-i18n="descSummary4">직관적인 UI와 다양한 편의 기능으로 누구나 쉽게 즐길 수 있으며, 반복 플레이를 통해 최고의 기록에 도전해보세요!</span>
+            </p>
+            <ul>
+                <li><b data-i18n="descFeature1Title">다양한 타워와 업그레이드</b> <span data-i18n="descFeature1Desc">: 여러 종류의 타워와 업그레이드 시스템</span></li>
+                <li><b data-i18n="descFeature2Title">여러 맵과 난이도</b> <span data-i18n="descFeature2Desc">: 15종 이상의 맵, 쉬움/보통/어려움 난이도</span></li>
+                <li><b data-i18n="descFeature3Title">웨이브 & 보스</b> <span data-i18n="descFeature3Desc">: 점점 강해지는 적과 보스 몬스터</span></li>
+                <li><b data-i18n="descFeature4Title">특수 이벤트/파워업</b> <span data-i18n="descFeature4Desc">: 골드 러시, 타워 강화 등 전략적 변수</span></li>
+                <li><b data-i18n="descFeature5Title">업적/통계</b> <span data-i18n="descFeature5Desc">: 다양한 업적과 실시간 통계</span></li>
+                <li><b data-i18n="descFeature6Title">저장/불러오기</b> <span data-i18n="descFeature6Desc">: 언제든 이어서 플레이 가능</span></li>
+            </ul>
+            <div style="margin-top:18px; color:#a5b4fc; font-size:0.98em;" data-i18n="descGoal">
+                목표: 제한된 자원으로 최적의 타워 조합과 배치로 최대한 많은 웨이브를 방어하세요!
+            </div>
+        </div>
+    </div>
+
+    <!-- 게임 이용 방법 모달 -->
+    <div id="howtoModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="닫기" data-i18n-title="close">×</button>
+            <h2 data-i18n="howtoTitle">이용 방법</h2>
+            <p>
+                <b data-i18n="howtoGameName">타워 디펜스 게임</b>
+                <span data-i18n="howtoIntro1">은 전략적으로 타워를 설치하고 업그레이드하여 몰려오는 적을 막는 게임입니다.</span><br>
+                <span data-i18n="howtoIntro2">아래 안내를 참고하여 최고의 기록에 도전해보세요!</span>
+            </p>
+            <ul>
+                <li><b data-i18n="howtoGoalTitle">게임 목표</b><span data-i18n="howtoGoalDesc">: 제한된 자원(골드)으로 최적의 타워 조합과 배치로 최대한 많은 웨이브를 방어하세요.</span></li>
+                <li><b data-i18n="howtoPlaceTitle">타워 설치</b><span data-i18n="howtoPlaceDesc">: 게임 영역의 빈 칸을 마우스로 클릭하면 타워 설치 메뉴가 나타납니다. 원하는 타워를 선택해 설치하세요.</span></li>
+                <li><b data-i18n="howtoUpgradeTitle">타워 업그레이드</b><span data-i18n="howtoUpgradeDesc">: 이미 설치된 타워를 클릭하면 업그레이드 메뉴가 열립니다. 골드를 사용해 타워를 강화할 수 있습니다.</span></li>
+                <li><b data-i18n="howtoWaveTitle">웨이브 시작</b><span data-i18n="howtoWaveDesc">: '게임 시작' 또는 '다음 웨이브' 버튼을 눌러 적의 공격을 시작할 수 있습니다.</span></li>
+                <li><b data-i18n="howtoPauseTitle">일시정지/재개</b><span data-i18n="howtoPauseDesc">: '일시정지' 버튼 또는 P 키로 게임을 일시정지/재개할 수 있습니다.</span></li>
+                <li><b data-i18n="howtoHelpTitle">도움말/설명</b><span data-i18n="howtoHelpDesc">: '도움말' 버튼(H 키)과 '게임 설명' 버튼을 통해 추가 정보를 확인할 수 있습니다.</span></li>
+                <li><b data-i18n="howtoSaveTitle">저장/불러오기</b><span data-i18n="howtoSaveDesc">: '저장' 버튼으로 현재 진행 상황을 저장하고, '불러오기' 버튼으로 이어서 플레이할 수 있습니다.</span></li>
+                <li><b data-i18n="howtoEventTitle">특수 이벤트</b><span data-i18n="howtoEventDesc">: 게임 중 무작위로 골드 러시, 타워 강화 등 다양한 이벤트가 발생할 수 있습니다. 화면 하단에서 발생한 이벤트를 확인하세요.</span></li>
+                <li><b data-i18n="howtoAchieveTitle">업적/통계</b><span data-i18n="howtoAchieveDesc">: 플레이 중 다양한 업적을 달성할 수 있으며, 게임 정보 바에서 실시간 통계를 확인할 수 있습니다.</span></li>
+            </ul>
+            <div style="margin-top:18px; color:#a5b4fc; font-size:0.98em;" data-i18n="howtoFooter">
+                다양한 맵과 난이도, 특수 이벤트, 업적 시스템을 활용해 최고의 기록에 도전해보세요!
+            </div>
+        </div>
+    </div>
+
+    <!-- 도움말 모달 -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="닫기" data-i18n-title="close">×</button>
+            <h2 data-i18n="helpTitle">게임 도움말</h2>
+            <div class="help-section">
+                <h3 data-i18n="helpShortcutTitle">단축키</h3>
+                <ul>
+                    <li><b data-i18n="helpShortcutSpace">스페이스바</b><span data-i18n="helpShortcutSpaceDesc">: 다음 웨이브 시작</span></li>
+                    <li><b data-i18n="helpShortcutP">P</b><span data-i18n="helpShortcutPDesc">: 일시정지/재개</span></li>
+                    <li><b data-i18n="helpShortcutH">H</b><span data-i18n="helpShortcutHDesc">: 도움말 열기</span></li>
+                </ul>
+            </div>
+            <div class="help-section">
+                <h3 data-i18n="helpFaqTitle">자주 묻는 질문</h3>
+                <ul>
+                    <li><b data-i18n="helpFaq1Title">타워가 설치되지 않아요</b><p data-i18n="helpFaq1Desc">경로 위에는 타워를 설치할 수 없습니다. 빈 칸을 클릭해 주세요.</p></li>
+                    <li><b data-i18n="helpFaq2Title">골드가 부족해요</b><p data-i18n="helpFaq2Desc">적을 처치하거나 웨이브를 클리어하면 골드를 얻을 수 있습니다.</p></li>
+                    <li><b data-i18n="helpFaq3Title">특수 이벤트 확인</b><p data-i18n="helpFaq3Desc">화면 하단 '발생한 특수 이벤트' 영역에서 확인할 수 있습니다.</p></li>
+                    <li><b data-i18n="helpFaq4Title">저장/불러오기</b><p data-i18n="helpFaq4Desc">하단의 저장/불러오기 버튼을 이용하세요.</p></li>
+                    <li><b data-i18n="helpFaq5Title">게임이 멈췄을 때</b><p data-i18n="helpFaq5Desc">새로고침 후 불러오기 버튼으로 이어서 플레이할 수 있습니다.</p></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="tutorial" class="modal">
+        <div class="modal-content">
+            <h2>게임 튜토리얼</h2>
+            <p>1. 타워를 설치하여 적을 막으세요.</p>
+            <p>2. 타워를 업그레이드하여 더 강력하게 만드세요.</p>
+            <p>3. 웨이브를 클리어하여 골드를 획득하세요.</p>
+            <button onclick="document.getElementById('tutorial').style.display='none'" class="control-button">시작하기</button>
+        </div>
+    </div>
+
+    <!-- 초보자 가이드 모달 -->
+    <div id="beginnerGuideModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="닫기" data-i18n-title="close">×</button>
+            <h2 data-i18n="guideBeginnerTitle">초보자 가이드</h2>
+            <p>
+                <b data-i18n="guideBeginnerGoal">타워 디펜스 게임의 기본 목표</b><br>
+                <span data-i18n="guideBeginnerGoalDesc">몰려오는 적을 타워로 막아내고, 생명(❤️)이 0이 되지 않도록 최대한 오래 버티는 것이 목표입니다.</span><br><br>
+                <b data-i18n="guideBeginnerHowto">게임 진행 방법</b><br>
+                <span data-i18n="guideBeginnerHowto1">1. <b>타워 설치</b>: 게임 영역의 빈 칸을 클릭하면 타워 설치 메뉴가 열립니다. 골드를 사용해 다양한 타워를 설치하세요.</span><br>
+                <span data-i18n="guideBeginnerHowto2">2. <b>웨이브 시작</b>: '게임 시작' 또는 '다음 웨이브' 버튼을 눌러 적의 공격을 시작할 수 있습니다.</span><br>
+                <span data-i18n="guideBeginnerHowto3">3. <b>타워 업그레이드</b>: 이미 설치한 타워를 클릭하면 업그레이드 메뉴가 열립니다. 골드를 사용해 타워를 강화하세요.</span><br>
+                <span data-i18n="guideBeginnerHowto4">4. <b>자원 관리</b>: 적을 처치하거나 웨이브를 클리어하면 골드를 얻을 수 있습니다. 골드를 아껴 쓰고, 필요한 곳에 투자하세요.</span><br><br>
+                <b data-i18n="guideBeginnerTip">초보자 추천 전략</b><br>
+                <span data-i18n="guideBeginnerTip1">- 초반에는 <b>기본 타워</b>를 여러 개 설치해 적을 분산시켜 막는 것이 좋습니다.</span><br>
+                <span data-i18n="guideBeginnerTip2">- 타워를 한 곳에 몰아두기보다는, 경로를 따라 고르게 배치하세요.</span><br>
+                <span data-i18n="guideBeginnerTip3">- 업그레이드는 골드가 여유 있을 때, 자주 공격하는 타워부터 우선적으로 강화하세요.</span><br>
+                <span data-i18n="guideBeginnerTip4">- 웨이브가 시작되기 전, 타워 설치와 업그레이드를 미리 준비하세요.</span><br>
+                <span data-i18n="guideBeginnerTip5">- <b>생명(❤️) 관리</b>에 신경 쓰세요. 한 번에 많은 적이 지나가면 게임 오버가 될 수 있습니다.</span><br><br>
+                <b data-i18n="guideBeginnerMistake">실수하기 쉬운 점</b><br>
+                <span data-i18n="guideBeginnerMistake1">- 경로 위에는 타워를 설치할 수 없습니다.</span><br>
+                <span data-i18n="guideBeginnerMistake2">- 골드가 부족할 때는 무리하게 업그레이드하지 말고, 다음 웨이브를 기다리세요.</span><br>
+                <span data-i18n="guideBeginnerMistake3">- 다양한 타워를 조합해보며, 각 타워의 특성을 익혀보세요.</span><br>
+            </p>
+        </div>
+    </div>
+    <!-- 타워 종류 설명 모달 -->
+    <div id="towerGuideModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="닫기" data-i18n-title="close">×</button>
+            <h2 data-i18n="guideTowerTitle">타워 종류 설명</h2>
+            <p>
+                <b data-i18n="guideTowerBasic">기본 타워</b><br>
+                <span data-i18n="guideTowerBasicDesc1">- 저렴한 비용, 빠른 공격 속도, 범용적으로 사용 가능</span><br>
+                <span data-i18n="guideTowerBasicDesc2">- 초반 방어선 구축에 적합</span><br><br>
+                <b data-i18n="guideTowerIce">얼음 타워</b><br>
+                <span data-i18n="guideTowerIceDesc1">- 적을 느리게 만드는 빙결 효과</span><br>
+                <span data-i18n="guideTowerIceDesc2">- 빠른 적이나 보스의 이동을 늦추는 데 효과적</span><br><br>
+                <b data-i18n="guideTowerPoison">독 타워</b><br>
+                <span data-i18n="guideTowerPoisonDesc1">- 지속적인 독 데미지 부여</span><br>
+                <span data-i18n="guideTowerPoisonDesc2">- 체력이 높은 적이나 보스에게 효과적</span><br><br>
+                <b data-i18n="guideTowerLaser">레이저 타워</b><br>
+                <span data-i18n="guideTowerLaserDesc1">- 강력한 단일 공격, 연속 데미지</span><br>
+                <span data-i18n="guideTowerLaserDesc2">- 업그레이드 시 보스 처치에 매우 유용</span><br><br>
+                <b data-i18n="guideTowerSplash">스플래시 타워</b><br>
+                <span data-i18n="guideTowerSplashDesc1">- 범위 공격 및 감속 효과</span><br>
+                <span data-i18n="guideTowerSplashDesc2">- 적이 몰려올 때 효율적</span><br><br>
+                <b data-i18n="guideTowerSupport">지원 타워</b><br>
+                <span data-i18n="guideTowerSupportDesc1">- 주변 타워의 공격력을 강화</span><br>
+                <span data-i18n="guideTowerSupportDesc2">- 여러 타워와 조합 시 전체 방어력 상승</span><br><br>
+                <b data-i18n="guideTowerUpgrade">업그레이드 효과</b><br>
+                <span data-i18n="guideTowerUpgradeDesc1">- 각 타워는 공격력, 사거리, 공격속도, 특수 효과 등 다양한 업그레이드가 가능합니다.</span><br>
+                <span data-i18n="guideTowerUpgradeDesc2">- 업그레이드 시 골드가 소모되며, 타워의 성능이 크게 향상됩니다.</span><br><br>
+                <b data-i18n="guideTowerCombo">추천 조합</b><br>
+                <span data-i18n="guideTowerCombo1">- <b>얼음 타워 + 독 타워</b>: 적을 느리게 하면서 지속 데미지</span><br>
+                <span data-i18n="guideTowerCombo2">- <b>지원 타워 + 레이저/스플래시 타워</b>: 강력한 타워의 화력을 극대화</span><br>
+                <span data-i18n="guideTowerCombo3">- <b>기본 타워 + 스플래시 타워</b>: 초반 적 처치와 다수 적 대응</span><br>
+            </p>
+        </div>
+    </div>
+    <!-- 전략 가이드 모달 -->
+    <div id="strategyGuideModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="닫기" data-i18n-title="close">×</button>
+            <h2 data-i18n="guideStrategyTitle">전략 가이드</h2>
+            <p>
+                <b data-i18n="guideStrategyGold">자원(골드) 관리</b><br>
+                <span data-i18n="guideStrategyGoldDesc1">- 초반에는 타워 설치에 집중, 중반 이후 업그레이드에 투자</span><br>
+                <span data-i18n="guideStrategyGoldDesc2">- 불필요한 업그레이드는 피하고, 효율적인 타워에 집중 투자</span><br><br>
+                <b data-i18n="guideStrategyPlacement">타워 배치 전략</b><br>
+                <span data-i18n="guideStrategyPlacementDesc1">- 경로가 꺾이는 지점, 적이 오래 머무는 곳에 강력한 타워 배치</span><br>
+                <span data-i18n="guideStrategyPlacementDesc2">- 범위 공격 타워는 적이 많이 모이는 곳에 설치</span><br>
+                <span data-i18n="guideStrategyPlacementDesc3">- 지원 타워는 여러 공격 타워가 닿는 위치에 설치</span><br><br>
+                <b data-i18n="guideStrategyWave">웨이브별 대응</b><br>
+                <span data-i18n="guideStrategyWaveDesc1">- 웨이브가 시작되기 전, 타워 업그레이드와 배치를 미리 점검</span><br>
+                <span data-i18n="guideStrategyWaveDesc2">- 보스 웨이브에는 단일 공격력이 높은 타워(레이저 등) 집중 강화</span><br>
+                <span data-i18n="guideStrategyWaveDesc3">- 특수 이벤트(골드 러시, 타워 강화 등) 발생 시 적극 활용</span><br><br>
+                <b data-i18n="guideStrategyAdvanced">고급 플레이 크</b><br>
+                <span data-i18n="guideStrategyAdvancedDesc1">- 다양한 타워 조합을 실험해보고, 맵에 따라 최적의 조합을 찾으세요.</span><br>
+                <span data-i18n="guideStrategyAdvancedDesc2">- 파워업과 업적 시스템을 적극 활용해 추가 보상을 노리세요.</span><br>
+                <span data-i18n="guideStrategyAdvancedDesc3">- 저장/불러오기 기능을 활용해 여러 전략을 시도해보세요.</span><br>
+            </p>
+        </div>
+    </div>
+
+    <!-- 상단 가이드 모달 -->
+    <div id="mainGuideModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" aria-label="닫기" data-i18n-title="close">×</button>
+            <h2 data-i18n="guideMainTitle">게임 가이드</h2>
+            <div class="guide-tabs">
+                <button class="guide-tab active" data-tab="beginner" data-i18n="guideTabBeginner">초보자</button>
+                <button class="guide-tab" data-tab="tower" data-i18n="guideTabTower">타워</button>
+                <button class="guide-tab" data-tab="strategy" data-i18n="guideTabStrategy">전략</button>
+                <button class="guide-tab" data-tab="faq" data-i18n="guideTabFaq">FAQ</button>
+            </div>
+            <input id="guideSearchInput" type="text" data-i18n-placeholder="guideSearchPlaceholder" placeholder="가이드 검색(예: 타워, 효과, 전략...)" autocomplete="off" style="width:100%;margin-bottom:14px;padding:8px 12px;border-radius:6px;border:1.5px solid #4CAF50;font-size:1em;box-sizing:border-box;">
+            <div class="guide-tab-content">
+                <div class="guide-section" id="guide-beginner" style="display:block;">
+                    <div class="guide-intro">
+                        <p data-i18n="guideMainBeginnerIntro">타워 디펜스 게임의 전반적인 규칙, 진행 방법, 주요 전략을 한눈에 확인하세요.</p>
+                    </div>
+                    <ul>
+                        <li data-i18n="guideMainBeginnerGoal">게임 목표: 몰려오는 적을 타워로 막아내고, 생명(❤️)이 0이 되지 않도록 최대한 오래 버티는 것이 목표입니다.</li>
+                        <li data-i18n="guideMainBeginnerInstall">타워 설치: 게임 영역의 빈 칸을 클릭하면 타워 설치 메뉴가 열립니다. 골드를 사용해 다양한 타워를 설치하세요.</li>
+                        <li data-i18n="guideMainBeginnerWave">웨이브 시작: '게임 시작' 또는 '다음 웨이브' 버튼을 눌러 적의 공격을 시작할 수 있습니다.</li>
+                        <li data-i18n="guideMainBeginnerUpgrade">타워 업그레이드: 이미 설치한 타워를 클릭하면 업그레이드 메뉴가 열립니다. 골드를 사용해 타워를 강화하세요.</li>
+                        <li data-i18n="guideMainBeginnerResource">자원 관리: 적을 처치하거나 웨이브를 클리어하면 골드를 얻을 수 있습니다. 골드를 아껴 쓰고, 필요한 곳에 투자하세요.</li>
+                    </ul>
+                    <div style="margin-top:18px; color:#a5b4fc; font-size:0.98em;" data-i18n="guideMainBeginnerTips">
+                        초반에는 <b>기본 타워</b>를 여러 개 설치해 적을 분산시켜 막는 것이 좋습니다.<br>
+                        타워를 한 곳에 몰아두기보다는, 경로를 따라 고르게 배치하세요.<br>
+                        업그레이드는 골드가 여유 있을 때, 자주 공격하는 타워부터 우선적으로 강화하세요.<br>
+                        웨이브가 시작되기 전, 타워 설치와 업그레이드를 미리 준비하세요.<br>
+                        생명(❤️) 관리에 신경 쓰세요. 한 번에 많은 적이 지나가면 게임 오버가 될 수 있습니다.
+                    </div>
+                </div>
+                <div class="guide-section" id="guide-tower" style="display:none;">
+                    <h3 data-i18n="guideMainTowerTitle">타워 종류 설명</h3>
+                    <ul>
+                        <li data-i18n="guideMainTowerBasic">기본 타워: 저렴한 비용, 빠른 공격 속도, 범용적으로 사용 가능</li>
+                        <li data-i18n="guideMainTowerIce">얼음 타워: 적을 느리게 만드는 빙결 효과</li>
+                        <li data-i18n="guideMainTowerPoison">독 타워: 지속적인 독 데미지 부여</li>
+                        <li data-i18n="guideMainTowerBasic2">기본 타워: 저렴한 비용, 빠른 공격 속도, 범용적으로 사용 가능</li>
+                        <li data-i18n="guideMainTowerIce2">얼음 타워: 적을 느리게 만드는 빙결 효과</li>
+                        <li data-i18n="guideMainTowerPoison2">독 타워: 지속적인 독 데미지 부여</li>
+                        <li data-i18n="guideMainTowerLaser">레이저 타워: 강력한 단일 공격, 연속 데미지</li>
+                        <li data-i18n="guideMainTowerSplash">스플래시 타워: 범위 공격 및 감속 효과</li>
+                        <li data-i18n="guideMainTowerSupport">지원 타워: 주변 타워의 공격력을 강화</li>
+                    </ul>
+                    <div style="margin-top:12px; color:#a5b4fc; font-size:0.98em;" data-i18n="guideMainTowerCombo">
+                        <b>추천 조합</b><br>
+                        얼음 타워 + 독 타워: 적을 느리게 하면서 지속 데미지<br>
+                        지원 타워 + 레이저/스플래시 타워: 강력한 타워의 화력을 극대화<br>
+                        기본 타워 + 스플래시 타워: 초반 적 처치와 다수 적 대응
+                    </div>
+                </div>
+                <div class="guide-section" id="guide-strategy" style="display:none;">
+                    <h3 data-i18n="guideMainStrategyTitle">전략 가이드</h3>
+                    <ul>
+                        <li data-i18n="guideMainStrategyGold">자원(골드) 관리: 초반에는 타워 설치에 집중, 중반 이후 업그레이드에 투자</li>
+                        <li data-i18n="guideMainStrategyGold2">불필요한 업그레이드는 피하고, 효율적인 타워에 집중 투자</li>
+                        <li data-i18n="guideMainStrategyPlacement">경로가 꺾이는 지점, 적이 오래 머무는 곳에 강력한 타워 배치<br>예: <span class="enemy-tooltip" data-type="TANK">탱커</span> 등장 웨이브에는 단일 공격 타워 강화</li>
+                        <li data-i18n="guideMainStrategySplash">범위 공격 타워는 적이 많이 모이는 곳에 설치<br>예: <span class="enemy-tooltip" data-type="SWARM">무리 적</span> 등장 시 스플래시 타워 활용</li>
+                        <li data-i18n="guideMainStrategySupport">지원 타워는 여러 공격 타워가 닿는 위치에 설치</li>
+                        <li data-i18n="guideMainStrategyBoss">보스 웨이브에는 단일 공격력이 높은 타워(레이저 등) 집중 강화<br>보스 스킬: <span class="skill-tooltip" data-type="SHIELD">방어막</span>, <span class="skill-tooltip" data-type="TELEPORT">순간이동</span>, <span class="skill-tooltip" data-type="SUMMON">소환</span></li>
+                        <li data-i18n="guideMainStrategyEvent">특수 이벤트(골드 러시, 타워 강화 등) 발생 시 적극 활용</li>
+                    </ul>
+                    <div style="margin-top:12px; color:#a5b4fc; font-size:0.98em;" data-i18n="guideMainStrategyTips">
+                        다양한 타워 조합을 실험해보고, 맵에 따라 최적의 조합을 찾으세요.<br>
+                        파워업과 업적 시스템을 적극 활용해 추가 보상을 노리세요.<br>
+                        저장/불러오기 기능을 활용해 여러 전략을 시도해보세요.
+                    </div>
+                </div>
+                <div class="guide-section" id="guide-faq" style="display:none;">
+                    <h3 data-i18n="guideMainFaqTitle">자주 묻는 질문(FAQ)</h3>
+                    <ul>
+                        <li data-i18n="guideMainFaq1">타워가 설치되지 않아요<br>경로 위에는 타워를 설치할 수 없습니다. 빈 칸을 클릭해 주세요.</li>
+                        <li data-i18n="guideMainFaq2">골드가 부족해요<br>적을 처치하거나 웨이브를 클리어하면 골드를 얻을 수 있습니다.</li>
+                        <li data-i18n="guideMainFaq3">특수 이벤트 확인<br>화면 하단 '발생한 특수 이벤트' 영역에서 확인할 수 있습니다.</li>
+                        <li data-i18n="guideMainFaq4">저장/불러오기<br>하단의 저장/불러오기 버튼을 이용하세요.</li>
+                        <li data-i18n="guideMainFaq5">게임이 멈췄을 때<br>새로고침 후 불러오기 버튼으로 이어서 플레이할 수 있습니다.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class="main-footer">
+        <div class="footer-links">
+            <a href="privacy.html" data-i18n="privacyPolicy">개인정보처리방침</a>
+            <a href="contact.html" data-i18n="contact">문의하기</a>
+            <!-- 언어 선택 드롭다운 추가 -->
+            <select id="footerLanguageSelect" onchange="changeLanguage(this.value)" style="background: transparent; color: inherit; border: none; margin-left: 10px;">
+                <option value="ko">한국어</option>
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+            </select>
+        </div>
+        <p data-i18n="copyright">&copy; 2025 ChipGames. All rights reserved.</p>
+    </footer>
+
+    <!-- 퀵 가이드 플로팅 버튼 -->
+    <button id="quickGuideBtn" title="게임 가이드" aria-label="게임 가이드 열기">❓</button>
+
+    <!-- 우측 하단 저사양 모드 토글 -->
+    <div class="low-spec-toggle">
+        <label for="lowSpecToggle" class="low-spec-label" data-i18n="lowSpecMode">저사양 모드</label>
+        <input type="checkbox" id="lowSpecToggle" />
+    </div>
+
+    <!-- 핵심 게임 로직 (우선 로드) -->
+    <script src="src/common.js" defer></script>
+    <script src="src/gameState.js" defer></script>
+    <script src="src/ui.js" defer></script>
+    
+    <!-- 게임 시스템 (지연 로드) -->
+    <script src="src/tower.js" defer></script>
+    <script src="src/enemy.js" defer></script>
+    <script src="src/saveSystem.js" defer></script>
+    
+    <!-- 사운드 시스템 (지연 로드) -->
+    <script src="src/sound.js" defer></script>
+    
+    <!-- 메인 게임 로직 (마지막 로드) -->
+    <script src="src/game.js" defer></script>
+    
+    <!-- 성능 모니터링 및 최적화 -->
+    <script>
+        // 개발/프로덕션 환경 감지
+        const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:';
+        const isProduction = location.hostname === 'chipgames.github.io';
+        
+        // Core Web Vitals 모니터링 (프로덕션에서만)
+        if (isProduction && 'web-vital' in window) {
+            import('https://unpkg.com/web-vitals@3/dist/web-vitals.attribution.js').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
+                getCLS(console.log);
+                getFID(console.log);
+                getFCP(console.log);
+                getLCP(console.log);
+                getTTFB(console.log);
+            });
+        }
+        
+        // 개발 환경 로그
+        //if (isDevelopment) {
+        //    console.log('🔧 개발 환경에서 실행 중');
+        //    console.log('ServiceWorker는 HTTPS 또는 localhost에서만 지원됩니다.');
+        //}
+        
+        // 광고 iframe 접근성 개선
+        function improveAdAccessibility() {
+            // Google AdSense iframe들의 aria-hidden 속성 제거
+            const adIframes = document.querySelectorAll('iframe[src*="googlesyndication.com"], iframe[src*="doubleclick.net"]');
+            adIframes.forEach(iframe => {
+                if (iframe.contentDocument) {
+                    const body = iframe.contentDocument.body;
+                    if (body && body.getAttribute('aria-hidden') === 'true') {
+                        body.removeAttribute('aria-hidden');
+                        //console.log('광고 iframe 접근성 개선 완료');
+                    }
+                }
+            });
+        }
+        
+        // AdSense 오류 방지
+        function preventAdSenseErrors() {
+            // adsbygoogle 배열이 이미 존재하는지 확인
+            if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
+                //console.log('AdSense 이미 초기화됨');
+                return;
+            }
+            
+            // adsbygoogle 배열 초기화
+            window.adsbygoogle = window.adsbygoogle || [];
+            //console.log('AdSense 초기화 완료');
+        }
+        
+        // AdSense 중복 설정 방지
+        function preventDuplicateAdSense() {
+            // 안전한 배열 확인
+            if (window.adsbygoogle && Array.isArray(window.adsbygoogle)) {
+                // 이미 enable_page_level_ads가 설정되었는지 확인
+                if (window.adsbygoogle.some(ad => ad.enable_page_level_ads)) {
+                    //console.log('AdSense 페이지 레벨 광고가 이미 설정됨');
+                    return false;
+                }
+            }
+            return true;
+        }
+        
+        // DOM 로드 후 접근성 개선 실행
+        document.addEventListener('DOMContentLoaded', function() {
+            // AdSense 디버깅
+            //console.log('AdSense 상태 확인:', {
+            //    adsbygoogle: typeof window.adsbygoogle,
+            //    isArray: Array.isArray(window.adsbygoogle),
+            //    length: window.adsbygoogle ? window.adsbygoogle.length : 0,
+            //    hasPageLevelAds: (window.adsbygoogle && Array.isArray(window.adsbygoogle)) ? 
+            //        window.adsbygoogle.some(ad => ad.enable_page_level_ads) : false
+            //});
+            
+            // AdSense 오류 방지
+            preventAdSenseErrors();
+            
+            // 광고 로드 후 접근성 개선
+            setTimeout(improveAdAccessibility, 2000);
+            
+            // 광고 동적 로드 감지
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.type === 'childList') {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.nodeType === 1 && node.tagName === 'IFRAME') {
+                                setTimeout(improveAdAccessibility, 1000);
+                            }
+                        });
+                    }
+                });
+            });
+            
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+        
+        // GitHub Pages 최적화: 리소스 로딩 완료 후 게임 초기화
+        window.addEventListener('load', function() {
+            // 모든 리소스 로딩 완료 후 실행
+            //console.log('🚀 ChipGames Tower Defense 로딩 완료');
+            
+            // 사운드 프리로딩 (사용자 상호작용 후)
+            document.addEventListener('click', function() {
+                if (typeof loadSound === 'function') {
+                    // 중요한 사운드만 미리 로드
+                    loadSound('ui_click');
+                    loadSound('game_start');
+                }
+            }, { once: true });
+        });
+        
+        // 오프라인 지원 (HTTPS 또는 localhost에서만)
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    //console.log('✅ ServiceWorker 등록 성공:', registration.scope);
+                }).catch(function(error) {
+                    //console.log('❌ ServiceWorker 등록 실패:', error);
+                });
+            });
+        } else {
+            //console.log('ℹ️ ServiceWorker는 HTTPS 또는 localhost에서만 지원됩니다.');
+            //console.log('현재 프로토콜:', location.protocol, '호스트:', location.hostname);
+        }
+    </script>
+</body>
+</html> 

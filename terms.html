@@ -3,258 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039" crossorigin="anonymous"></script>
-    <title data-i18n="termsOfService">이용약관 - ChipTowerGame</title>
+    <script>var t=localStorage.getItem('chipgamesTheme');if(t)document.documentElement.setAttribute('data-theme',t);</script>
+    <title data-i18n="termsTitle">이용약관 - ChipGames</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="images/ChipGames_favicon.png">
-    <link rel="shortcut icon" type="image/png" href="images/ChipGames_favicon.png">
-    <link rel="apple-touch-icon" href="images/ChipGames_favicon.png">
-    <!-- 다국어 지원 스크립트 로드 -->
-    <script src="lang/translations.js"></script>
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .main-container {
-            flex: 1 0 auto;
-        }
-
-        footer, .main-footer, .game-footer {
-            flex-shrink: 0;
-        }
-
-        .terms-container {
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 30px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            border: 2px solid #4CAF50;
-            box-shadow: 0 0 30px rgba(76, 175, 80, 0.3);
-            color: #fff;
-        }
-
-        .terms-container h1 {
-            color: #4CAF50;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 2em;
-        }
-
-        .terms-container h2 {
-            color: #4CAF50;
-            margin: 25px 0 15px;
-            font-size: 1.5em;
-        }
-
-        .terms-container p {
-            margin: 15px 0;
-            line-height: 1.6;
-        }
-
-        .terms-container ul {
-            margin: 15px 0;
-            padding-left: 20px;
-        }
-
-        .terms-container li {
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-
-        .back-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #4CAF50;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
-            background: #45a049;
-            transform: translateY(-2px);
-        }
-
-        /* 언어 선택 드롭다운 스타일 */
-        .language-selector {
-            margin-left: 20px;
-        }
-
-        .language-selector select {
-            background: transparent;
-            color: var(--text-color);
-            border: 1px solid var(--primary-color);
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .language-selector select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .language-selector option {
-            background: var(--background-color);
-            color: var(--text-color);
-        }
-
-        @media (max-width: 768px) {
-            .terms-container {
-                margin: 20px;
-                padding: 20px;
-            }
-        }
+        .page-container { max-width: 720px; margin: 2rem auto; padding: 2rem; }
+        .page-container h1 { margin-bottom: 1rem; color: var(--accent); }
+        .page-container h2 { margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .page-container p, .page-container ul { margin: 0.75rem 0; line-height: 1.7; }
+        .page-container ul { padding-left: 1.5rem; }
+        .back-link { display: inline-block; margin-top: 1.5rem; color: var(--accent); text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-    <!-- 헤더 영역 -->
-    <header class="main-header">
-        <nav class="main-nav">
-            <div class="logo">
-                <img src="images/ChipGames_Logo.png" alt="ChipGames Logo" class="logo-image">
-                <h1 data-i18n="gameTitle">타워 디펜스</h1>
-            </div>
-            <button class="nav-toggle" aria-label="메뉴 열기">☰</button>
-            <ul class="nav-links">
-                <li><a href="index.html#game" data-i18n="playGame">게임하기</a></li>
-                <li><a href="index.html#guides" data-i18n="guides">가이드</a></li>
-                <li><a href="index.html#" id="descriptionBtn" data-i18n="gameDescriptionBtn">게임 설명</a></li>
-                <li><a href="index.html#" id="howtoBtn" data-i18n="howToPlay">이용 방법</a></li>
-                <li><a href="index.html#" id="helpBtn" data-i18n="help">도움말</a></li>
-                <!-- 언어 선택 드롭다운 추가 -->
-                <li class="language-selector">
-                    <select id="languageSelect" onchange="changeLanguage(this.value)">
-                        <option value="ko">한국어</option>
-                        <option value="en">English</option>
-                        <option value="zh">中文</option>
-                        <option value="ja">日本語</option>
-                    </select>
-                </li>
-            </ul>
-        </nav>
-    </header>
-
-    <div class="main-container">
-        <main class="game-area terms-container">
-            <h1 style="color:#4CAF50; text-align:center; margin-bottom:30px; font-size:2em;" data-i18n="termsOfService">이용약관</h1>
-            <p data-i18n="termsIntro">본 약관은 ChipGames(이하 "운영자")가 제공하는 타워 디펜스 게임 서비스(이하 "서비스")의 이용과 관련하여 운영자와 이용자 간의 권리, 의무 및 책임사항을 규정함을 목적으로 합니다.</p>
-            
-            <h2 data-i18n="termsSection1">1. 서비스 이용</h2>
-            <p data-i18n="termsSection1Desc">이용자는 서비스를 자유롭게 이용할 수 있으며, 서비스 이용을 통해 얻은 정보를 개인적인 용도로만 사용할 수 있습니다.</p>
-            
-            <h2 data-i18n="termsSection2">2. 이용자의 의무</h2>
-            <p data-i18n="termsSection2Desc">이용자는 다음 각 호의 행위를 하여서는 안 됩니다:</p>
-            <ul>
-                <li data-i18n="termsUserDuty1">서비스의 정상적인 운영을 방해하는 행위</li>
-                <li data-i18n="termsUserDuty2">다른 이용자의 개인정보를 수집, 저장, 공개하는 행위</li>
-                <li data-i18n="termsUserDuty3">서비스를 통해 얻은 정보를 운영자의 사전 승낙 없이 복제, 유통하는 행위</li>
-                <li data-i18n="termsUserDuty4">기타 관련 법령에 위배되는 행위</li>
-            </ul>
-            
-            <h2 data-i18n="termsSection3">3. 운영자의 의무</h2>
-            <p data-i18n="termsSection3Desc">운영자는 안정적이고 지속적인 서비스 제공을 위해 최선을 다하며, 이용자의 개인정보 보호를 위해 보안 시스템을 구축하고 개인정보 처리방침을 공시하고 준수합니다.</p>
-            
-            <h2 data-i18n="termsSection4">4. 서비스 제공의 중단</h2>
-            <p data-i18n="termsSection4Desc">운영자는 다음 각 호의 경우 서비스 제공을 중단할 수 있습니다:</p>
-            <ul>
-                <li data-i18n="termsServiceStop1">서비스용 설비의 점검, 보수 또는 공사로 인한 부득이한 경우</li>
-                <li data-i18n="termsServiceStop2">천재지변, 전쟁, 기간통신사업자의 서비스 중지 등 불가항력적인 사유로 인한 경우</li>
-                <li data-i18n="termsServiceStop3">기타 운영자가 서비스 제공이 불가능하다고 판단하는 경우</li>
-            </ul>
-            
-            <h2 data-i18n="termsSection5">5. 개인정보 보호</h2>
-            <p data-i18n="termsSection5Desc">운영자는 이용자의 개인정보 보호를 위해 개인정보 처리방침을 수립하고 이를 준수합니다. 개인정보의 수집, 이용, 제공 등에 관한 자세한 내용은 개인정보 처리방침을 통해 확인할 수 있습니다.</p>
-            
-            <h2 data-i18n="termsSection6">6. 면책조항</h2>
-            <p data-i18n="termsSection6Desc">운영자는 다음 각 호의 경우에 대해 책임을 지지 않습니다:</p>
-            <ul>
-                <li data-i18n="termsDisclaimer1">천재지변, 전쟁, 기간통신사업자의 서비스 중지 등 불가항력적인 사유로 인한 서비스 중단</li>
-                <li data-i18n="termsDisclaimer2">이용자의 귀책사유로 인한 서비스 이용 장애</li>
-                <li data-i18n="termsDisclaimer3">게임 이용으로 인한 개인정보 유출</li>
-                <li data-i18n="termsDisclaimer4">게임 이용 중 발생한 데이터 손실</li>
-                <li data-i18n="termsDisclaimer5">제3자가 제공하는 서비스의 이용</li>
-                <li data-i18n="termsDisclaimer6">광고 서비스 이용으로 인한 손해</li>
-            </ul>
-            
-            <h2 data-i18n="termsSection7">7. 광고 서비스</h2>
-            <p data-i18n="termsSection7Desc">운영자는 게임 내에 광고를 게재할 수 있으며, 이용자는 광고 서비스 이용에 동의한 것으로 간주됩니다. 광고 서비스 이용과 관련하여 발생하는 모든 책임은 이용자가 부담합니다.</p>
-            
-            <h2 data-i18n="termsSection8">8. 약관 변경</h2>
-            <p data-i18n="termsSection8Desc">운영자는 필요한 경우 약관을 변경할 수 있으며, 변경된 약관은 게임 내 공지사항을 통해 공지합니다. 이용자가 변경된 약관에 동의하지 않는 경우, 서비스 이용을 중단할 수 있습니다.</p>
-            
-            <h2 data-i18n="termsSection9">9. 분쟁 해결</h2>
-            <p data-i18n="termsSection9Desc">본 약관과 관련하여 분쟁이 발생할 경우, 운영자와 이용자는 상호 협의하여 해결합니다. 협의가 이루어지지 않을 경우, 관련 법령 및 상관례에 따릅니다.</p>
-            
-            <h2 data-i18n="termsSection10">10. 준거법</h2>
-            <p data-i18n="termsSection10Desc">본 약관은 대한민국 법률을 준거법으로 합니다.</p>
-            
-            <h2 data-i18n="termsSection11">11. 기타</h2>
-            <p data-i18n="termsSection11Desc">본 약관에 명시되지 않은 사항은 관련 법령 및 운영자가 정한 규정에 따릅니다.</p>
-            
-            <a href="index.html" class="back-button" data-i18n="backToGame">게임으로 돌아가기</a>
-        </main>
-    </div>
-
-    <!-- 푸터 -->
-    <footer class="main-footer">
-        <div class="footer-links">
-            <a href="privacy.html" data-i18n="privacyPolicy">개인정보처리방침</a>
-            <a href="contact.html" data-i18n="contact">문의하기</a>
-            <!-- 언어 선택 드롭다운 추가 -->
-            <select id="footerLanguageSelect" onchange="changeLanguage(this.value)" style="background: transparent; color: inherit; border: none; margin-left: 10px;">
-                <option value="ko">한국어</option>
-                <option value="en">English</option>
-                <option value="zh">中文</option>
-                <option value="ja">日本語</option>
-            </select>
+    <header class="header">
+        <div class="header-inner">
+            <a href="index.html" class="logo">
+                <picture>
+                    <source srcset="images/ChipGames_Logo.webp" type="image/webp">
+                    <img src="images/ChipGames_Logo.png" alt="ChipGames" class="logo-image" width="200" height="100" loading="eager">
+                </picture>
+            </a>
+            <nav class="nav">
+                <div class="nav-menu">
+                    <button class="nav-menu-btn" aria-expanded="false" aria-haspopup="true" id="gameMenuBtn"><span data-i18n="menuGames">게임</span><span class="nav-menu-arrow">▼</span></button>
+                    <ul class="nav-submenu" id="gameSubmenu" role="menu">
+                        <li role="none"><a href="https://chipgames.github.io/ChipGemSort/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gameGemSort">색상 정렬 퍼즐</a></li>
+                        <li role="none"><a href="https://chipgames.github.io/ChipBlockCrush/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gameBlockCrush">블록 퍼즐 게임</a></li>
+                        <li role="none"><a href="https://chipgames.github.io/ChipPuzzleGame/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gamePuzzle">매칭 퍼즐 게임</a></li>
+                        <li role="none"><a href="https://chipgames.github.io/ChipTowerGame/" target="_blank" rel="noopener noreferrer" role="menuitem" data-i18n="gameTower">타워 디펜스 게임</a></li>
+                    </ul>
+                </div>
+                <button id="themeToggle" class="icon-btn" aria-label="테마 전환"><span class="icon-sun">☀</span><span class="icon-moon">🌙</span></button>
+                <div class="lang-selector">
+                    <select id="langSelect" onchange="changeLanguage(this.value)"><option value="ko">한국어</option><option value="en">English</option><option value="zh">中文</option><option value="ja">日本語</option></select>
+                </div>
+            </nav>
         </div>
-        <p data-i18n="copyright">&copy; 2025 ChipGames. All rights reserved.</p>
+    </header>
+    <main class="main">
+        <article class="page-container">
+            <h1 data-i18n="termsTitle">이용약관</h1>
+            <p data-i18n="termsIntro">ChipGames 웹사이트 및 제공 게임 이용 시 아래 약관이 적용됩니다.</p>
+            <h2 data-i18n="termsUse">서비스 이용</h2>
+            <p data-i18n="termsUseDesc">본 서비스는 무료로 제공되며, 개인적인 이용 목적으로 사용해 주세요.</p>
+            <h2 data-i18n="termsDisclaimer">면책</h2>
+            <p data-i18n="termsDisclaimerDesc">서비스 이용으로 인한 문제에 대해 ChipGames는 책임을 지지 않습니다.</p>
+            <h2 data-i18n="termsChanges">변경</h2>
+            <p data-i18n="termsChangesDesc">약관은 사전 공지 없이 변경될 수 있습니다.</p>
+            <a href="index.html" class="back-link" data-i18n="backToHome">홈으로</a>
+        </article>
+    </main>
+    <footer class="footer">
+        <nav class="footer-nav">
+            <a href="privacy.html" data-i18n="privacy">개인정보처리방침</a>
+            <a href="terms.html" data-i18n="terms">이용약관</a>
+            <a href="contact.html" data-i18n="contact">문의</a>
+        </nav>
+        <p class="copyright">&copy; ChipGames.</p>
     </footer>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // 햄버거 메뉴 토글 (index.html과 동일하게)
-        const navToggle = document.querySelector('.nav-toggle');
-        const navLinks = document.querySelector('.nav-links');
-        if (navToggle && navLinks) {
-            navToggle.addEventListener('click', function() {
-                navLinks.classList.toggle('open');
-            });
-        }
-
-        // 언어 선택 드롭다운 값 설정
-        const languageSelect = document.getElementById('languageSelect');
-        const footerLanguageSelect = document.getElementById('footerLanguageSelect');
-        
-        if (languageSelect) {
-            languageSelect.value = currentLanguage;
-        }
-        if (footerLanguageSelect) {
-            footerLanguageSelect.value = currentLanguage;
-        }
-        
-        // 언어 변경 시 드롭다운 값 동기화
-        const originalChangeLanguage = window.changeLanguage;
-        window.changeLanguage = function(langCode) {
-            originalChangeLanguage(langCode);
-            if (languageSelect) languageSelect.value = langCode;
-            if (footerLanguageSelect) footerLanguageSelect.value = langCode;
-        };
-    });
-    </script>
+    <script src="lang/i18n.js"></script>
+    <script src="src/app.js"></script>
 </body>
-</html> 
+</html>
