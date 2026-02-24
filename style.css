@@ -312,7 +312,7 @@ body::after {
     opacity: 0.5;
 }
 
-.hero h2 {
+.hero h1 {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 0.75rem;
@@ -564,7 +564,7 @@ body::after {
     .hero {
         padding: 2.5rem 1rem 3rem;
     }
-    .hero h2 {
+    .hero h1 {
         font-size: 1.5rem;
     }
     .game-grid {
