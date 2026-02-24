@@ -32,7 +32,17 @@ TRANSLATIONS = {
     termsChanges: "变更",
     termsChangesDesc: "条款可能在不另行通知的情况下更改。",
     contactTitle: "联系我们",
-    contactDesc: "有关 ChipGames 的咨询，请使用 GitHub Issues。",
-    contactGitHub: "GitHub Issues",
-    backToHome: "返回首页"
+    contactDesc: "请将 ChipGames 相关咨询发送至以下邮箱。",
+    contactEmail: "邮箱",
+    backToHome: "返回首页",
+    shareTitle: "分享",
+    shareQR: "二维码",
+    shareCopy: "复制",
+    shareCopied: "已复制",
+    snsTwitter: "Twitter",
+    snsFacebook: "Facebook",
+    snsInstagram: "Instagram",
+    snsNaver: "Naver",
+    snsKakao: "Kakao",
+    snsLine: "LINE"
 };

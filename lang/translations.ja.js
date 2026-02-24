@@ -32,7 +32,17 @@ TRANSLATIONS = {
     termsChanges: "変更",
     termsChangesDesc: "規約は予告なく変更される場合があります。",
     contactTitle: "お問い合わせ",
-    contactDesc: "ChipGamesに関するお問い合わせは、GitHub Issuesでお願いします。",
-    contactGitHub: "GitHub Issues",
-    backToHome: "ホームに戻る"
+    contactDesc: "ChipGamesに関するお問い合わせは、下記メールアドレスまでお送りください。",
+    contactEmail: "メール",
+    backToHome: "ホームに戻る",
+    shareTitle: "シェア",
+    shareQR: "QRコード",
+    shareCopy: "コピー",
+    shareCopied: "コピーしました",
+    snsTwitter: "Twitter",
+    snsFacebook: "Facebook",
+    snsInstagram: "Instagram",
+    snsNaver: "Naver",
+    snsKakao: "Kakao",
+    snsLine: "LINE"
 };

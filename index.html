@@ -10,7 +10,7 @@
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://chipgames.github.io">
     <meta name="theme-color" content="#1e293b">
-    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="ChipGames">
     <meta property="og:title" content="ChipGames - 무료 웹 게임 모음">
     <meta property="og:description" content="퍼즐, 타워 디펜스 등 다양한 무료 웹 게임을 즐기세요.">
@@ -22,14 +22,23 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="ChipGames - 무료 웹 게임 모음">
     <meta name="twitter:description" content="퍼즐, 타워 디펜스 등 다양한 무료 웹 게임을 즐기세요.">
+    <link rel="icon" href="images/ChipGames_Logo.png" type="image/png">
     <link rel="dns-prefetch" href="//pagead2.googlesyndication.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="site.webmanifest">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039" crossorigin="anonymous"></script>
     <script>
-        window.addEventListener('load', function() {
-            try { (adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "ca-pub-2533613198240039", enable_page_level_ads: true }); } catch(e) {}
-        });
+        (function() {
+            if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') return;
+            var s = document.createElement('script');
+            s.async = true;
+            s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2533613198240039';
+            s.crossOrigin = 'anonymous';
+            document.head.appendChild(s);
+            s.onload = function() {
+                try { (adsbygoogle = window.adsbygoogle || []).push({ google_ad_client: "ca-pub-2533613198240039", enable_page_level_ads: true }); } catch(e) {}
+            };
+        })();
     </script>
     <script type="application/ld+json">
     {
@@ -108,13 +117,13 @@
             <ul class="game-grid">
                 <li class="game-card">
                     <a href="https://chipgames.github.io/ChipGemSort/" class="game-link" target="_blank" rel="noopener noreferrer">
-                        <img src="images/ChipGemSort.png" alt="색상 정렬 퍼즐 - ChipGemSort" width="400" height="225" loading="lazy">
+                        <img src="images/ChipGemSort.png" alt="색상 정렬 퍼즐 - ChipGemSort" width="400" height="225" loading="eager">
                         <span class="game-name" data-i18n="gameGemSort">색상 정렬 퍼즐</span>
                     </a>
                 </li>
                 <li class="game-card">
                     <a href="https://chipgames.github.io/ChipBlockCrush/" class="game-link" target="_blank" rel="noopener noreferrer">
-                        <img src="images/ChipBlockCrush.png" alt="블록 퍼즐 게임 - ChipBlockCrush" width="400" height="225" loading="lazy">
+                        <img src="images/ChipBlockCrush.png" alt="블록 퍼즐 게임 - ChipBlockCrush" width="400" height="225" loading="eager">
                         <span class="game-name" data-i18n="gameBlockCrush">블록 퍼즐 게임</span>
                     </a>
                 </li>
@@ -135,6 +144,45 @@
     </main>
 
     <footer class="footer">
+        <section class="footer-share" aria-labelledby="shareTitle">
+            <h2 id="shareTitle" class="share-section-title" data-i18n="shareTitle">공유하기</h2>
+            <div class="share-content">
+                <div class="share-qr">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=https://chipgames.github.io/&format=svg" alt="QR 코드" width="100" height="100" loading="lazy">
+                    <span data-i18n="shareQR">QR 코드</span>
+                </div>
+                <div class="share-sns">
+                    <a href="https://twitter.com/intent/tweet?url=https://chipgames.github.io/&text=ChipGames%20-%20무료%20웹%20게임%20모음" target="_blank" rel="noopener noreferrer" class="share-sns-btn share-twitter" aria-label="Twitter 공유" title="Twitter">
+                        <i class="fab fa-x-twitter"></i>
+                        <span data-i18n="snsTwitter">트위터</span>
+                    </a>
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=https://chipgames.github.io/" target="_blank" rel="noopener noreferrer" class="share-sns-btn share-facebook" aria-label="Facebook 공유" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                        <span data-i18n="snsFacebook">페이스북</span>
+                    </a>
+                    <button type="button" class="share-sns-btn share-instagram share-copy-url" data-url="https://chipgames.github.io/" aria-label="인스타그램 - URL 복사" title="인스타그램 (URL 복사)">
+                        <i class="fab fa-instagram"></i>
+                        <span data-i18n="snsInstagram">인스타그램</span>
+                    </button>
+                    <a href="https://share.naver.com/web/shareView.nhn?url=https%3A%2F%2Fchipgames.github.io%2F" target="_blank" rel="noopener noreferrer" class="share-sns-btn share-naver" aria-label="네이버 공유" title="네이버">
+                        <span class="naver-icon">N</span>
+                        <span data-i18n="snsNaver">네이버</span>
+                    </a>
+                    <a href="https://story.kakao.com/share?url=https://chipgames.github.io/" target="_blank" rel="noopener noreferrer" class="share-sns-btn share-kakao" aria-label="카카오스토리 공유" title="카카오스토리">
+                        <i class="fa-solid fa-comment"></i>
+                        <span data-i18n="snsKakao">카카오</span>
+                    </a>
+                    <a href="https://social-plugins.line.me/lineit/share?url=https://chipgames.github.io/" target="_blank" rel="noopener noreferrer" class="share-sns-btn share-line" aria-label="LINE 공유" title="LINE">
+                        <i class="fab fa-line"></i>
+                        <span data-i18n="snsLine">라인</span>
+                    </a>
+                    <button type="button" class="share-sns-btn share-copy" id="shareCopyBtn" aria-label="URL 복사" title="URL 복사" data-copied-i18n="shareCopied">
+                        <i class="fa-solid fa-link"></i>
+                        <span data-i18n="shareCopy">복사</span>
+                    </button>
+                </div>
+            </div>
+        </section>
         <nav class="footer-nav" aria-label="푸터">
             <a href="privacy.html" data-i18n="privacy">개인정보처리방침</a>
             <a href="terms.html" data-i18n="terms">이용약관</a>

@@ -21,5 +21,5 @@ ChipGames 퍼블릭 사이트의 메인 페이지로, ChipGames에서 제공하�
 
 ## 📞 문의
 
-- **GitHub Issues**: 버그 리포트 및 기능 제안
+- **이메일**: chipwebgames@gmail.com
 - **웹사이트**: https://chipgames.github.io

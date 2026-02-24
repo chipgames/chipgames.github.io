@@ -32,7 +32,17 @@ TRANSLATIONS = {
     termsChanges: "변경",
     termsChangesDesc: "약관은 사전 공지 없이 변경될 수 있습니다.",
     contactTitle: "문의",
-    contactDesc: "ChipGames 관련 문의사항은 GitHub Issues를 통해 남겨 주세요.",
-    contactGitHub: "GitHub Issues",
-    backToHome: "홈으로"
+    contactDesc: "ChipGames 관련 문의사항은 아래 이메일로 보내 주세요.",
+    contactEmail: "이메일",
+    backToHome: "홈으로",
+    shareTitle: "공유하기",
+    shareQR: "QR 코드",
+    shareCopy: "복사",
+    shareCopied: "복사됨",
+    snsTwitter: "트위터",
+    snsFacebook: "페이스북",
+    snsInstagram: "인스타그램",
+    snsNaver: "네이버",
+    snsKakao: "카카오",
+    snsLine: "라인"
 };

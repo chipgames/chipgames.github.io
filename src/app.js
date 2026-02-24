@@ -53,6 +53,49 @@
         }
     }
 
+    function initShareCopy() {
+        var url = 'https://chipgames.github.io/';
+        var copyBtn = document.getElementById('shareCopyBtn');
+        var copyUrlBtns = document.querySelectorAll('.share-copy-url');
+        function doCopy(targetBtn, labelSpan) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(url).then(function() {
+                    showCopied(targetBtn, labelSpan);
+                }).catch(function() { fallbackCopy(url, targetBtn, labelSpan); });
+            } else {
+                fallbackCopy(url, targetBtn, labelSpan);
+            }
+        }
+        function showCopied(btn, span) {
+            var orig = span ? span.textContent : btn.textContent;
+            var key = btn.getAttribute('data-copied-i18n');
+            var copied = (window.t && key ? window.t(key) : null) || '복사됨';
+            if (span) { span.textContent = copied; } else { btn.textContent = copied; }
+            setTimeout(function() { (span || btn).textContent = orig; }, 1500);
+        }
+        function fallbackCopy(text, btn, span) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showCopied(btn, span);
+            } catch (e) {}
+            document.body.removeChild(ta);
+        }
+        if (copyBtn) {
+            var span = copyBtn.querySelector('span');
+            copyBtn.addEventListener('click', function() { doCopy(copyBtn, span); });
+        }
+        copyUrlBtns.forEach(function(btn) {
+            var span = btn.querySelector('span');
+            btn.addEventListener('click', function() { doCopy(btn, span); });
+        });
+    }
+
     function initLangSelect() {
         const sel = document.getElementById('langSelect');
         if (sel) {
@@ -71,6 +114,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         initTheme();
         initGameMenu();
+        initShareCopy();
         initLangSelect();
         initServiceWorker();
     });

@@ -68,7 +68,7 @@ body {
     position: relative;
 }
 
-/* 배경 데코레이션 */
+/* 배경 데코레이션 (콘텐츠 뒤에만 표시) */
 body::before {
     content: '';
     position: fixed;
@@ -78,7 +78,7 @@ body::before {
     height: 60%;
     background: radial-gradient(ellipse, var(--pastel-lavender) 0%, transparent 70%);
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
 }
 body::after {
     content: '';
@@ -89,7 +89,7 @@ body::after {
     height: 50%;
     background: radial-gradient(ellipse, var(--pastel-mint) 0%, transparent 70%);
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
 }
 
 [data-theme="dark"] body::before,
@@ -436,6 +436,105 @@ body::after {
     margin-top: 3rem;
     box-shadow: 0 -2px 12px rgba(155, 138, 180, 0.06);
 }
+
+.footer-share {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.share-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.share-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.5rem 2rem;
+}
+
+.share-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.share-qr img {
+    border-radius: 8px;
+    padding: 6px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+}
+
+.share-qr span {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.share-sns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.share-sns-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    color: white;
+    background: var(--text-muted);
+}
+
+.share-sns-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.share-sns-btn i,
+.share-sns-btn .naver-icon { font-size: 1rem; font-weight: 700; }
+
+.share-twitter { background: #000; }
+.share-twitter:hover { background: #333; }
+
+.share-facebook { background: #1877F2; }
+.share-facebook:hover { background: #0d65d9; }
+
+.share-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+.share-instagram:hover { filter: brightness(1.1); }
+
+.share-naver { background: #03C75A; }
+.share-naver:hover { background: #02b350; }
+
+.share-kakao { background: #FAE100; color: #3c1e1e; }
+.share-kakao:hover { background: #f0d000; }
+
+.share-line { background: #00B900; }
+.share-line:hover { background: #009a00; }
+
+.share-copy {
+    background: var(--accent);
+    color: white;
+    border: none;
+}
+.share-copy:hover { background: var(--accent-hover); }
 
 .footer-nav {
     display: flex;
