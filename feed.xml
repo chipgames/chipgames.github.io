@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ChipGames - 무료 웹 게임 모음</title>
+    <link>https://chipgames.github.io/</link>
+    <description>ChipGames에서 제공하는 무료 웹 게임을 플레이하세요. 퍼즐, 타워 디펜스 등 다양한 게임을 즐길 수 있습니다.</description>
+    <language>ko</language>
+    <copyright>Copyright 2025 ChipGames. All rights reserved.</copyright>
+    <lastBuildDate>Thu, 27 Feb 2025 12:00:00 +0900</lastBuildDate>
+    <atom:link href="https://chipgames.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>ChipGames - 무료 웹 게임 모음</title>
+      <link>https://chipgames.github.io/</link>
+      <guid isPermaLink="true">https://chipgames.github.io/</guid>
+      <pubDate>Thu, 27 Feb 2025 12:00:00 +0900</pubDate>
+      <description><![CDATA[<p>ChipGames에서 제공하는 다양한 퍼즐과 전략 게임을 플레이하세요. PC·모바일 한 게임으로 즐길 수 있습니다.</p><p><a href="https://chipgames.github.io/"><img src="https://chipgames.github.io/images/ChipGemSort.png" alt="색상 정렬 퍼즐" width="400" height="225"/></a></p><p><strong>게임 목록:</strong></p><ul><li><a href="https://chipgames.github.io/ChipGemSort/">색상 정렬 퍼즐 (ChipGemSort)</a></li><li><a href="https://chipgames.github.io/ChipBlockCrush/">블록 퍼즐 게임 (ChipBlockCrush)</a></li><li><a href="https://chipgames.github.io/ChipPuzzleGame/">매칭 퍼즐 게임 (ChipPuzzleGame)</a></li><li><a href="https://chipgames.github.io/ChipTowerGame/">타워 디펜스 게임 (ChipTowerGame)</a></li></ul>]]></description>
+    </item>
+    <item>
+      <title>색상 정렬 퍼즐 - ChipGemSort</title>
+      <link>https://chipgames.github.io/ChipGemSort/</link>
+      <guid isPermaLink="true">https://chipgames.github.io/ChipGemSort/</guid>
+      <pubDate>Thu, 27 Feb 2025 12:00:00 +0900</pubDate>
+      <description><![CDATA[<p>색상 정렬 퍼즐 게임 ChipGemSort를 플레이하세요.</p><p><a href="https://chipgames.github.io/ChipGemSort/"><img src="https://chipgames.github.io/images/ChipGemSort.png" alt="색상 정렬 퍼즐 - ChipGemSort" width="400" height="225"/></a></p><p><a href="https://chipgames.github.io/">ChipGames 홈으로</a></p>]]></description>
+    </item>
+    <item>
+      <title>블록 퍼즐 게임 - ChipBlockCrush</title>
+      <link>https://chipgames.github.io/ChipBlockCrush/</link>
+      <guid isPermaLink="true">https://chipgames.github.io/ChipBlockCrush/</guid>
+      <pubDate>Thu, 27 Feb 2025 12:00:00 +0900</pubDate>
+      <description><![CDATA[<p>블록 퍼즐 게임 ChipBlockCrush를 플레이하세요.</p><p><a href="https://chipgames.github.io/ChipBlockCrush/"><img src="https://chipgames.github.io/images/ChipBlockCrush.png" alt="블록 퍼즐 게임 - ChipBlockCrush" width="400" height="225"/></a></p><p><a href="https://chipgames.github.io/">ChipGames 홈으로</a></p>]]></description>
+    </item>
+    <item>
+      <title>매칭 퍼즐 게임 - ChipPuzzleGame</title>
+      <link>https://chipgames.github.io/ChipPuzzleGame/</link>
+      <guid isPermaLink="true">https://chipgames.github.io/ChipPuzzleGame/</guid>
+      <pubDate>Thu, 27 Feb 2025 12:00:00 +0900</pubDate>
+      <description><![CDATA[<p>매칭 퍼즐 게임 ChipPuzzleGame를 플레이하세요.</p><p><a href="https://chipgames.github.io/ChipPuzzleGame/"><img src="https://chipgames.github.io/images/ChipPuzzleGame.png" alt="매칭 퍼즐 게임 - ChipPuzzleGame" width="400" height="225"/></a></p><p><a href="https://chipgames.github.io/">ChipGames 홈으로</a></p>]]></description>
+    </item>
+    <item>
+      <title>타워 디펜스 게임 - ChipTowerGame</title>
+      <link>https://chipgames.github.io/ChipTowerGame/</link>
+      <guid isPermaLink="true">https://chipgames.github.io/ChipTowerGame/</guid>
+      <pubDate>Thu, 27 Feb 2025 12:00:00 +0900</pubDate>
+      <description><![CDATA[<p>타워 디펜스 게임 ChipTowerGame를 플레이하세요.</p><p><a href="https://chipgames.github.io/ChipTowerGame/"><img src="https://chipgames.github.io/images/ChipTowerGame.png" alt="타워 디펜스 게임 - ChipTowerGame" width="400" height="225"/></a></p><p><a href="https://chipgames.github.io/">ChipGames 홈으로</a></p>]]></description>
+    </item>
+  </channel>
+</rss>

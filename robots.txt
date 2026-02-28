@@ -8,3 +8,6 @@ Allow: /
 
 User-agent: Bingbot
 Allow: /
+
+User-agent: Yeti
+Allow:/
