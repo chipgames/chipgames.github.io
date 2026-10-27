@@ -1,3 +1,1 @@
-# ChipGames root site: https://chipgames.github.io/
-# Shared by project sites including https://chipgames.github.io/GameInfo-Diablo2/
 google.com, pub-2533613198240039, DIRECT, f08c47fec0942fa0
